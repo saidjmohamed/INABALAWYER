@@ -8,11 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowRight, Trash2 } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { RequestWithDetails } from '@/components/requests/RequestList';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
 
 interface Reply {
   id: string;
@@ -50,6 +62,8 @@ const RequestDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [replying, setReplying] = useState(false);
   const [accepting, setAccepting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
 
   const fetchRequestAndReplies = async () => {
     if (!id) {
@@ -158,6 +172,24 @@ const RequestDetailsPage = () => {
     }
   };
 
+  const handleDeleteRequest = async () => {
+    if (!id) return;
+
+    setDeleting(true);
+    const { error } = await supabase
+      .from('requests')
+      .delete()
+      .eq('id', id);
+    setDeleting(false);
+
+    if (error) {
+      showError('فشل في حذف الطلب: ' + error.message);
+    } else {
+      showSuccess('تم حذف الطلب بنجاح.');
+      navigate('/'); // Redirect to home page after deletion
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -171,18 +203,48 @@ const RequestDetailsPage = () => {
   }
 
   const isLawyer = profile?.role === 'lawyer';
+  const isAdmin = profile?.role === 'admin';
+  const isRequestCreator = user?.id === request.creator?.id;
   const isRequestOpen = request.status === 'open';
   const isAssignedToCurrentUser = request.lawyer_id === user?.id;
   const canAcceptRequest = isLawyer && isRequestOpen && !request.lawyer_id;
+  const canDeleteRequest = isRequestCreator || isAdmin;
+
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <header className="flex justify-between items-center w-full py-4 border-b mb-8">
           <h1 className="text-2xl font-bold text-gray-900">تفاصيل الطلب</h1>
-          <Button variant="outline" asChild>
-            <Link to="/"><ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {canDeleteRequest && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={deleting}>
+                    {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                    حذف الطلب
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>هل أنت متأكد تمامًا؟</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      لا يمكن التراجع عن هذا الإجراء. سيتم حذف هذا الطلب وجميع الردود المرتبطة به بشكل دائم.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteRequest} disabled={deleting}>
+                      {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'حذف'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            <Button variant="outline" asChild>
+              <Link to="/"><ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية</Link>
+            </Button>
+          </div>
         </header>
 
         <main className="space-y-8">
@@ -259,7 +321,7 @@ const RequestDetailsPage = () => {
             )}
           </div>
 
-          {profile && (isLawyer && (isAssignedToCurrentUser || !request.lawyer_id)) || profile?.role === 'admin' || user?.id === request.creator?.id ? (
+          {profile && (isLawyer && (isAssignedToCurrentUser || !request.lawyer_id)) || isAdmin || isRequestCreator ? (
             <div>
               <Separator className="my-6" />
               <h3 className="text-lg font-semibold mb-2">إضافة رد جديد</h3>
