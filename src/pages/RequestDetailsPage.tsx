@@ -63,9 +63,9 @@ const RequestDetailsPage = () => {
       .from('requests')
       .select(`
         id, created_at, type, case_number, status, details, section, lawyer_id,
-        creator:profiles ( id, first_name, last_name ),
+        creator:creator_id ( id, first_name, last_name ),
         court:courts ( name ),
-        assigned_lawyer:profiles!requests_lawyer_id_fkey ( first_name, last_name )
+        assigned_lawyer:lawyer_id ( first_name, last_name )
       `)
       .eq('id', id)
       .single();

@@ -47,7 +47,7 @@ export const RequestList = () => {
           type,
           case_number,
           status,
-          creator:profiles ( id, first_name, last_name ),
+          creator:creator_id ( id, first_name, last_name ),
           court:courts ( name )
         `)
         .eq('status', 'open')
