@@ -42,7 +42,7 @@ const Signup = () => {
 
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
-    const email = `${values.username.toLowerCase()}@inabalawyer.com`;
+    const email = `${values.username.toLowerCase()}@local-user.com`;
 
     const { error } = await supabase.auth.signUp({
       email: email,
