@@ -15,7 +15,7 @@ import { Loader2 } from 'lucide-react';
 const signupSchema = z.object({
   firstName: z.string().min(1, 'الاسم مطلوب'),
   lastName: z.string().min(1, 'اللقب مطلوب'),
-  username: z.string().min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل'),
+  username: z.string().min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل').regex(/^[a-zA-Z0-9]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط'),
   phone: z.string().min(1, 'رقم الهاتف مطلوب'),
   address: z.string().min(1, 'العنوان المهني مطلوب'),
   password: z.string().min(6, 'يجب أن تكون كلمة المرور 6 أحرف على الأقل'),
