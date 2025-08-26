@@ -15,6 +15,7 @@ import { Loader2 } from 'lucide-react';
 const signupSchema = z.object({
   firstName: z.string().min(1, 'الاسم مطلوب'),
   lastName: z.string().min(1, 'اللقب مطلوب'),
+  email: z.string().email('يجب أن يكون بريداً إلكترونياً صالحاً').min(1, 'البريد الإلكتروني مطلوب'),
   username: z.string().min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل').regex(/^[a-zA-Z0-9]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط'),
   phone: z.string().min(1, 'رقم الهاتف مطلوب'),
   address: z.string().min(1, 'العنوان المهني مطلوب'),
@@ -33,6 +34,7 @@ const Signup = () => {
     defaultValues: {
       firstName: '',
       lastName: '',
+      email: '',
       username: '',
       phone: '',
       address: '',
@@ -42,10 +44,9 @@ const Signup = () => {
 
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
-    const email = `${values.username.toLowerCase()}@local-user.com`;
 
     const { error } = await supabase.auth.signUp({
-      email: email,
+      email: values.email,
       password: values.password,
       options: {
         data: {
@@ -127,12 +128,25 @@ const Signup = () => {
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>البريد الإلكتروني</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
                <FormField
                 control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اسم المستخدم</FormLabel>
+                    <FormLabel>اسم المستخدم (للعرض)</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -180,7 +194,7 @@ const Signup = () => {
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'جاري الإنشاء...' : 'إنشاء حساب'}
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'إنشاء حساب'}
               </Button>
             </form>
           </Form>

@@ -13,7 +13,7 @@ import { showError } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'اسم المستخدم مطلوب'),
+  email: z.string().email('يجب أن يكون بريداً إلكترونياً صالحاً').min(1, 'البريد الإلكتروني مطلوب'),
   password: z.string().min(1, 'كلمة المرور مطلوبة'),
 });
 
@@ -28,7 +28,7 @@ const Login = () => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
@@ -51,16 +51,14 @@ const Login = () => {
     setLoginAttempted(true); // Mark that a login attempt is being made
     setLoginError(null); // Clear previous errors
 
-    const email = `${values.username.toLowerCase()}@local-user.com`;
-
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email,
+      email: values.email,
       password: values.password,
     });
 
     if (signInError) {
-      setLoginError('اسم المستخدم أو كلمة المرور غير صحيحة.');
-      showError('اسم المستخدم أو كلمة المرور غير صحيحة.');
+      setLoginError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+      showError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
       setIsLoading(false);
       setLoginAttempted(false); // Reset if direct sign-in error
       return;
@@ -86,12 +84,12 @@ const Login = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="username"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اسم المستخدم</FormLabel>
+                    <FormLabel>البريد الإلكتروني</FormLabel>
                     <FormControl>
-                      <Input placeholder="ادخل اسم المستخدم" {...field} />
+                      <Input type="email" placeholder="ادخل بريدك الإلكتروني" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
