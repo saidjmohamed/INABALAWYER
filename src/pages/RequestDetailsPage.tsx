@@ -70,7 +70,13 @@ const RequestDetailsPage = () => {
       .eq('id', id)
       .single();
 
-    if (requestError || !requestData) {
+    if (requestError) {
+      console.error('Error fetching request details:', requestError);
+      showError('فشل في جلب تفاصيل الطلب: ' + requestError.message);
+      navigate('/');
+      return;
+    }
+    if (!requestData) {
       showError('لم يتم العثور على الطلب.');
       navigate('/');
       return;
