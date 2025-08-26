@@ -10,6 +10,7 @@ export interface Profile {
   address: string;
   status: 'pending' | 'active' | 'rejected' | 'disabled';
   role: 'lawyer' | 'admin';
+  email: string; // Added email field
 }
 
 interface SessionContextValue {

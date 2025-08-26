@@ -1,5 +1,5 @@
 import { useSession } from '@/contexts/SessionContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
@@ -17,6 +17,11 @@ const Index = () => {
           <div className="flex items-center gap-4">
             {profile && (
               <span>مرحباً، {profile.first_name}</span>
+            )}
+            {profile?.role === 'admin' && (
+              <Link to="/admin">
+                <Button variant="secondary">لوحة تحكم المشرف</Button>
+              </Link>
             )}
             <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
           </div>
