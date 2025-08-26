@@ -25,68 +25,78 @@ interface Reply {
   } | null;
 }
 
+// Extend RequestWithDetails to include lawyer information
+interface RequestDetails extends RequestWithDetails {
+  lawyer_id: string | null;
+  assigned_lawyer: {
+    first_name: string;
+    last_name: string;
+  } | null;
+}
+
 const requestTypeTranslations = {
-  information_request: 'طلب معلومة من تطبيقة', // New translation
-  representation: 'طلب إنابة', // Updated translation
-  other_request: 'طلب آخر', // New translation
+  information_request: 'طلب معلومة من تطبيقة',
+  representation: 'طلب إنابة',
+  other_request: 'طلب آخر',
 };
 
 const RequestDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { user, profile } = useSession();
   const navigate = useNavigate();
-  const [request, setRequest] = useState<RequestWithDetails | null>(null);
+  const [request, setRequest] = useState<RequestDetails | null>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
   const [newReply, setNewReply] = useState('');
   const [loading, setLoading] = useState(true);
   const [replying, setReplying] = useState(false);
+  const [accepting, setAccepting] = useState(false);
 
-  useEffect(() => {
+  const fetchRequestAndReplies = async () => {
     if (!id) {
       navigate('/');
       return;
     }
+    setLoading(true);
 
-    const fetchRequestAndReplies = async () => {
-      setLoading(true);
+    // Fetch request details including assigned lawyer
+    const { data: requestData, error: requestError } = await supabase
+      .from('requests')
+      .select(`
+        id, created_at, type, case_number, status, details, section, lawyer_id,
+        creator:profiles ( id, first_name, last_name ),
+        court:courts ( name ),
+        assigned_lawyer:profiles!requests_lawyer_id_fkey ( first_name, last_name )
+      `)
+      .eq('id', id)
+      .single();
 
-      // Fetch request details
-      const { data: requestData, error: requestError } = await supabase
-        .from('requests')
-        .select(`
-          id, created_at, type, case_number, status, details, section,
-          creator:profiles ( first_name, last_name ),
-          court:courts ( name )
-        `)
-        .eq('id', id)
-        .single();
+    if (requestError || !requestData) {
+      showError('لم يتم العثور على الطلب.');
+      navigate('/');
+      return;
+    }
+    setRequest(requestData as any);
 
-      if (requestError || !requestData) {
-        showError('لم يتم العثور على الطلب.');
-        navigate('/');
-        return;
-      }
-      setRequest(requestData as any);
+    // Fetch replies
+    const { data: repliesData, error: repliesError } = await supabase
+      .from('replies')
+      .select(`
+        id, content, created_at,
+        author:profiles ( id, first_name, last_name )
+      `)
+      .eq('request_id', id)
+      .order('created_at', { ascending: true });
 
-      // Fetch replies
-      const { data: repliesData, error: repliesError } = await supabase
-        .from('replies')
-        .select(`
-          id, content, created_at,
-          author:profiles ( id, first_name, last_name )
-        `)
-        .eq('request_id', id)
-        .order('created_at', { ascending: true });
+    if (repliesError) {
+      showError('فشل في جلب الردود.');
+    } else {
+      setReplies(repliesData as any);
+    }
 
-      if (repliesError) {
-        showError('فشل في جلب الردود.');
-      } else {
-        setReplies(repliesData as any);
-      }
+    setLoading(false);
+  };
 
-      setLoading(false);
-    };
-
+  useEffect(() => {
     fetchRequestAndReplies();
   }, [id, navigate]);
 
@@ -118,6 +128,30 @@ const RequestDetailsPage = () => {
     }
   };
 
+  const handleAcceptRequest = async () => {
+    if (!user || !id || profile?.role !== 'lawyer' || request?.status !== 'open' || request?.lawyer_id) {
+      showError('لا يمكنك قبول هذا الطلب.');
+      return;
+    }
+
+    setAccepting(true);
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        status: 'in_progress',
+        lawyer_id: user.id,
+      })
+      .eq('id', id);
+    setAccepting(false);
+
+    if (error) {
+      showError('فشل في قبول الطلب: ' + error.message);
+    } else {
+      showSuccess('تم قبول الطلب بنجاح!');
+      fetchRequestAndReplies(); // Re-fetch to update status and assigned lawyer
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -129,6 +163,11 @@ const RequestDetailsPage = () => {
   if (!request) {
     return null; // Should be redirected by the effect
   }
+
+  const isLawyer = profile?.role === 'lawyer';
+  const isRequestOpen = request.status === 'open';
+  const isAssignedToCurrentUser = request.lawyer_id === user?.id;
+  const canAcceptRequest = isLawyer && isRequestOpen && !request.lawyer_id;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,6 +192,14 @@ const RequestDetailsPage = () => {
             </CardHeader>
             <CardContent>
               {request.details && <p className="text-gray-700 whitespace-pre-wrap">{request.details}</p>}
+              {request.assigned_lawyer && (
+                <p className="mt-4 text-sm text-gray-600">
+                  <span className="font-semibold">المحامي المعين:</span> {request.assigned_lawyer.first_name} {request.assigned_lawyer.last_name}
+                </p>
+              )}
+              <Badge className="mt-4" variant={request.status === 'open' ? 'default' : 'outline'}>
+                الحالة: {request.status === 'open' ? 'مفتوح' : request.status === 'in_progress' ? 'قيد التقدم' : 'مغلق'}
+              </Badge>
             </CardContent>
             <CardFooter className="flex justify-between items-center text-sm text-muted-foreground">
               <span>
@@ -163,6 +210,14 @@ const RequestDetailsPage = () => {
               </span>
             </CardFooter>
           </Card>
+
+          {canAcceptRequest && (
+            <div className="text-center">
+              <Button onClick={handleAcceptRequest} disabled={accepting}>
+                {accepting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'قبول الطلب'}
+              </Button>
+            </div>
+          )}
 
           <div className="space-y-6">
             <h2 className="text-xl font-semibold">الردود ({replies.length})</h2>
@@ -198,7 +253,7 @@ const RequestDetailsPage = () => {
             )}
           </div>
 
-          {profile && (
+          {profile && (isLawyer && (isAssignedToCurrentUser || !request.lawyer_id)) || profile?.role === 'admin' || user?.id === request.creator?.id ? (
             <div>
               <Separator className="my-6" />
               <h3 className="text-lg font-semibold mb-2">إضافة رد جديد</h3>
@@ -215,7 +270,7 @@ const RequestDetailsPage = () => {
                 </Button>
               </form>
             </div>
-          )}
+          ) : null}
         </main>
       </div>
     </div>

@@ -17,6 +17,7 @@ export interface RequestWithDetails {
   details?: string;
   section?: string;
   creator: {
+    id: string; // Added id here
     first_name: string;
     last_name: string;
   } | null;
@@ -46,7 +47,7 @@ export const RequestList = () => {
           type,
           case_number,
           status,
-          creator:profiles ( first_name, last_name ),
+          creator:profiles ( id, first_name, last_name ),
           court:courts ( name )
         `)
         .eq('status', 'open')
