@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
 import { Navigate, Link } from 'react-router-dom';
@@ -20,8 +20,10 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { session } = useSession();
+  const { session, profile, loading: sessionLoading } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginAttempted, setLoginAttempted] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -31,22 +33,44 @@ const Login = () => {
     },
   });
 
+  useEffect(() => {
+    if (!sessionLoading) {
+      if (session && profile) {
+        // Successfully logged in and profile is active/admin, Navigate will handle redirect
+      } else if (loginAttempted && !session && !profile) {
+        // Login was attempted, but no session/profile means it was rejected (e.g., pending)
+        setLoginError('تم تسجيل الدخول بنجاح، ولكن حسابك قيد المراجعة من قبل الإدارة. يرجى الانتظار حتى يتم تفعيله.');
+        showError('حسابك قيد المراجعة.');
+        setLoginAttempted(false); // Reset after showing message
+      }
+    }
+  }, [session, profile, sessionLoading, loginAttempted]);
+
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
+    setLoginAttempted(true); // Mark that a login attempt is being made
+    setLoginError(null); // Clear previous errors
+
     const email = `${values.username.toLowerCase()}@local-user.com`;
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: email,
       password: values.password,
     });
-    setIsLoading(false);
 
-    if (error) {
+    if (signInError) {
+      setLoginError('اسم المستخدم أو كلمة المرور غير صحيحة.');
       showError('اسم المستخدم أو كلمة المرور غير صحيحة.');
+      setIsLoading(false);
+      setLoginAttempted(false); // Reset if direct sign-in error
+      return;
     }
+    // If no direct signInError, SessionContext will handle the session and profile.
+    // The useEffect above will catch the state change if the profile is pending.
+    setIsLoading(false);
   };
 
-  if (session) {
+  if (session && profile) {
     return <Navigate to="/" replace />;
   }
 
@@ -86,6 +110,7 @@ const Login = () => {
                   </FormItem>
                 )}
               />
+              {loginError && <p className="text-red-500 text-sm text-center">{loginError}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'تسجيل الدخول'}
               </Button>
