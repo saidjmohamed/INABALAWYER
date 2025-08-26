@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { showError } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
 const signupSchema = z.object({
@@ -26,8 +26,8 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 const Signup = () => {
   const { session } = useSession();
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -63,31 +63,13 @@ const Signup = () => {
     if (error) {
       showError(error.message);
     } else {
-      setIsSubmitted(true);
+      showSuccess('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
+      navigate('/login');
     }
   };
 
   if (session) {
     return <Navigate to="/" replace />;
-  }
-
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle>تم استلام طلبك</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>شكراً لتسجيلك. حسابك قيد المراجعة من قبل الإدارة.</p>
-            <p>سيتم إعلامك عبر البريد الإلكتروني عند تفعيل حسابك.</p>
-            <Link to="/login" className="mt-4 inline-block text-primary hover:underline">
-              العودة إلى صفحة تسجيل الدخول
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   return (
