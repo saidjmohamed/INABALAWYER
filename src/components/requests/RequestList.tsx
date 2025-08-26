@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,8 @@ export interface RequestWithDetails {
   type: 'representation' | 'consultation' | 'documentation';
   case_number: string;
   status: 'open' | 'closed' | 'in_progress';
+  details?: string;
+  section?: string;
   creator: {
     first_name: string;
     last_name: string;
@@ -81,25 +84,27 @@ export const RequestList = () => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {requests.map((request) => (
-        <Card key={request.id} className="flex flex-col">
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg">{requestTypeTranslations[request.type]}</CardTitle>
-              <Badge variant="outline">{request.court?.name || 'محكمة غير محددة'}</Badge>
-            </div>
-            <CardDescription>رقم القضية: {request.case_number}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">
-              صاحب الطلب: {request.creator?.first_name} {request.creator?.last_name || 'محام غير معروف'}
-            </p>
-          </CardContent>
-          <CardFooter>
-            <p className="text-xs text-gray-500">
-              نشر قبل {formatDistanceToNow(new Date(request.created_at), { addSuffix: false, locale: ar })}
-            </p>
-          </CardFooter>
-        </Card>
+        <Link to={`/requests/${request.id}`} key={request.id} className="block hover:shadow-lg transition-shadow duration-200 rounded-lg">
+          <Card className="flex flex-col h-full">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-lg">{requestTypeTranslations[request.type]}</CardTitle>
+                <Badge variant="outline">{request.court?.name || 'محكمة غير محددة'}</Badge>
+              </div>
+              <CardDescription>رقم القضية: {request.case_number}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <p className="text-sm text-muted-foreground">
+                صاحب الطلب: {request.creator?.first_name} {request.creator?.last_name || 'محام غير معروف'}
+              </p>
+            </CardContent>
+            <CardFooter>
+              <p className="text-xs text-gray-500">
+                نشر قبل {formatDistanceToNow(new Date(request.created_at), { addSuffix: false, locale: ar })}
+              </p>
+            </CardFooter>
+          </Card>
+        </Link>
       ))}
     </div>
   );
