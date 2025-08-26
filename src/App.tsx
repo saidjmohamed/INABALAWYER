@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
-import RequestDetailsPage from "./pages/RequestDetailsPage"; // Import the new page
+import RequestDetailsPage from "./pages/RequestDetailsPage";
+import LawyersDirectory from "./pages/LawyersDirectory";
 import { SessionProvider } from "./contexts/SessionContext";
 
 const queryClient = new QueryClient();
@@ -25,7 +26,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/requests/:id" element={<RequestDetailsPage />} /> {/* Add the new route */}
+            <Route path="/requests/:id" element={<RequestDetailsPage />} />
+            <Route path="/lawyers" element={<LawyersDirectory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
