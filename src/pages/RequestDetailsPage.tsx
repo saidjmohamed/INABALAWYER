@@ -26,9 +26,9 @@ interface Reply {
 }
 
 const requestTypeTranslations = {
-  representation: 'مرافعة',
-  consultation: 'استشارة',
-  documentation: 'إجراءات مكتبية',
+  information_request: 'طلب معلومة من تطبيقة', // New translation
+  representation: 'طلب إنابة', // Updated translation
+  other_request: 'طلب آخر', // New translation
 };
 
 const RequestDetailsPage = () => {

@@ -11,7 +11,7 @@ import { ar } from 'date-fns/locale';
 export interface RequestWithDetails {
   id: string;
   created_at: string;
-  type: 'representation' | 'consultation' | 'documentation';
+  type: 'information_request' | 'representation' | 'other_request'; // Updated type enum
   case_number: string;
   status: 'open' | 'closed' | 'in_progress';
   details?: string;
@@ -26,9 +26,9 @@ export interface RequestWithDetails {
 }
 
 const requestTypeTranslations = {
-  representation: 'مرافعة',
-  consultation: 'استشارة',
-  documentation: 'إجراءات مكتبية',
+  information_request: 'طلب معلومة من تطبيقة', // New translation
+  representation: 'طلب إنابة', // Updated translation
+  other_request: 'طلب آخر', // New translation
 };
 
 export const RequestList = () => {

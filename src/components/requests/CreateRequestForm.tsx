@@ -19,7 +19,7 @@ interface Court {
 }
 
 const requestSchema = z.object({
-  type: z.enum(['representation', 'consultation', 'documentation'], {
+  type: z.enum(['information_request', 'representation', 'other_request'], { // Updated enum values
     required_error: "نوع الإنابة مطلوب"
   }),
   court_id: z.string().uuid('يجب اختيار المحكمة'),
@@ -112,9 +112,9 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="representation">مرافعة</SelectItem>
-                      <SelectItem value="consultation">استشارة</SelectItem>
-                      <SelectItem value="documentation">إجراءات مكتبية</SelectItem>
+                      <SelectItem value="information_request">طلب معلومة من تطبيقة</SelectItem> {/* New option */}
+                      <SelectItem value="representation">طلب إنابة</SelectItem> {/* Updated label */}
+                      <SelectItem value="other_request">طلب آخر</SelectItem> {/* New option */}
                     </SelectContent>
                   </Select>
                   <FormMessage />
