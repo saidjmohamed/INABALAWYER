@@ -2,7 +2,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 
 const Login = () => {
@@ -25,6 +25,8 @@ const Login = () => {
             appearance={{ theme: ThemeSupa }}
             providers={[]}
             theme="light"
+            view="sign_in"
+            showLinks={false}
             localization={{
               variables: {
                 sign_in: {
@@ -35,31 +37,17 @@ const Login = () => {
                   social_provider_text: 'تسجيل الدخول عبر {{provider}}',
                   link_text: 'هل لديك حساب بالفعل؟ سجل الدخول',
                 },
-                sign_up: {
-                  email_label: 'البريد الإلكتروني',
-                  password_label: 'كلمة المرور',
-                  button_label: 'إنشاء حساب',
-                  loading_button_label: 'جاري إنشاء الحساب...',
-                  social_provider_text: 'إنشاء حساب عبر {{provider}}',
-                  link_text: 'ليس لديك حساب؟ أنشئ حسابًا',
-                  confirmation_text: 'تفقد بريدك الإلكتروني لتأكيد الحساب',
-                },
-                forgotten_password: {
-                  email_label: 'البريد الإلكتروني',
-                  button_label: 'إرسال تعليمات إعادة تعيين كلمة المرور',
-                  loading_button_label: 'جاري الإرسال...',
-                  link_text: 'هل نسيت كلمة المرور؟',
-                  confirmation_text: 'تفقد بريدك الإلكتروني لإعادة تعيين كلمة المرور',
-                },
-                update_password: {
-                  password_label: 'كلمة مرور جديدة',
-                  button_label: 'تحديث كلمة المرور',
-                  loading_button_label: 'جاري التحديث...',
-                  confirmation_text: 'تم تحديث كلمة المرور بنجاح',
-                },
               },
             }}
           />
+          <div className="text-center mt-4 text-sm">
+            <p>
+              ليس لديك حساب؟{' '}
+              <Link to="/signup" className="font-medium text-primary hover:underline">
+                أنشئ حسابًا جديدًا
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
