@@ -1,103 +1,65 @@
-import { useState } from 'react';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useSession } from '@/contexts/SessionContext';
-import { Navigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { showError } from '@/utils/toast';
-import { Loader2 } from 'lucide-react';
-
-const loginSchema = z.object({
-  email: z.string().email('يجب أن يكون بريداً إلكترونياً صالحاً').min(1, 'البريد الإلكتروني مطلوب'),
-  password: z.string().min(1, 'كلمة المرور مطلوبة'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { Navigate } from 'react-router-dom';
+import { useSession } from '@/contexts/SessionContext';
 
 const Login = () => {
-  const { session, profile } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
+  const { session } = useSession();
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  const onSubmit = async (values: LoginFormValues) => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-    setIsLoading(false);
-
-    if (error) {
-      showError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
-    }
-    // On success, the SessionProvider will handle the redirect.
-  };
-
-  if (session && profile) {
-    return <Navigate to="/" replace />;
+  if (session) {
+    return <Navigate to="/" />;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">INABALAWYER</CardTitle>
+          <CardTitle className="text-2xl">إنابة و معلومة بين المحامين</CardTitle>
           <CardDescription>تسجيل الدخول إلى حسابك</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>البريد الإلكتروني</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="ادخل بريدك الإلكتروني" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="ادخل كلمة المرور" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'تسجيل الدخول'}
-              </Button>
-            </form>
-          </Form>
-          <div className="text-center mt-4 text-sm">
-            <p>
-              ليس لديك حساب؟{' '}
-              <Link to="/signup" className="font-medium text-primary hover:underline">
-                إنشاء حساب
-              </Link>
-            </p>
-          </div>
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            providers={[]}
+            theme="light"
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'البريد الإلكتروني',
+                  password_label: 'كلمة المرور',
+                  button_label: 'تسجيل الدخول',
+                  loading_button_label: 'جاري تسجيل الدخول...',
+                  social_provider_text: 'تسجيل الدخول عبر {{provider}}',
+                  link_text: 'هل لديك حساب بالفعل؟ سجل الدخول',
+                },
+                sign_up: {
+                  email_label: 'البريد الإلكتروني',
+                  password_label: 'كلمة المرور',
+                  button_label: 'إنشاء حساب',
+                  loading_button_label: 'جاري إنشاء الحساب...',
+                  social_provider_text: 'إنشاء حساب عبر {{provider}}',
+                  link_text: 'ليس لديك حساب؟ أنشئ حسابًا',
+                  confirmation_text: 'تفقد بريدك الإلكتروني لتأكيد الحساب',
+                },
+                forgotten_password: {
+                  email_label: 'البريد الإلكتروني',
+                  button_label: 'إرسال تعليمات إعادة تعيين كلمة المرور',
+                  loading_button_label: 'جاري الإرسال...',
+                  link_text: 'هل نسيت كلمة المرور؟',
+                  confirmation_text: 'تفقد بريدك الإلكتروني لإعادة تعيين كلمة المرور',
+                },
+                update_password: {
+                  password_label: 'كلمة مرور جديدة',
+                  button_label: 'تحديث كلمة المرور',
+                  loading_button_label: 'جاري التحديث...',
+                  confirmation_text: 'تم تحديث كلمة المرور بنجاح',
+                },
+              },
+            }}
+          />
         </CardContent>
       </Card>
     </div>
