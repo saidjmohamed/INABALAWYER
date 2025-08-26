@@ -20,9 +20,9 @@ const Index = () => {
   if (!profile) {
      return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">حسابك قيد المراجعة</h1>
+        <h1 className="text-2xl font-bold mb-4">لا يمكن الوصول للحساب</h1>
         <p className="text-gray-600 mb-6">
-          حسابك قيد المراجعة من قبل الإدارة أو تم تعطيله. سيتم إعلامك عند تفعيله.
+          قد يكون حسابك معطلاً أو مرفوضاً. يرجى التواصل مع الإدارة.
         </p>
         <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
       </div>
