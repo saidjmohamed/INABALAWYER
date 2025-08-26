@@ -10,13 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { showError } from '@/utils/toast';
+import { Loader2 } from 'lucide-react';
 
 const signupSchema = z.object({
   firstName: z.string().min(1, 'الاسم مطلوب'),
   lastName: z.string().min(1, 'اللقب مطلوب'),
+  username: z.string().min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل'),
   phone: z.string().min(1, 'رقم الهاتف مطلوب'),
   address: z.string().min(1, 'العنوان المهني مطلوب'),
-  email: z.string().email('بريد إلكتروني غير صالح'),
   password: z.string().min(6, 'يجب أن تكون كلمة المرور 6 أحرف على الأقل'),
 });
 
@@ -32,17 +33,19 @@ const Signup = () => {
     defaultValues: {
       firstName: '',
       lastName: '',
+      username: '',
       phone: '',
       address: '',
-      email: '',
       password: '',
     },
   });
 
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
+    const email = `${values.username.toLowerCase()}@inabalawyer.local`;
+
     const { error } = await supabase.auth.signUp({
-      email: values.email,
+      email: email,
       password: values.password,
       options: {
         data: {
@@ -50,6 +53,7 @@ const Signup = () => {
           last_name: values.lastName,
           phone: values.phone,
           address: values.address,
+          username: values.username,
         },
       },
     });
@@ -123,6 +127,19 @@ const Signup = () => {
                   )}
                 />
               </div>
+               <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>اسم المستخدم</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="phone"
@@ -144,19 +161,6 @@ const Signup = () => {
                     <FormLabel>العنوان المهني</FormLabel>
                     <FormControl>
                       <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>البريد الإلكتروني</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -1,12 +1,50 @@
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
 import { Navigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { showError } from '@/utils/toast';
+import { Loader2 } from 'lucide-react';
+
+const loginSchema = z.object({
+  username: z.string().min(1, 'اسم المستخدم مطلوب'),
+  password: z.string().min(1, 'كلمة المرور مطلوبة'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const { session } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (values: LoginFormValues) => {
+    setIsLoading(true);
+    const email = `${values.username.toLowerCase()}@inabalawyer.local`;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: values.password,
+    });
+    setIsLoading(false);
+
+    if (error) {
+      showError('اسم المستخدم أو كلمة المرور غير صحيحة.');
+    }
+  };
 
   if (session) {
     return <Navigate to="/" replace />;
@@ -20,23 +58,39 @@ const Login = () => {
           <CardDescription>تسجيل الدخول إلى حسابك</CardDescription>
         </CardHeader>
         <CardContent>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            providers={[]}
-            view="sign_in"
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'البريد الإلكتروني',
-                  password_label: 'كلمة المرور',
-                  button_label: 'تسجيل الدخول',
-                },
-              },
-            }}
-            theme="light"
-            showLinks={false}
-          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>اسم المستخدم</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ادخل اسم المستخدم" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>كلمة المرور</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="ادخل كلمة المرور" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'تسجيل الدخول'}
+              </Button>
+            </form>
+          </Form>
           <div className="text-center mt-4 text-sm">
             <p>
               ليس لديك حساب؟{' '}

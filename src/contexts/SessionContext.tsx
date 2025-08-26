@@ -10,7 +10,8 @@ export interface Profile {
   address: string;
   status: 'pending' | 'active' | 'rejected' | 'disabled';
   role: 'lawyer' | 'admin';
-  email: string; // Added email field
+  email: string;
+  username: string;
 }
 
 interface SessionContextValue {
@@ -51,7 +52,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         if (profileError) {
           console.error("Error fetching profile:", profileError);
           setProfile(null);
-        } else if (profileData && profileData.status === 'active') {
+        } else if (profileData && (profileData.status === 'active' || profileData.role === 'admin')) {
           setProfile(profileData);
         } else {
           setProfile(null);
