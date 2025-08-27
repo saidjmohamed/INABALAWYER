@@ -50,7 +50,7 @@ const Index = () => {
 
       <main className="container mx-auto p-8">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">منصتك القانونية الموثوقة</h2>
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">معلومة و إنابة بين المحامين</h2>
           <p className="text-xl text-gray-600">ربط المحامين بالفرص القانونية بكفاءة وسهولة.</p>
         </div>
 
