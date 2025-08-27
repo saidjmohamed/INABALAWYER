@@ -35,8 +35,10 @@ const ProfilePage = () => {
         <h1 className="text-3xl font-bold text-gray-900">ملفي الشخصي</h1>
         <div className="flex flex-col sm:flex-row gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
           <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
-            <Edit className="mr-2 h-4 w-4" />
-            {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
+            <span className="flex items-center">
+              <Edit className="mr-2 h-4 w-4" />
+              {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
+            </span>
           </Button>
           <Button variant="outline" asChild className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
             <Link to="/">

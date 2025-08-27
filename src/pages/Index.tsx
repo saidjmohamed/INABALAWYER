@@ -31,8 +31,10 @@ const Index = () => {
                 <Button variant="secondary" size="sm" asChild>
                   <Link to="/lawyers">جدول المحامين</Link>
                 </Button>
-                <Button variant="secondary" size="sm" onClick={handleSignOut} className="flex items-center">
-                  <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
+                <Button variant="secondary" size="sm" onClick={handleSignOut}>
+                  <span className="flex items-center">
+                    <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
+                  </span>
                 </Button>
               </>
             ) : null}
