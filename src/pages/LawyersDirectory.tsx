@@ -1,169 +1,148 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useSession, Profile } from '@/contexts/SessionContext';
-import { Navigate, Link, useNavigate } from 'react-router-dom';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase';
+import { Profile } from '@/types';
+import { LawyerCard } from '@/components/lawyers/LawyerCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { showError } from '@/utils/toast';
-import { Loader2, ArrowRight, MessageSquare } from 'lucide-react';
-import { usePresence } from '@/contexts/PresenceContext';
-
-type LawyerProfile = Pick<Profile, 'id' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'specialties' | 'experience_years' | 'languages' | 'organization'>;
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Loader2, Search } from 'lucide-react';
 
 const LawyersDirectory = () => {
-  const { session, user, loading: sessionLoading } = useSession();
-  const navigate = useNavigate();
-  const [lawyers, setLawyers] = useState<LawyerProfile[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
-  const [startingChatId, setStartingChatId] = useState<string | null>(null);
-  const { onlineUsers } = usePresence();
+  const [lawyers, setLawyers] = useState<Profile[]>([]);
+  const [totalLawyersCount, setTotalLawyersCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [experience, setExperience] = useState('');
 
   useEffect(() => {
-    const fetchActiveLawyers = async () => {
-      setLoadingData(true);
-      const { data, error } = await supabase
+    const fetchTotalCount = async () => {
+      const { count, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, phone, address, specialties, experience_years, languages, organization')
+        .select('*', { count: 'exact', head: true })
         .eq('role', 'lawyer')
         .eq('status', 'active');
 
       if (error) {
-        showError('فشل في جلب قائمة المحامين: ' + error.message);
-      } else {
-        setLawyers(data || []);
+        console.error('Error fetching total lawyers count:', error);
+      } else if (count !== null) {
+        setTotalLawyersCount(count);
       }
-      setLoadingData(false);
+    };
+    fetchTotalCount();
+  }, []);
+
+  useEffect(() => {
+    const fetchLawyers = async () => {
+      setLoading(true);
+      let query = supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'lawyer')
+        .eq('status', 'active');
+
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`);
+      }
+      if (specialty) {
+        query = query.contains('specialties', [specialty]);
+      }
+      if (experience) {
+        query = query.gte('experience_years', parseInt(experience));
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching lawyers:', error);
+        toast.error('فشل في جلب قائمة المحامين');
+      } else {
+        setLawyers(data as Profile[]);
+      }
+      setLoading(false);
     };
 
-    if (!sessionLoading && session) {
-      fetchActiveLawyers();
-    }
-  }, [sessionLoading, session]);
+    const handler = setTimeout(() => {
+      fetchLawyers();
+    }, 300);
 
-  const handleStartConversation = async (otherLawyer: LawyerProfile) => {
-    if (!user || user.id === otherLawyer.id) return;
-    setStartingChatId(otherLawyer.id);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, specialty, experience]);
 
-    try {
-      const { data: conversationId, error } = await supabase.rpc('start_conversation', {
-        other_user_id: otherLawyer.id,
-      });
-
-      if (error) throw error;
-
-      if (conversationId) {
-        navigate(`/conversations/${conversationId}`);
-      } else {
-        throw new Error("Could not start or find conversation.");
-      }
-
-    } catch (error: any) {
-      showError('فشل في بدء المحادثة: ' + error.message);
-    } finally {
-      setStartingChatId(null);
-    }
-  };
-
-  if (sessionLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
+  const specialties = [
+    'الجنائي', 'المدني', 'التجاري', 'الإداري', 'العقاري', 'الأحوال الشخصية', 'العمالي'
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto py-4 border-b mb-8">
         <h1 className="text-3xl font-bold text-gray-900">جدول المحامين</h1>
         <Button variant="outline" asChild>
-          <Link to="/">
-            <span className="flex items-center">
-              <ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية
-            </span>
-          </Link>
+          <Link to="/profile">العودة للملف الشخصي</Link>
         </Button>
       </header>
 
       <main className="max-w-7xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>المحامون المعتمدون</CardTitle>
-            <CardDescription>قائمة بجميع المحامين النشطين على المنصة.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loadingData ? (
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : lawyers.length === 0 ? (
-              <p className="text-center text-gray-500">لا يوجد محامون نشطون حالياً.</p>
+        <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center shadow-sm">
+          <h2 className="text-lg font-semibold text-blue-800">
+            إجمالي المحامين المسجلين: <span className="text-2xl font-bold">{totalLawyersCount}</span>
+          </h2>
+        </div>
+
+        <div className="mb-8 p-6 bg-white rounded-lg shadow-sm border">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="البحث بالاسم..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={specialty} onValueChange={setSpecialty}>
+              <SelectTrigger>
+                <SelectValue placeholder="التخصص" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">الكل</SelectItem>
+                {specialties.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={experience} onValueChange={setExperience}>
+              <SelectTrigger>
+                <SelectValue placeholder="سنوات الخبرة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="5">5+ سنوات</SelectItem>
+                <SelectItem value="10">10+ سنوات</SelectItem>
+                <SelectItem value="15">15+ سنوات</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-gray-500" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {lawyers.length > 0 ? (
+              lawyers.map(lawyer => (
+                <LawyerCard key={lawyer.id} lawyer={lawyer} />
+              ))
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>الاسم الكامل</TableHead>
-                      <TableHead>البريد الإلكتروني</TableHead>
-                      <TableHead>الهاتف</TableHead>
-                      <TableHead>المنظمة</TableHead>
-                      <TableHead>الإجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {lawyers.filter(l => l.id !== user?.id).map((lawyer) => {
-                      const isOnline = onlineUsers.includes(lawyer.id);
-                      return (
-                        <TableRow key={lawyer.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {lawyer.first_name} {lawyer.last_name}
-                              {isOnline && (
-                                <span className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>{lawyer.email}</TableCell>
-                          <TableCell>{lawyer.phone || 'غير محدد'}</TableCell>
-                          <TableCell>{lawyer.organization || 'غير محدد'}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleStartConversation(lawyer)}
-                              disabled={startingChatId === lawyer.id}
-                            >
-                              {startingChatId === lawyer.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <MessageSquare className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+              <p className="col-span-full text-center text-gray-500">لا يوجد محامون يطابقون معايير البحث.</p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </main>
     </div>
   );
