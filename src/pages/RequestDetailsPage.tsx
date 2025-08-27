@@ -1,115 +1,211 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase";
-import { RequestWithDetails, RequestStatus } from "@/types";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Calendar, Gavel, Building, FileText, Clock } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/contexts/SessionContext';
+import { RequestWithDetails, ReplyWithAuthor } from '@/types';
+import { Loader2, ArrowRight, Send, User, Landmark, Calendar, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { showError, showSuccess } from '@/utils/toast';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { ReplyCard } from '@/components/ReplyCard';
 
-const statusMap: Record<RequestStatus, string> = {
-  open: "مفتوح",
-  assigned: "معين",
-  closed: "مغلق",
-  cancelled: "ملغى",
-};
-
-const statusColorMap: Record<RequestStatus, string> = {
-  open: "bg-green-500",
-  assigned: "bg-yellow-500",
-  closed: "bg-gray-500",
-  cancelled: "bg-red-500",
-};
-
-const requestTypeMap: Record<string, string> = {
-    information_retrieval: "اطلاع على معلومة من تطبيقة محامين",
-    representation: "طلب انابة في جلسة",
-    other: "طلب اخر",
-};
-
-export default function RequestDetailsPage() {
-  const { requestId } = useParams<{ requestId: string }>();
+const RequestDetailsPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const { session, profile } = useSession();
   const [request, setRequest] = useState<RequestWithDetails | null>(null);
+  const [replies, setReplies] = useState<ReplyWithAuthor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newReply, setNewReply] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchRequest = async () => {
-      if (!requestId) return;
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("requests")
-        .select("*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)")
-        .eq("id", requestId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching request:", error);
-      } else {
-        setRequest(data as RequestWithDetails);
+    const fetchRequestAndReplies = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      setLoading(true);
+      try {
+        const { data: requestData, error: requestError } = await supabase
+          .from('requests')
+          .select('*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)')
+          .eq('id', id)
+          .single();
+
+        if (requestError) throw requestError;
+        setRequest(requestData);
+
+        const { data: repliesData, error: repliesError } = await supabase
+          .from('replies')
+          .select('*, author:profiles!author_id(*)')
+          .eq('request_id', id)
+          .order('created_at', { ascending: true });
+
+        if (repliesError) throw repliesError;
+        setReplies(repliesData);
+      } catch (error: any) {
+        showError(`فشل في تحميل تفاصيل الطلب: ${error.message}`);
+        setRequest(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchRequest();
-  }, [requestId]);
+    fetchRequestAndReplies();
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const channel = supabase
+      .channel(`replies-for-request-${id}`)
+      .on<ReplyWithAuthor>(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'replies', filter: `request_id=eq.${id}` },
+        async (payload) => {
+          const { data: author, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', payload.new.author_id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching author for new reply:', error);
+            return;
+          }
+
+          const newReplyWithAuthor = { ...payload.new, author };
+          setReplies((currentReplies) => [...currentReplies, newReplyWithAuthor as ReplyWithAuthor]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
+
+  const handleReplySubmit = async () => {
+    if (!newReply.trim() || !session || !profile) {
+      showError('الرجاء كتابة رد وتسجيل الدخول أولاً.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from('replies').insert({
+        request_id: id!,
+        author_id: profile.id,
+        content: newReply.trim(),
+      });
+      if (error) throw error;
+      showSuccess('تم إرسال ردك بنجاح.');
+      setNewReply('');
+    } catch (error: any) {
+      showError(`فشل في إرسال الرد: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (!request) {
-    return <div className="flex justify-center items-center h-screen">Request not found.</div>;
+    return (
+      <div className="flex flex-col justify-center items-center h-screen text-center bg-gray-100">
+        <h2 className="text-2xl font-bold mb-4">لم يتم العثور على الطلب</h2>
+        <p className="text-gray-600 mb-6">قد يكون الطلب الذي تبحث عنه قد تم حذفه أو أن الرابط غير صحيح.</p>
+        <Button asChild>
+          <Link to="/requests">
+            <ArrowRight className="ml-2 h-4 w-4" />
+            العودة إلى قائمة الطلبات
+          </Link>
+        </Button>
+      </div>
+    );
   }
 
-  const creatorName = request.creator ? `${request.creator.first_name || ''} ${request.creator.last_name || ''}`.trim() : "غير معروف";
-  const lawyerName = request.lawyer ? `${request.lawyer.first_name || ''} ${request.lawyer.last_name || ''}`.trim() : "لم يتم التعيين بعد";
-
   return (
-    <div className="container mx-auto p-4">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-2xl font-bold">
-              تفاصيل الطلب: {request.case_number}
-            </CardTitle>
-            <Badge className={`${statusColorMap[request.status]} text-white`}>
-              {statusMap[request.status]}
-            </Badge>
-          </div>
-          <p className="text-md text-gray-600">
-            {requestTypeMap[request.type] || request.type}
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center"><Building className="w-4 h-4 mr-2" /><strong>المحكمة:</strong> {request.court.name}</div>
-            <div className="flex items-center"><FileText className="w-4 h-4 mr-2" /><strong>الدائرة:</strong> {request.section || 'غير محدد'}</div>
-            <div className="flex items-center"><User className="w-4 h-4 mr-2" /><strong>مقدم الطلب:</strong> {creatorName}</div>
-            <div className="flex items-center"><Gavel className="w-4 h-4 mr-2" /><strong>المحامي المسؤول:</strong> {lawyerName}</div>
-            <div className="flex items-center"><Calendar className="w-4 h-4 mr-2" /><strong>تاريخ الإنشاء:</strong> {new Date(request.created_at).toLocaleString()}</div>
-            {request.session_date && <div className="flex items-center"><Clock className="w-4 h-4 mr-2" /><strong>تاريخ الجلسة:</strong> {new Date(request.session_date).toLocaleString()}</div>}
-          </div>
-          
-          {request.details && (
-            <div>
-              <h3 className="font-semibold mb-1">تفاصيل الطلب:</h3>
-              <p className="text-sm bg-gray-50 p-3 rounded-md">{request.details}</p>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <main className="max-w-4xl mx-auto">
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl mb-2">تفاصيل الطلب</CardTitle>
+                <CardDescription>رقم القضية: {request.case_number}</CardDescription>
+              </div>
+              <Badge variant={request.status === 'open' ? 'default' : 'secondary'}>
+                {request.status === 'open' ? 'مفتوح' : 'مغلق'}
+              </Badge>
             </div>
-          )}
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="flex items-center gap-3 text-sm">
+              <User className="h-4 w-4 text-gray-500" />
+              <strong>صاحب الطلب:</strong> {request.creator.first_name} {request.creator.last_name}
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Landmark className="h-4 w-4 text-gray-500" />
+              <strong>المحكمة:</strong> {request.court.name}
+            </div>
+            {request.session_date && (
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <strong>تاريخ الجلسة:</strong> {format(new Date(request.session_date), 'd MMMM yyyy, h:mm a', { locale: ar })}
+              </div>
+            )}
+            <div className="flex items-start gap-3 text-sm">
+              <FileText className="h-4 w-4 text-gray-500 mt-1" />
+              <div>
+                <strong>التفاصيل:</strong>
+                <p className="whitespace-pre-wrap text-gray-700">{request.details}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {request.type === 'representation' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-semibold mb-1">بيانات المدعي:</h3>
-                <p className="text-sm bg-gray-50 p-3 rounded-md">{request.plaintiff_details || 'لا يوجد'}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">بيانات المدعى عليه:</h3>
-                <p className="text-sm bg-gray-50 p-3 rounded-md">{request.defendant_details || 'لا يوجد'}</p>
-              </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>الردود والمناقشات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mb-6">
+              {replies.length > 0 ? (
+                replies.map(reply => <ReplyCard key={reply.id} reply={reply} />)
+              ) : (
+                <p className="text-center text-gray-500 py-4">لا توجد ردود حتى الآن. كن أول من يرد!</p>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+            {session && (
+              <div className="flex flex-col gap-4">
+                <Textarea
+                  placeholder="اكتب ردك هنا..."
+                  value={newReply}
+                  onChange={(e) => setNewReply(e.target.value)}
+                  rows={4}
+                />
+                <Button onClick={handleReplySubmit} disabled={isSubmitting || !newReply.trim()}>
+                  {isSubmitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Send className="ml-2 h-4 w-4" />}
+                  إرسال الرد
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
-}
+};
+
+export default RequestDetailsPage;
