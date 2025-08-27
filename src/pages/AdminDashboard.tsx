@@ -16,7 +16,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { session, profile, loading: sessionLoading } = useSession();
+  const { session, profile, loading: sessionLoading, signOut } = useSession();
   const [pendingLawyers, setPendingLawyers] = useState<Profile[]>([]);
   const [managedLawyers, setManagedLawyers] = useState<Profile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <header className="flex justify-between items-center w-full max-w-6xl mx-auto py-4 border-b mb-8">
         <h1 className="text-3xl font-bold text-gray-900">لوحة تحكم المشرف</h1>
-        <Button onClick={useSession().signOut} variant="outline">تسجيل الخروج</Button>
+        <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
       </header>
 
       <main className="max-w-6xl mx-auto space-y-8">
