@@ -15,6 +15,7 @@ import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
 import ProfilePage from "@/pages/ProfilePage";
 import RequestsPage from "@/pages/RequestsPage";
 import ConversationsPage from "@/pages/ConversationsPage";
+import RepresentationCalendarPage from "@/pages/RepresentationCalendarPage";
 import { SessionProvider } from "@/contexts/SessionContext";
 import { PresenceProvider } from "@/contexts/PresenceContext";
 import AdminRoute from "@/components/auth/AdminRoute";
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/requests/court/:courtId" element={<RequestsByCourtPage />} />
               <Route path="/conversations" element={<ConversationsPage />} />
               <Route path="/conversations/:id" element={<ConversationsPage />} />
+              <Route path="/representation-calendar" element={<RepresentationCalendarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

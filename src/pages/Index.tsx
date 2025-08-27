@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users } from 'lucide-react';
+import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, CalendarDays } from 'lucide-react';
 import { OnlineLawyersIndicator } from '@/components/OnlineLawyersIndicator';
 
 const Index = () => {
@@ -80,6 +80,12 @@ const Index = () => {
               title="المحادثات"
               description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
               link="/conversations"
+            />
+            <FeatureCard
+              icon={<CalendarDays className="h-8 w-8 text-primary" />}
+              title="تقويم الإنابات"
+              description="عرض جميع طلبات الإنابة في تقويم تفاعلي."
+              link="/representation-calendar"
             />
           </div>
         )}
