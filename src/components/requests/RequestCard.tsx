@@ -1,9 +1,10 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { RequestWithDetails, RequestStatus } from "@/types";
+import { RequestWithDetails, RequestStatus, Request } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { User, Calendar, Gavel } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type RequestCardProps = {
   request: RequestWithDetails;
@@ -29,11 +30,17 @@ const requestTypeMap: Record<string, string> = {
   other: "طلب اخر",
 };
 
+const requestTypeColorMap: Record<Request['type'], string> = {
+  representation: "bg-blue-50 hover:bg-blue-100",
+  information_retrieval: "bg-green-50 hover:bg-green-100",
+  other: "bg-gray-50 hover:bg-gray-100",
+};
+
 export function RequestCard({ request }: RequestCardProps) {
   const creatorName = request.creator ? `${request.creator.first_name || ''} ${request.creator.last_name || ''}`.trim() : "غير معروف";
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className={cn("flex flex-col h-full transition-colors", requestTypeColorMap[request.type])}>
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-bold mb-2">
