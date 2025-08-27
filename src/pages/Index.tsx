@@ -33,7 +33,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <header className="flex flex-wrap justify-between items-center gap-4 w-full py-4 border-b mb-8">
-          <h1 className="text-2xl font-bold">INABALAWYER</h1>
+          <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
           <div className="flex items-center gap-4">
             {profile && (
               <span className="text-sm sm:text-base">مرحباً، {profile.first_name}</span>

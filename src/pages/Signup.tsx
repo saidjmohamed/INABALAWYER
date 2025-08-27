@@ -1,195 +1,64 @@
-import { useState } from 'react';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
-import { Navigate, Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { showSuccess, showError } from '@/utils/toast';
-import { Loader2 } from 'lucide-react';
-
-const signupSchema = z.object({
-  firstName: z.string().min(1, 'الاسم مطلوب'),
-  lastName: z.string().min(1, 'اللقب مطلوب'),
-  email: z.string().email('يجب أن يكون بريداً إلكترونياً صالحاً').min(1, 'البريد الإلكتروني مطلوب'),
-  username: z.string().min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل').regex(/^[a-zA-Z0-9]+$/, 'اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط'),
-  phone: z.string().min(1, 'رقم الهاتف مطلوب'),
-  address: z.string().min(1, 'العنوان المهني مطلوب'),
-  password: z.string().min(6, 'يجب أن تكون كلمة المرور 6 أحرف على الأقل'),
-});
-
-type SignupFormValues = z.infer<typeof signupSchema>;
+import { Navigate, Link } from 'react-router-dom';
 
 const Signup = () => {
   const { session } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const form = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      username: '',
-      phone: '',
-      address: '',
-      password: '',
-    },
-  });
-
-  const onSubmit = async (values: SignupFormValues) => {
-    setIsLoading(true);
-
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: {
-          first_name: values.firstName,
-          last_name: values.lastName,
-          phone: values.phone,
-          address: values.address,
-          username: values.username,
-        },
-      },
-    });
-    setIsLoading(false);
-
-    if (error) {
-      showError(error.message);
-    } else {
-      showSuccess('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.');
-      navigate('/login');
-    }
-  };
 
   if (session) {
     return <Navigate to="/" replace />;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">إنشاء حساب جديد</CardTitle>
-          <CardDescription>املأ البيانات لإنشاء حسابك</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>الاسم</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>اللقب</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>البريد الإلكتروني</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>اسم المستخدم (للعرض)</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رقم الهاتف</FormLabel>
-                    <FormControl>
-                      <Input type="tel" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>العنوان المهني</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'إنشاء حساب'}
-              </Button>
-            </form>
-          </Form>
-          <div className="text-center mt-4 text-sm">
-            <p>
-              لديك حساب بالفعل؟{' '}
-              <Link to="/login" className="font-medium text-primary hover:underline">
-                تسجيل الدخول
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-6">إنشاء حساب جديد في إنابة و معلومة بين المحامين</h1>
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#007BFF',
+                    brandAccent: '#0056b3',
+                  },
+                },
+              },
+            }}
+            providers={[]}
+            view="sign_up"
+            localization={{
+              variables: {
+                sign_up: {
+                  email_label: 'البريد الإلكتروني',
+                  password_label: 'كلمة المرور',
+                  button_label: 'إنشاء حساب',
+                  loading_button_label: 'جارٍ إنشاء الحساب...',
+                  social_provider_text: 'التسجيل عبر {{provider}}',
+                  link_text: 'هل لديك حساب؟ سجل الدخول',
+                },
+              },
+            }}
+            additionalData={{
+              first_name: '',
+              last_name: '',
+              phone: '',
+              address: '',
+              username: '',
+            }}
+          />
+        </div>
+        <p className="text-center text-sm text-gray-600 mt-6">
+          هل لديك حساب بالفعل؟{' '}
+          <Link to="/login" className="font-medium text-primary hover:underline">
+            سجل الدخول من هنا
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
