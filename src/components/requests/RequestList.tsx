@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 import { showError } from '@/utils/toast';
 import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 export interface RequestWithDetails {
   id: string;
@@ -24,6 +25,7 @@ export interface RequestWithDetails {
   court: {
     name: string;
   } | null;
+  replies: { count: number }[];
 }
 
 const requestTypeTranslations = {
@@ -53,7 +55,8 @@ export const RequestList = ({ courtId }: RequestListProps) => {
           case_number,
           status,
           creator:creator_id ( id, first_name, last_name ),
-          court:courts ( name )
+          court:courts ( name ),
+          replies(count)
         `)
         .eq('status', 'open');
 
@@ -96,29 +99,40 @@ export const RequestList = ({ courtId }: RequestListProps) => {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {requests.map((request) => (
-        <Link to={`/requests/${request.id}`} key={request.id} className="block hover:shadow-lg transition-shadow duration-200 rounded-lg">
-          <Card className="flex flex-col h-full">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{requestTypeTranslations[request.type]}</CardTitle>
-                <Badge variant="outline">{request.court?.name || 'محكمة غير محددة'}</Badge>
-              </div>
-              <CardDescription>رقم القضية: {request.case_number}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">
-                صاحب الطلب: {request.creator?.first_name} {request.creator?.last_name || 'محام غير معروف'}
-              </p>
-            </CardContent>
-            <CardFooter>
-              <p className="text-xs text-gray-500">
-                نشر قبل {formatDistanceToNow(new Date(request.created_at), { addSuffix: false, locale: ar })}
-              </p>
-            </CardFooter>
-          </Card>
-        </Link>
-      ))}
+      {requests.map((request) => {
+        const hasReplies = request.replies && request.replies.length > 0 && request.replies[0].count > 0;
+        return (
+          <Link to={`/requests/${request.id}`} key={request.id} className="block hover:shadow-lg transition-shadow duration-200 rounded-lg">
+            <Card className={cn(
+              "flex flex-col h-full transition-colors",
+              hasReplies ? "bg-emerald-50 hover:bg-emerald-100" : "bg-amber-50 hover:bg-amber-100"
+            )}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-lg">{requestTypeTranslations[request.type]}</CardTitle>
+                  <Badge variant="outline">{request.court?.name || 'محكمة غير محددة'}</Badge>
+                </div>
+                <CardDescription>رقم القضية: {request.case_number}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-sm text-muted-foreground">
+                  صاحب الطلب: {request.creator?.first_name} {request.creator?.last_name || 'محام غير معروف'}
+                </p>
+              </CardContent>
+              <CardFooter className="flex justify-between items-center">
+                <p className="text-xs text-gray-500">
+                  نشر قبل {formatDistanceToNow(new Date(request.created_at), { addSuffix: false, locale: ar })}
+                </p>
+                {hasReplies ? (
+                  <Badge variant="secondary" className="bg-emerald-200 text-emerald-800">يوجد ردود</Badge>
+                ) : (
+                  <Badge variant="secondary" className="bg-amber-200 text-amber-800">لا توجد ردود</Badge>
+                )}
+              </CardFooter>
+            </Card>
+          </Link>
+        );
+      })}
     </div>
   );
 };
