@@ -3,17 +3,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import AdminDashboard from "./pages/AdminDashboard";
-import RequestDetailsPage from "./pages/RequestDetailsPage";
-import LawyersDirectory from "./pages/LawyersDirectory";
-import CourtsListPage from "./pages/CourtsListPage";
-import RequestsByCourtPage from "./pages/RequestsByCourtPage";
-import { SessionProvider } from "./contexts/SessionContext";
-import AdminRoute from "./components/auth/AdminRoute";
+import Index from "@/pages/Index";
+import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import AdminDashboard from "@/pages/AdminDashboard";
+import RequestDetailsPage from "@/pages/RequestDetailsPage";
+import LawyersDirectory from "@/pages/LawyersDirectory";
+import CourtsListPage from "@/pages/CourtsListPage";
+import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
+import { SessionProvider } from "@/contexts/SessionContext";
+import AdminRoute from "@/components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
 
