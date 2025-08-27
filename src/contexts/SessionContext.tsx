@@ -12,6 +12,11 @@ export interface Profile {
   role: 'lawyer' | 'admin';
   email: string;
   username: string;
+  specialties: string[] | null; // New field
+  experience_years: number | null; // New field
+  languages: string[] | null; // New field
+  bio: string | null; // New field
+  avatar_url: string | null; // New field
 }
 
 interface SessionContextValue {

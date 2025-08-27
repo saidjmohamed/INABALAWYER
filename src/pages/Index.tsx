@@ -38,6 +38,9 @@ const Index = () => {
             {profile && (
               <span className="text-sm sm:text-base">مرحباً، {profile.first_name}</span>
             )}
+            <Link to="/profile"> {/* New link to ProfilePage */}
+              <Button variant="secondary">ملفي الشخصي</Button>
+            </Link>
             <Link to="/lawyers">
               <Button variant="secondary">جدول المحامين</Button>
             </Link>

@@ -12,6 +12,7 @@ import RequestDetailsPage from "@/pages/RequestDetailsPage";
 import LawyersDirectory from "@/pages/LawyersDirectory";
 import CourtsListPage from "@/pages/CourtsListPage";
 import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
+import ProfilePage from "@/pages/ProfilePage"; // Import the new ProfilePage
 import { SessionProvider } from "@/contexts/SessionContext";
 import AdminRoute from "@/components/auth/AdminRoute";
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<ProfilePage />} /> {/* New route for ProfilePage */}
             <Route 
               path="/admin" 
               element={
