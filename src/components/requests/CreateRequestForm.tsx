@@ -122,7 +122,7 @@ export function CreateRequestForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-h-[70vh] overflow-y-auto pr-4">
         <FormField
           control={form.control}
           name="court_id"
