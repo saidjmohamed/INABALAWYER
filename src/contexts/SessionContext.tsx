@@ -1,24 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-
-export interface Profile {
-  id: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  address: string;
-  status: 'pending' | 'active' | 'rejected' | 'disabled';
-  role: 'lawyer' | 'admin';
-  email: string;
-  username: string;
-  specialties: string[] | null;
-  experience_years: number | null;
-  languages: string[] | null;
-  bio: string | null;
-  avatar_url: string | null;
-  organization: string | null;
-}
+import { Profile } from "@/types";
 
 interface SessionContextValue {
   session: Session | null;

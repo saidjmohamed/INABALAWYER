@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useSession, Profile } from '@/contexts/SessionContext';
+import { useSession } from '@/contexts/SessionContext';
+import { Profile } from '@/types';
 import { Navigate, useNavigate } from 'react-router-dom';
 import {
   Table,

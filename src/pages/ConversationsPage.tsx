@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useSession, Profile } from '@/contexts/SessionContext';
+import { useSession } from '@/contexts/SessionContext';
+import { Profile } from '@/types';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

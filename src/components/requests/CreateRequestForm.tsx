@@ -51,12 +51,14 @@ interface CreateRequestFormProps {
   courts: Court[];
   currentProfile: Profile;
   onFormSubmit?: () => void;
+  defaultCourtId?: string;
 }
 
 export function CreateRequestForm({
   courts,
   currentProfile,
   onFormSubmit,
+  defaultCourtId,
 }: CreateRequestFormProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -64,6 +66,7 @@ export function CreateRequestForm({
   const form = useForm<CreateRequestFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      court_id: defaultCourtId || "",
       case_number: "",
       plaintiff_details: "",
       defendant_details: "",

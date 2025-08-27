@@ -1,5 +1,5 @@
 export type UserRole = 'admin' | 'lawyer';
-export type UserStatus = 'pending' | 'active' | 'inactive';
+export type UserStatus = 'pending' | 'active' | 'rejected' | 'disabled';
 export type RequestStatus = 'open' | 'closed' | 'in_progress' | 'assigned' | 'cancelled';
 export type RequestType = 'information_retrieval' | 'representation' | 'other';
 export type CourtLevel = 'first_instance' | 'appeal' | 'cassation';
@@ -12,7 +12,7 @@ export type Profile = {
   address: string | null;
   status: UserStatus;
   role: UserRole;
-  updated_at: string;
+  updated_at: string | null;
   email: string | null;
   username: string | null;
   specialties: string[] | null;

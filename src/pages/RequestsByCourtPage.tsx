@@ -7,10 +7,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { CreateRequestForm } from "@/components/requests/CreateRequestForm";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { PlusCircle } from "lucide-react";
+import { useSession } from "@/contexts/SessionContext";
 
 export default function RequestsByCourtPage() {
   const { courtId } = useParams<{ courtId: string }>();
+  const { profile } = useSession();
   const [court, setCourt] = useState<Court | null>(null);
+  const [allCourts, setAllCourts] = useState<Court[]>([]);
   const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateRequestOpen, setIsCreateRequestOpen] = useState(false);
@@ -30,6 +33,16 @@ export default function RequestsByCourtPage() {
       setCourt(null);
     } else {
       setCourt(courtData);
+    }
+
+    const { data: allCourtsData, error: allCourtsError } = await supabase
+      .from("courts")
+      .select("*");
+    
+    if (allCourtsError) {
+      console.error("Error fetching all courts:", allCourtsError);
+    } else {
+      setAllCourts(allCourtsData || []);
     }
 
     const { data: requestsData, error: requestsError } = await supabase
@@ -67,23 +80,27 @@ export default function RequestsByCourtPage() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">الطلبات في {court.name}</h1>
-        <Dialog open={isCreateRequestOpen} onOpenChange={setIsCreateRequestOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              إنشاء طلب جديد
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>إنشاء طلب جديد في {court.name}</DialogTitle>
-            </DialogHeader>
-            <CreateRequestForm
-              court={court}
-              onSuccess={handleRequestCreation}
-            />
-          </DialogContent>
-        </Dialog>
+        {profile && (
+          <Dialog open={isCreateRequestOpen} onOpenChange={setIsCreateRequestOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                إنشاء طلب جديد
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>إنشاء طلب جديد في {court.name}</DialogTitle>
+              </DialogHeader>
+              <CreateRequestForm
+                courts={allCourts}
+                currentProfile={profile}
+                onFormSubmit={handleRequestCreation}
+                defaultCourtId={courtId}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
       {requests.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
