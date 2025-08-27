@@ -47,14 +47,19 @@ export default function RequestsByCourtPage() {
 
     const { data: requestsData, error: requestsError } = await supabase
       .from("requests")
-      .select("*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)")
+      .select(`
+        id, creator_id, court_id, type, case_number, section, details, status, created_at, lawyer_id, session_date, plaintiff_details, defendant_details,
+        court:courts(*),
+        creator:profiles!creator_id(*),
+        lawyer:profiles!lawyer_id(*)
+      `)
       .eq("court_id", courtId)
       .order("created_at", { ascending: false });
 
     if (requestsError) {
       console.error("Error fetching requests:", requestsError);
     } else {
-      setRequests(requestsData as RequestWithDetails[]);
+      setRequests(requestsData as any as RequestWithDetails[]);
     }
     setLoading(false);
   };

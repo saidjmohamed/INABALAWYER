@@ -24,14 +24,19 @@ const RepresentationCalendarPage = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('requests')
-        .select('*, court:courts(*), creator:profiles!creator_id(*)')
+        .select(`
+          id, creator_id, court_id, type, case_number, section, details, status, created_at, lawyer_id, session_date, plaintiff_details, defendant_details,
+          court:courts(*),
+          creator:profiles!creator_id(*),
+          lawyer:profiles!lawyer_id(*)
+        `)
         .eq('type', 'representation')
         .not('session_date', 'is', null);
 
       if (error) {
         showError('فشل في جلب طلبات الإنابة: ' + error.message);
       } else {
-        setRequests(data as RepresentationRequest[]);
+        setRequests(data as any as RepresentationRequest[]);
       }
       setLoading(false);
     };
