@@ -42,8 +42,8 @@ const RequestDetailsPage = () => {
           .select(`
             *,
             court:courts(*),
-            creator:profiles!creator_id(*),
-            lawyer:profiles!lawyer_id(*)
+            creator:profiles!requests_creator_id_fkey(*),
+            lawyer:profiles!requests_lawyer_id_fkey(*)
           `)
           .eq('id', id)
           .single();
@@ -53,7 +53,7 @@ const RequestDetailsPage = () => {
 
         const { data: repliesData, error: repliesError } = await supabase
           .from('replies')
-          .select('*, author:profiles!author_id(*)')
+          .select('*, author:profiles!replies_author_id_fkey(*)')
           .eq('request_id', id)
           .order('created_at', { ascending: true });
 

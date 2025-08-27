@@ -36,8 +36,8 @@ const CourtsListPage = () => {
       .select(`
         *,
         court:courts(*),
-        creator:profiles!creator_id(*),
-        lawyer:profiles!lawyer_id(*)
+        creator:profiles!requests_creator_id_fkey(*),
+        lawyer:profiles!requests_lawyer_id_fkey(*)
       `)
       .eq('court_id', court.id);
 
