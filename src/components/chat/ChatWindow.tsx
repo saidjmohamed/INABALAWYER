@@ -21,9 +21,10 @@ interface Message {
 
 interface ChatWindowProps {
   conversationId: string;
+  participants: Map<string, Pick<Profile, 'id' | 'first_name' | 'last_name' | 'avatar_url'>>;
 }
 
-export const ChatWindow = ({ conversationId }: ChatWindowProps) => {
+export const ChatWindow = ({ conversationId, participants }: ChatWindowProps) => {
   const { user } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -57,16 +58,13 @@ export const ChatWindow = ({ conversationId }: ChatWindowProps) => {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
-        async (payload) => {
-          const { data: senderData, error } = await supabase
-            .from('profiles')
-            .select('first_name, last_name, avatar_url')
-            .eq('id', payload.new.sender_id)
-            .single();
-          
-          if (!error) {
-            const newMessageWithSender = { ...payload.new, sender: senderData } as Message;
+        (payload) => {
+          const senderProfile = participants.get(payload.new.sender_id);
+          if (senderProfile) {
+            const newMessageWithSender = { ...payload.new, sender: senderProfile } as Message;
             setMessages((prevMessages) => [...prevMessages, newMessageWithSender]);
+          } else {
+            console.warn(`Sender profile with id ${payload.new.sender_id} not found in participants map.`);
           }
         }
       )
@@ -75,7 +73,7 @@ export const ChatWindow = ({ conversationId }: ChatWindowProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId]);
+  }, [conversationId, participants]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {

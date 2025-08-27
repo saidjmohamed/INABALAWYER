@@ -18,7 +18,7 @@ interface Conversation {
 
 const ConversationsPage = () => {
   const { id: activeConversationId } = useParams<{ id: string }>();
-  const { user, loading: sessionLoading } = useSession();
+  const { user, profile, loading: sessionLoading } = useSession();
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState(true);
@@ -87,6 +87,13 @@ const ConversationsPage = () => {
     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-10 w-10 animate-spin" /></div>;
   }
 
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
+  const participantsMap = new Map<string, Pick<Profile, 'id' | 'first_name' | 'last_name' | 'avatar_url'>>();
+  if (profile && activeConversation?.participant) {
+    participantsMap.set(profile.id, profile);
+    participantsMap.set(activeConversation.participant.id, activeConversation.participant);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="flex justify-between items-center w-full mx-auto p-4 border-b bg-white">
@@ -132,8 +139,8 @@ const ConversationsPage = () => {
           )}
         </aside>
         <main className="flex-1">
-          {activeConversationId ? (
-            <ChatWindow conversationId={activeConversationId} />
+          {activeConversationId && participantsMap.size === 2 ? (
+            <ChatWindow conversationId={activeConversationId} participants={participantsMap} />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
               <MessageSquare className="h-16 w-16 mb-4" />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { RequestList } from '@/components/requests/RequestList';
+import { CreateRequestForm } from '@/components/requests/CreateRequestForm';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight } from 'lucide-react';
 
@@ -9,6 +10,11 @@ const RequestsByCourtPage = () => {
   const { courtId } = useParams<{ courtId: string }>();
   const [courtName, setCourtName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [key, setKey] = useState(0);
+
+  const handleRequestCreation = () => {
+    setKey(prevKey => prevKey + 1);
+  };
 
   useEffect(() => {
     const fetchCourtName = async () => {
@@ -45,6 +51,7 @@ const RequestsByCourtPage = () => {
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto py-4 border-b mb-8">
         <h1 className="text-3xl font-bold text-gray-900">طلبات {courtName}</h1>
         <div className="flex gap-4">
+            <CreateRequestForm onSuccess={handleRequestCreation} courtId={courtId} />
             <Button variant="outline" asChild>
               <Link to="/courts">
                 <span className="flex items-center">
@@ -55,7 +62,7 @@ const RequestsByCourtPage = () => {
         </div>
       </header>
       <main className="max-w-7xl mx-auto">
-        {courtId ? <RequestList courtId={courtId} /> : <p>لم يتم تحديد المحكمة.</p>}
+        {courtId ? <RequestList courtId={courtId} key={key} /> : <p>لم يتم تحديد المحكمة.</p>}
       </main>
     </div>
   );

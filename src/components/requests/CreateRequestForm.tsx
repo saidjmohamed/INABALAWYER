@@ -32,9 +32,10 @@ type RequestFormValues = z.infer<typeof requestSchema>;
 
 interface CreateRequestFormProps {
   onSuccess: () => void;
+  courtId?: string;
 }
 
-export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
+export const CreateRequestForm = ({ onSuccess, courtId }: CreateRequestFormProps) => {
   const { user } = useSession();
   const [courts, setCourts] = useState<Court[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +44,7 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
   const form = useForm<RequestFormValues>({
     resolver: zodResolver(requestSchema),
     defaultValues: {
+      court_id: courtId,
       case_number: '',
       section: '',
       details: '',
@@ -60,8 +62,15 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
     };
     if (isOpen) {
       fetchCourts();
+      form.reset({
+        court_id: courtId,
+        case_number: '',
+        section: '',
+        details: '',
+        type: undefined,
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, courtId, form]);
 
   const onSubmit = async (values: RequestFormValues) => {
     if (!user) {
@@ -129,7 +138,7 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>المحكمة</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر المحكمة" />
