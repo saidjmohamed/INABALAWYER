@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/contexts/SessionContext';
-import { PlusCircle, Gavel, Users, User } from 'lucide-react';
+import { PlusCircle, Gavel, Users, User, LogOut } from 'lucide-react';
 import { RequestList } from '@/components/requests/RequestList';
 
 const Index = () => {
-  const { session, profile } = useSession();
+  const { session, profile, signOut } = useSession();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -21,6 +21,10 @@ const Index = () => {
                 <Link to="/profile">
                   <Button variant="outline">ملفي الشخصي</Button>
                 </Link>
+                <Button variant="ghost" onClick={signOut}>
+                  <LogOut className="ml-2 h-4 w-4" />
+                  تسجيل الخروج
+                </Button>
               </>
             ) : (
               <>
