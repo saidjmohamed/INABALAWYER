@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase';
 import { Profile } from '@/types';
-import { LawyerCard } from '@/components/lawyers/LawyerCard';
+import { LawyerCard } from '@/components/LawyerCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
