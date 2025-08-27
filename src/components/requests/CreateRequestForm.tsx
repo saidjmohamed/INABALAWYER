@@ -1,208 +1,214 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { supabase } from '@/integrations/supabase/client';
-import { useSession } from '@/contexts/SessionContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { showSuccess, showError } from '@/utils/toast';
-import { Loader2, PlusCircle } from 'lucide-react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@/hooks/useUser";
+import { supabase } from "@/integrations/supabase";
+import { Court, RequestType } from "@/types";
+import { useEffect, useState } from "react";
 
-interface Court {
-  id: string;
-  name: string;
-}
-
-const requestSchema = z.object({
-  type: z.enum(['information_request', 'representation', 'other_request'], {
-    required_error: "نوع الإنابة مطلوب"
+const formSchema = z.object({
+  court_id: z.string().uuid({ message: "الرجاء اختيار المحكمة" }),
+  type: z.nativeEnum(RequestType, {
+    errorMap: () => ({ message: "الرجاء اختيار نوع الطلب" }),
   }),
-  court_id: z.string().uuid('يجب اختيار المحكمة'),
-  case_number: z.string().min(1, 'رقم القضية مطلوب'),
+  case_number: z.string().min(1, { message: "الرجاء إدخال رقم القضية" }),
   section: z.string().optional(),
   details: z.string().optional(),
 });
 
-type RequestFormValues = z.infer<typeof requestSchema>;
+type CreateRequestFormValues = z.infer<typeof formSchema>;
 
 interface CreateRequestFormProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   courtId?: string;
 }
 
-export const CreateRequestForm = ({ onSuccess, courtId }: CreateRequestFormProps) => {
-  const { user } = useSession();
+export function CreateRequestForm({ onSuccess, courtId }: CreateRequestFormProps) {
+  const { toast } = useToast();
+  const { user } = useUser();
   const [courts, setCourts] = useState<Court[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const form = useForm<RequestFormValues>({
-    resolver: zodResolver(requestSchema),
-    defaultValues: {
-      court_id: courtId,
-      case_number: '',
-      section: '',
-      details: '',
-    },
-  });
 
   useEffect(() => {
     const fetchCourts = async () => {
-      const { data, error } = await supabase.from('courts').select('id, name');
+      const { data, error } = await supabase.from("courts").select("*");
       if (error) {
-        showError('Failed to fetch courts.');
+        console.error("Error fetching courts:", error);
+        toast({
+          title: "خطأ",
+          description: "حدث خطأ أثناء جلب قائمة المحاكم.",
+          variant: "destructive",
+        });
       } else {
-        setCourts(data || []);
+        setCourts(data);
       }
     };
-    if (isOpen) {
-      fetchCourts();
-      form.reset({
-        court_id: courtId,
-        case_number: '',
-        section: '',
-        details: '',
-        type: undefined,
-      });
-    }
-  }, [isOpen, courtId, form]);
+    fetchCourts();
+  }, [toast]);
 
-  const onSubmit = async (values: RequestFormValues) => {
+  const form = useForm<CreateRequestFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      court_id: courtId || "",
+      case_number: "",
+      section: "",
+      details: "",
+    },
+  });
+
+  async function onSubmit(values: CreateRequestFormValues) {
     if (!user) {
-      showError('You must be logged in to create a request.');
+      toast({
+        title: "خطأ",
+        description: "يجب أن تكون مسجلاً للدخول لإنشاء طلب.",
+        variant: "destructive",
+      });
       return;
     }
-    setIsLoading(true);
-    const { error } = await supabase.from('requests').insert({
-      ...values,
-      creator_id: user.id,
-    });
-    setIsLoading(false);
+
+    const { error } = await supabase
+      .from("requests")
+      .insert([{ ...values, creator_id: user.id }])
+      .select();
 
     if (error) {
-      showError(error.message);
+      toast({
+        title: "حدث خطأ",
+        description: "لم يتمكن من إنشاء الطلب. الرجاء المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
     } else {
-      showSuccess('تم إنشاء الطلب بنجاح.');
+      toast({
+        title: "تم بنجاح",
+        description: "تم إنشاء طلبك بنجاح.",
+      });
       form.reset();
-      setIsOpen(false);
-      onSuccess();
+      onSuccess?.();
     }
-  };
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <span className="flex items-center">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            إضافة طلب جديد
-          </span>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="court_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>المحكمة</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={!!courtId}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر المحكمة" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {courts.map((court) => (
+                      <SelectItem key={court.id} value={court.id}>
+                        {court.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>اختر نوع الطلب من زميلك</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر نوع الطلب" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.values(RequestType).map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="case_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>رقم القضية</FormLabel>
+                <FormControl>
+                  <Input placeholder="ادخل رقم القضية" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="section"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الدائرة</FormLabel>
+                <FormControl>
+                  <Input placeholder="ادخل رقم الدائرة (اختياري)" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="details"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>تفاصيل الطلب</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="اكتب تفاصيل الطلب هنا..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "جاري الإنشاء..." : "إنشاء طلب"}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>إنشاء طلب إنابة جديد</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>نوع الإنابة</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر نوع الإنابة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="information_request">طلب معلومة من تطبيقة</SelectItem>
-                      <SelectItem value="representation">طلب إنابة</SelectItem>
-                      <SelectItem value="other_request">طلب آخر</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="court_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>المحكمة</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المحكمة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {courts.map((court) => (
-                        <SelectItem key={court.id} value={court.id}>
-                          {court.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="case_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>رقم القضية</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="section"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>القسم (اختياري)</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="details"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>تفاصيل إضافية (اختياري)</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              <span className="flex items-center justify-center">
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إنشاء الطلب</span>}
-              </span>
-            </Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+      </form>
+    </Form>
   );
-};
+}
