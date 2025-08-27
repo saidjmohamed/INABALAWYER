@@ -136,7 +136,7 @@ export function CreateRequestForm({
 
     } catch (error: any) {
       console.error("Error creating request:", error);
-      showError("فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى.");
+      showError(`فشل في إنشاء الطلب: ${error.message}`);
     }
   }
 
