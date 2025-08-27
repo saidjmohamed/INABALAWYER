@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession, Profile } from '@/contexts/SessionContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -13,14 +13,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { showError } from '@/utils/toast';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowRight, MessageSquare } from 'lucide-react';
 
 type LawyerProfile = Pick<Profile, 'id' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'specialties' | 'experience_years' | 'languages' | 'organization'>;
 
 const LawyersDirectory = () => {
-  const { session, loading: sessionLoading } = useSession();
+  const { session, user, loading: sessionLoading } = useSession();
+  const navigate = useNavigate();
   const [lawyers, setLawyers] = useState<LawyerProfile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [startingChatId, setStartingChatId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchActiveLawyers = async () => {
@@ -44,6 +46,70 @@ const LawyersDirectory = () => {
     }
   }, [sessionLoading, session]);
 
+  const handleStartConversation = async (otherLawyer: LawyerProfile) => {
+    if (!user || user.id === otherLawyer.id) return;
+    setStartingChatId(otherLawyer.id);
+
+    try {
+      // Step 1: Find conversations where the current user is a participant.
+      const { data: userParticipants, error: userParticipantsError } = await supabase
+        .from('participants')
+        .select('conversation_id')
+        .eq('user_id', user.id);
+
+      if (userParticipantsError) throw userParticipantsError;
+
+      const userConversationIds = userParticipants.map(p => p.conversation_id);
+
+      if (userConversationIds.length > 0) {
+        // Step 2: Check if any of these conversations also include the other lawyer.
+        const { data: existingParticipant, error: existingParticipantError } = await supabase
+          .from('participants')
+          .select('conversation_id')
+          .in('conversation_id', userConversationIds)
+          .eq('user_id', otherLawyer.id)
+          .limit(1)
+          .single();
+
+        if (existingParticipantError && existingParticipantError.code !== 'PGRST116') {
+          throw existingParticipantError;
+        }
+
+        if (existingParticipant) {
+          navigate(`/conversations/${existingParticipant.conversation_id}`);
+          return;
+        }
+      }
+
+      // Step 3: If no existing conversation, create a new one.
+      const { data: newConversation, error: newConversationError } = await supabase
+        .from('conversations')
+        .insert({})
+        .select('id')
+        .single();
+
+      if (newConversationError) throw newConversationError;
+
+      // Step 4: Add both users as participants.
+      const { error: participantsError } = await supabase
+        .from('participants')
+        .insert([
+          { conversation_id: newConversation.id, user_id: user.id },
+          { conversation_id: newConversation.id, user_id: otherLawyer.id },
+        ]);
+
+      if (participantsError) throw participantsError;
+
+      // Step 5: Navigate to the new conversation.
+      navigate(`/conversations/${newConversation.id}`);
+
+    } catch (error: any) {
+      showError('فشل في بدء المحادثة: ' + error.message);
+    } finally {
+      setStartingChatId(null);
+    }
+  };
+
   if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -58,7 +124,7 @@ const LawyersDirectory = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex justify-between items-center w-full max-w-6xl mx-auto py-4 border-b mb-8">
+      <header className="flex justify-between items-center w-full max-w-7xl mx-auto py-4 border-b mb-8">
         <h1 className="text-3xl font-bold text-gray-900">جدول المحامين</h1>
         <Button variant="outline" asChild>
           <Link to="/">
@@ -69,7 +135,7 @@ const LawyersDirectory = () => {
         </Button>
       </header>
 
-      <main className="max-w-6xl mx-auto">
+      <main className="max-w-7xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>المحامون المعتمدون</CardTitle>
@@ -90,24 +156,31 @@ const LawyersDirectory = () => {
                       <TableHead>الاسم الكامل</TableHead>
                       <TableHead>البريد الإلكتروني</TableHead>
                       <TableHead>الهاتف</TableHead>
-                      <TableHead>المنظمة</TableHead> {/* New TableHead */}
-                      <TableHead>التخصصات</TableHead>
-                      <TableHead>سنوات الخبرة</TableHead>
-                      <TableHead>اللغات</TableHead>
-                      <TableHead>العنوان</TableHead>
+                      <TableHead>المنظمة</TableHead>
+                      <TableHead>الإجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {lawyers.map((lawyer) => (
+                    {lawyers.filter(l => l.id !== user?.id).map((lawyer) => (
                       <TableRow key={lawyer.id}>
                         <TableCell>{lawyer.first_name} {lawyer.last_name}</TableCell>
                         <TableCell>{lawyer.email}</TableCell>
                         <TableCell>{lawyer.phone || 'غير محدد'}</TableCell>
-                        <TableCell>{lawyer.organization || 'غير محدد'}</TableCell> {/* New TableCell */}
-                        <TableCell>{lawyer.specialties?.join(', ') || 'غير محددة'}</TableCell>
-                        <TableCell>{lawyer.experience_years ?? 'غير محدد'}</TableCell>
-                        <TableCell>{lawyer.languages?.join(', ') || 'غير محددة'}</TableCell>
-                        <TableCell>{lawyer.address || 'غير محدد'}</TableCell>
+                        <TableCell>{lawyer.organization || 'غير محدد'}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleStartConversation(lawyer)}
+                            disabled={startingChatId === lawyer.id}
+                          >
+                            {startingChatId === lawyer.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <MessageSquare className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

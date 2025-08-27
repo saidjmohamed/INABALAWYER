@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/contexts/SessionContext';
-import { PlusCircle, Gavel, Users, User, LogOut } from 'lucide-react';
+import { PlusCircle, Gavel, Users, User, LogOut, MessageSquare } from 'lucide-react';
 import { RequestList } from '@/components/requests/RequestList';
 
 const Index = () => {
@@ -53,7 +53,7 @@ const Index = () => {
 
             {profile ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <Link to="/requests">
                     <Button className="w-full h-full text-lg py-4 flex flex-col gap-2">
                       <PlusCircle className="h-6 w-6" />
@@ -70,6 +70,12 @@ const Index = () => {
                     <Button variant="outline" className="w-full h-full text-lg py-4 flex flex-col gap-2">
                       <Users className="h-6 w-6" />
                       <span>جدول المحامين</span>
+                    </Button>
+                  </Link>
+                  <Link to="/conversations">
+                    <Button variant="outline" className="w-full h-full text-lg py-4 flex flex-col gap-2">
+                      <MessageSquare className="h-6 w-6" />
+                      <span>محادثاتي</span>
                     </Button>
                   </Link>
                   <Link to="/profile">

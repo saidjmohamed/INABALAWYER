@@ -13,7 +13,8 @@ import LawyersDirectory from "@/pages/LawyersDirectory";
 import CourtsListPage from "@/pages/CourtsListPage";
 import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
 import ProfilePage from "@/pages/ProfilePage";
-import RequestsPage from "@/pages/RequestsPage"; // Import the new page
+import RequestsPage from "@/pages/RequestsPage";
+import ConversationsPage from "@/pages/ConversationsPage"; // Import the new page
 import { SessionProvider } from "@/contexts/SessionContext";
 import AdminRoute from "@/components/auth/AdminRoute";
 
@@ -39,11 +40,13 @@ const App = () => (
                 </AdminRoute>
               } 
             />
-            <Route path="/requests" element={<RequestsPage />} /> {/* Add the new route */}
+            <Route path="/requests" element={<RequestsPage />} />
             <Route path="/requests/:id" element={<RequestDetailsPage />} />
             <Route path="/lawyers" element={<LawyersDirectory />} />
             <Route path="/courts" element={<CourtsListPage />} />
             <Route path="/requests/court/:courtId" element={<RequestsByCourtPage />} />
+            <Route path="/conversations" element={<ConversationsPage />} />
+            <Route path="/conversations/:id" element={<ConversationsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
