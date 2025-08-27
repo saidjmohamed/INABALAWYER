@@ -7,8 +7,9 @@ export type Court = {
 
 export enum RequestStatus {
   Open = "open",
-  InProgress = "in_progress",
+  Assigned = "assigned",
   Closed = "closed",
+  Cancelled = "cancelled",
 }
 
 export type Request = {
