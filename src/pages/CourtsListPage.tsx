@@ -11,7 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import RequestCard from '@/components/requests/RequestCard';
+import { RequestCard } from '@/components/requests/RequestCard';
 import { cn } from '@/lib/utils';
 
 const CourtsListPage = () => {

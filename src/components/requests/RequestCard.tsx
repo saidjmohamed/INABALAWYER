@@ -21,7 +21,7 @@ const typeTranslations: { [key: string]: string } = {
   other: 'أخرى',
 };
 
-const RequestCard = ({ request }: { request: RequestWithDetails }) => {
+export const RequestCard = ({ request }: { request: RequestWithDetails }) => {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'open': return 'default';
@@ -68,5 +68,3 @@ const RequestCard = ({ request }: { request: RequestWithDetails }) => {
     </Card>
   );
 };
-
-export default RequestCard;
