@@ -50,8 +50,8 @@ export default function RequestsByCourtPage() {
       .select(`
         *,
         court:courts(*),
-        creator:profiles!requests_creator_id_fkey(*),
-        lawyer:profiles!requests_lawyer_id_fkey(*)
+        creator:profiles!creator_id(*),
+        lawyer:profiles!lawyer_id(*)
       `)
       .eq("court_id", courtId)
       .order("created_at", { ascending: false });
