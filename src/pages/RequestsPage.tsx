@@ -26,7 +26,7 @@ export default function RequestsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("requests")
-      .select("*, creator:profiles(*), court:courts(*), lawyer:profiles(*)")
+      .select("*, creator:creator_id(*), court:courts(*), lawyer:lawyer_id(*)")
       .order("created_at", { ascending: false });
 
     if (error) {

@@ -31,7 +31,7 @@ export default function RequestsByCourtPage() {
 
     const requestsPromise = supabase
       .from("requests")
-      .select("*, creator:profiles(*), court:courts(*), lawyer:profiles(*)")
+      .select("*, creator:creator_id(*), court:courts(*), lawyer:lawyer_id(*)")
       .eq("court_id", courtId)
       .order("created_at", { ascending: false });
 
