@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../integrations/supabase/client';
-import { useSession } from '../contexts/SessionContext';
-import { Profile } from '../types';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/contexts/SessionContext';
+import { Profile } from '@/types';
 import { Navigate } from 'react-router-dom';
 import {
   Table,
@@ -10,11 +10,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../components/ui/table';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { showSuccess, showError } from '../utils/toast';
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { showSuccess, showError } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
+import { DesignerAvatarManager } from '@/components/admin/DesignerAvatarManager';
 
 const AdminDashboard = () => {
   const { session, profile, loading: sessionLoading } = useSession();
@@ -112,6 +113,7 @@ const AdminDashboard = () => {
           </div>
         ) : (
           <>
+            <DesignerAvatarManager />
             <Card>
               <CardHeader>
                 <CardTitle>حسابات المحامين المعلقة</CardTitle>

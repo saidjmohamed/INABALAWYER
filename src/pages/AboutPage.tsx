@@ -1,7 +1,27 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const AboutPage = () => {
+  const [designerAvatarUrl, setDesignerAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'designer_avatar_url')
+        .single();
+      
+      if (data && data.value) {
+        setDesignerAvatarUrl(data.value);
+      }
+    };
+    fetchAvatar();
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">عن التطبيق</h1>
@@ -29,12 +49,20 @@ const AboutPage = () => {
             <CardTitle className="text-2xl">عن المصمم</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700">
-            <p>
-              تم تصميم وتطوير هذا التطبيق من طرف الأستاذ سايج محمد، محامٍ جزائري معتمد لدى منظمة محامي الجزائر، وباحث في مجال أنظمة الذكاء الاصطناعي وتقنيات Vibe Coding.
-            </p>
-            <p>
-              جمع الأستاذ سايج محمد بين خبرته المهنية في ميدان المحاماة واهتمامه بالابتكار التكنولوجي، من أجل وضع أداة عملية حديثة تواكب احتياجات المحامي وتُساهم في تطوير آليات العمل القانوني.
-            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-right">
+              <Avatar className="h-24 w-24 flex-shrink-0">
+                <AvatarImage src={designerAvatarUrl || undefined} alt="الأستاذ سايج محمد" />
+                <AvatarFallback className="text-3xl">SM</AvatarFallback>
+              </Avatar>
+              <div>
+                <p>
+                  تم تصميم وتطوير هذا التطبيق من طرف الأستاذ سايج محمد، محامٍ جزائري معتمد لدى منظمة محامي الجزائر، وباحث في مجال أنظمة الذكاء الاصطناعي وتقنيات Vibe Coding.
+                </p>
+                <p className="mt-2">
+                  جمع الأستاذ سايج محمد بين خبرته المهنية في ميدان المحاماة واهتمامه بالابتكار التكنولوجي، من أجل وضع أداة عملية حديثة تواكب احتياجات المحامي وتُساهم في تطوير آليات العمل القانوني.
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
