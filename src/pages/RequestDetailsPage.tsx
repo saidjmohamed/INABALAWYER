@@ -242,7 +242,11 @@ const RequestDetailsPage = () => {
               </AlertDialog>
             )}
             <Button variant="outline" asChild className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
-              <Link to="/"><ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية</Link>
+              <Link to="/">
+                <span className="flex items-center">
+                  <ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية
+                </span>
+              </Link>
             </Button>
           </div>
         </header>

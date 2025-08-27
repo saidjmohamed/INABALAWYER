@@ -46,7 +46,11 @@ const RequestsByCourtPage = () => {
         <h1 className="text-3xl font-bold text-gray-900">طلبات {courtName}</h1>
         <div className="flex gap-4">
             <Button variant="outline" asChild>
-              <Link to="/courts"><ArrowRight className="ml-2 h-4 w-4" /> العودة للمحاكم</Link>
+              <Link to="/courts">
+                <span className="flex items-center">
+                  <ArrowRight className="ml-2 h-4 w-4" /> العودة للمحاكم
+                </span>
+              </Link>
             </Button>
         </div>
       </header>
