@@ -6,10 +6,9 @@ export interface Court {
 }
 
 export enum RequestType {
-  Marafah = "مرافعة",
-  Istishara = "استشارة",
-  TaqdeemMustanad = "تقديم مستند",
-  MutabaahQadiyah = "متابعة قضية",
+  ViewCase = "اطلاع على قضية",
+  SessionRepresentation = "طلب إنابة في جلسة",
+  OtherRequest = "طلب آخر",
 }
 
 export type RequestStatus = 'open' | 'assigned' | 'closed' | 'cancelled';
