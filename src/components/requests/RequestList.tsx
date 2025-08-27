@@ -38,6 +38,15 @@ export interface RequestListProps {
   courtId?: string;
 }
 
+const cardColors = [
+  "bg-sky-50 hover:bg-sky-100",
+  "bg-emerald-50 hover:bg-emerald-100",
+  "bg-amber-50 hover:bg-amber-100",
+  "bg-rose-50 hover:bg-rose-100",
+  "bg-violet-50 hover:bg-violet-100",
+  "bg-fuchsia-50 hover:bg-fuchsia-100",
+];
+
 export const RequestList = ({ courtId }: RequestListProps) => {
   const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,13 +108,14 @@ export const RequestList = ({ courtId }: RequestListProps) => {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {requests.map((request) => {
+      {requests.map((request, index) => {
         const hasReplies = request.replies && request.replies.length > 0 && request.replies[0].count > 0;
+        const colorClass = cardColors[index % cardColors.length];
         return (
           <Link to={`/requests/${request.id}`} key={request.id} className="block hover:shadow-lg transition-shadow duration-200 rounded-lg">
             <Card className={cn(
               "flex flex-col h-full transition-colors",
-              hasReplies ? "bg-emerald-50 hover:bg-emerald-100" : "bg-amber-50 hover:bg-amber-100"
+              colorClass
             )}>
               <CardHeader>
                 <div className="flex justify-between items-start">
