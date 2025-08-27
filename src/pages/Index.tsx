@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/contexts/SessionContext';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Gavel, Users, User } from 'lucide-react';
 import { RequestList } from '@/components/requests/RequestList';
 
 const Index = () => {
@@ -27,7 +27,7 @@ const Index = () => {
                 <Link to="/login">
                   <Button variant="ghost">تسجيل الدخول</Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/signup">
                   <Button>إنشاء حساب</Button>
                 </Link>
               </>
@@ -37,30 +37,55 @@ const Index = () => {
       </header>
       <main className="flex-grow container mx-auto p-4">
         {session ? (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-gray-800">الطلبات الحالية</h2>
-              {profile ? (
-                <Link to="/requests/new">
-                  <Button>
-                    <PlusCircle className="ml-2 h-4 w-4" />
-                    إضافة طلب جديد
-                  </Button>
-                </Link>
-              ) : (
-                <Button disabled title="يجب تفعيل حسابك أولاً">
-                  <PlusCircle className="ml-2 h-4 w-4" />
-                  إضافة طلب جديد
-                </Button>
-              )}
+          <div className="space-y-8">
+            <div className="p-8 bg-white rounded-lg shadow-sm text-center">
+              <h2 className="text-3xl font-bold text-gray-800">
+                أهلاً بك مجدداً، {profile ? profile.first_name : 'محامينا'}!
+              </h2>
+              <p className="text-gray-600 mt-2">
+                أنت في المكان المناسب لإدارة طلباتك والتواصل مع زملائك.
+              </p>
             </div>
+
             {profile ? (
-              <RequestList />
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Link to="/requests">
+                    <Button className="w-full h-full text-lg py-4 flex flex-col gap-2">
+                      <PlusCircle className="h-6 w-6" />
+                      <span>إضافة أو عرض الطلبات</span>
+                    </Button>
+                  </Link>
+                  <Link to="/courts">
+                    <Button variant="outline" className="w-full h-full text-lg py-4 flex flex-col gap-2">
+                      <Gavel className="h-6 w-6" />
+                      <span>تصفح المحاكم</span>
+                    </Button>
+                  </Link>
+                  <Link to="/lawyers">
+                    <Button variant="outline" className="w-full h-full text-lg py-4 flex flex-col gap-2">
+                      <Users className="h-6 w-6" />
+                      <span>جدول المحامين</span>
+                    </Button>
+                  </Link>
+                  <Link to="/profile">
+                    <Button variant="outline" className="w-full h-full text-lg py-4 flex flex-col gap-2">
+                      <User className="h-6 w-6" />
+                      <span>ملفي الشخصي</span>
+                    </Button>
+                  </Link>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">أحدث الطلبات المفتوحة</h3>
+                  <RequestList />
+                </div>
+              </>
             ) : (
               <div className="text-center p-8 border rounded-lg bg-yellow-50 text-yellow-800">
                 <p className="font-semibold">حسابك قيد المراجعة</p>
                 <p className="mt-2">
-                  ستتمكن من رؤية الطلبات وإنشاء طلبات جديدة بمجرد الموافقة على حسابك من قبل الإدارة.
+                  ستتمكن من استخدام ميزات المنصة بمجرد الموافقة على حسابك من قبل الإدارة.
                 </p>
               </div>
             )}
@@ -71,7 +96,7 @@ const Index = () => {
             <p className="text-lg text-gray-700 mb-8 max-w-2xl">
               تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
             </p>
-            <Link to="/register">
+            <Link to="/signup">
               <Button size="lg">ابدأ الآن</Button>
             </Link>
           </div>
