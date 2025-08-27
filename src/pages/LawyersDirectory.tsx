@@ -105,21 +105,21 @@ const LawyersDirectory = () => {
                 className="pl-10"
               />
             </div>
-            <Select value={specialty} onValueChange={setSpecialty}>
+            <Select value={specialty} onValueChange={(value) => setSpecialty(value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="التخصص" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 {specialties.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Select value={experience} onValueChange={setExperience}>
+            <Select value={experience} onValueChange={(value) => setExperience(value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="سنوات الخبرة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 <SelectItem value="5">5+ سنوات</SelectItem>
                 <SelectItem value="10">10+ سنوات</SelectItem>
                 <SelectItem value="15">15+ سنوات</SelectItem>
