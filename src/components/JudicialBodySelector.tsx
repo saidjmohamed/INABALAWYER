@@ -43,8 +43,11 @@ export const JudicialBodySelector = ({ councils, courts, value, onChange }: Judi
               return (
                 <AccordionItem value={council.id} key={council.id}>
                   <AccordionTrigger className="px-2 py-2 hover:no-underline">
-                    <div className="flex items-center space-x-2 space-x-reverse w-full">
-                      <RadioGroupItem value={councilValue} id={councilValue} onClick={(e) => { e.stopPropagation(); onChange(councilValue); }} />
+                    <div 
+                      className="flex items-center space-x-2 space-x-reverse"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <RadioGroupItem value={councilValue} id={councilValue} />
                       <Label htmlFor={councilValue} className="cursor-pointer">{council.name} (مجلس)</Label>
                     </div>
                   </AccordionTrigger>
