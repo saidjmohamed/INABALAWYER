@@ -59,14 +59,14 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
               icon={<PlusCircle className="h-8 w-8 text-primary" />}
-              title="إضافة قضية جديدة"
-              description="قم بإضافة قضية جديدة ليراها المحامون الآخرون."
+              title="ايداع طلب جديد"
+              description="قم بإيداع طلب إنابة أو معلومة جديد ليطلع عليه الزملاء."
               link="/cases/new"
             />
             <FeatureCard
               icon={<Briefcase className="h-8 w-8 text-primary" />}
-              title="إدارة القضايا"
-              description="عرض وتتبع جميع القضايا القانونية المتاحة."
+              title="الاطلاع على طلبات الزملاء"
+              description="تصفح جميع الطلبات التي أودعها الزملاء المحامون."
               link="/cases"
             />
             <FeatureCard

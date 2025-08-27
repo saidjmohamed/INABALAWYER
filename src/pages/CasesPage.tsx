@@ -54,11 +54,11 @@ export default function CasesPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">القضايا</h1>
+        <h1 className="text-3xl font-bold">طلبات الزملاء</h1>
         <Button asChild>
           <Link to="/cases/new">
             <PlusCircle className="ml-2 h-4 w-4" />
-            إضافة قضية جديدة
+            إيداع طلب جديد
           </Link>
         </Button>
       </div>
@@ -71,7 +71,7 @@ export default function CasesPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-500">لا توجد قضايا حالياً.</p>
+          <p className="text-gray-500">لا توجد طلبات حالياً.</p>
         </div>
       )}
     </div>

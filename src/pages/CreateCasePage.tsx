@@ -53,11 +53,11 @@ export default function CreateCasePage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <header className="flex justify-between items-center w-full max-w-2xl mx-auto py-4 border-b mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">إنشاء قضية جديدة</h1>
+        <h1 className="text-3xl font-bold text-gray-900">إيداع طلب جديد</h1>
         <Button variant="outline" asChild>
           <Link to="/cases">
             <span className="flex items-center">
-              <ArrowRight className="ml-2 h-4 w-4" /> العودة للقضايا
+              <ArrowRight className="ml-2 h-4 w-4" /> العودة للطلبات
             </span>
           </Link>
         </Button>
@@ -65,7 +65,7 @@ export default function CreateCasePage() {
       <main className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>املأ تفاصيل القضية</CardTitle>
+            <CardTitle>املأ تفاصيل الطلب</CardTitle>
           </CardHeader>
           <CardContent>
             <CreateCaseForm councils={councils} courts={courts} currentProfile={profile} />
