@@ -12,7 +12,8 @@ import RequestDetailsPage from "@/pages/RequestDetailsPage";
 import LawyersDirectory from "@/pages/LawyersDirectory";
 import CourtsListPage from "@/pages/CourtsListPage";
 import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
-import ProfilePage from "@/pages/ProfilePage"; // Import the new ProfilePage
+import ProfilePage from "@/pages/ProfilePage";
+import RequestsPage from "@/pages/RequestsPage"; // Import the new page
 import { SessionProvider } from "@/contexts/SessionContext";
 import AdminRoute from "@/components/auth/AdminRoute";
 
@@ -29,7 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<ProfilePage />} /> {/* New route for ProfilePage */}
+            <Route path="/profile" element={<ProfilePage />} />
             <Route 
               path="/admin" 
               element={
@@ -38,6 +39,7 @@ const App = () => (
                 </AdminRoute>
               } 
             />
+            <Route path="/requests" element={<RequestsPage />} /> {/* Add the new route */}
             <Route path="/requests/:id" element={<RequestDetailsPage />} />
             <Route path="/lawyers" element={<LawyersDirectory />} />
             <Route path="/courts" element={<CourtsListPage />} />

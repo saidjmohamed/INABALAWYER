@@ -9,9 +9,9 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-primary text-primary-foreground p-4 shadow-md">
-        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
+        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
-          <nav className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4"> {/* Added flex-col sm:flex-row and gap-2 sm:gap-4 */}
+          <nav className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
             {profile && (
               <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
             )}
@@ -20,7 +20,7 @@ const Index = () => {
                 <User className="ml-2 h-4 w-4" /> ملفي الشخصي
               </Button>
             </Link>
-            <Link to="/lawyers-directory">
+            <Link to="/lawyers">
               <Button variant="secondary" size="sm">جدول المحامين</Button>
             </Link>
             {session && (
@@ -37,7 +37,7 @@ const Index = () => {
           تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
         </p>
         {!session && (
-          <div className="flex flex-col sm:flex-row gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
+          <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/login">
               <Button size="lg" className="w-full sm:w-auto">تسجيل الدخول</Button>
             </Link>
@@ -51,12 +51,9 @@ const Index = () => {
             <p className="text-xl text-gray-800">
               أهلاً بك في لوحة التحكم الخاصة بك.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/requests">
-                <Button size="lg" className="w-full sm:w-auto">عرض طلبات الإنابة</Button>
-              </Link>
-              <Link to="/create-request">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">إنشاء طلب إنابة جديد</Button>
+                <Button size="lg" className="w-full sm:w-auto">عرض وإنشاء طلبات الإنابة</Button>
               </Link>
             </div>
           </div>
