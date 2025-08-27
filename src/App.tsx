@@ -1,26 +1,26 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { SessionProvider } from "@/contexts/SessionContext";
-import { PresenceProvider } from "@/contexts/PresenceContext";
+import { Toaster as Sonner } from "./components/ui/sonner";
+import { SessionProvider } from "./contexts/SessionContext";
+import { PresenceProvider } from "./contexts/PresenceContext";
 
 // Pages
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import Signup from "@/pages/Signup";
-import AdminDashboard from "@/pages/AdminDashboard";
-import ProfilePage from "@/pages/ProfilePage";
-import CourtsListPage from "@/pages/CourtsListPage";
-import LawyersDirectory from "@/pages/LawyersDirectory";
-import ConversationsPage from "@/pages/ConversationsPage";
-import AboutPage from "@/pages/AboutPage";
-import NotFound from "@/pages/NotFound";
-import CasesPage from "@/pages/CasesPage";
-import CreateCasePage from "@/pages/CreateCasePage";
-import CaseDetailsPage from "@/pages/CaseDetailsPage";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProfilePage from "./pages/ProfilePage";
+import CourtsListPage from "./pages/CourtsListPage";
+import LawyersDirectory from "./pages/LawyersDirectory";
+import ConversationsPage from "./pages/ConversationsPage";
+import AboutPage from "./pages/AboutPage";
+import NotFound from "./pages/NotFound";
+import CasesPage from "./pages/CasesPage";
+import CreateCasePage from "./pages/CreateCasePage";
+import CaseDetailsPage from "./pages/CaseDetailsPage";
 
 // Auth wrappers
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import AdminRoute from "@/components/auth/AdminRoute";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import AdminRoute from "./components/auth/AdminRoute";
 
 function App() {
   return (
