@@ -52,6 +52,10 @@ export type RequestWithDetails = Request & {
   lawyer: Profile | null;
 };
 
+export type RequestForList = RequestWithDetails & {
+  replies: { count: number }[];
+};
+
 export type Reply = {
   id: string;
   author_id: string;

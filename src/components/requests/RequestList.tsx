@@ -8,30 +8,12 @@ import { showError } from '@/utils/toast';
 import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-
-export interface RequestWithDetails {
-  id: string;
-  created_at: string;
-  type: 'information_request' | 'representation' | 'other_request';
-  case_number: string;
-  status: 'open' | 'closed' | 'in_progress';
-  details?: string;
-  section?: string;
-  creator: {
-    id: string;
-    first_name: string;
-    last_name: string;
-  } | null;
-  court: {
-    name: string;
-  } | null;
-  replies: { count: number }[];
-}
+import { RequestForList } from '@/types';
 
 const requestTypeTranslations = {
-  information_request: 'طلب معلومة من تطبيقة',
+  information_retrieval: 'طلب معلومة من تطبيقة',
   representation: 'طلب إنابة',
-  other_request: 'طلب آخر',
+  other: 'طلب آخر',
 };
 
 export interface RequestListProps {
@@ -48,7 +30,7 @@ const cardColors = [
 ];
 
 export const RequestList = ({ courtId }: RequestListProps) => {
-  const [requests, setRequests] = useState<RequestWithDetails[]>([]);
+  const [requests, setRequests] = useState<RequestForList[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,13 +40,10 @@ export const RequestList = ({ courtId }: RequestListProps) => {
       let query = supabase
         .from('requests')
         .select(`
-          id,
-          created_at,
-          type,
-          case_number,
-          status,
-          creator:creator_id ( id, first_name, last_name ),
-          court:courts ( name ),
+          *,
+          court:courts(*),
+          creator:profiles!creator_id(*),
+          lawyer:profiles!lawyer_id(*),
           replies(count)
         `)
         .eq('status', 'open');
@@ -81,7 +60,7 @@ export const RequestList = ({ courtId }: RequestListProps) => {
         showError('Failed to fetch requests: ' + error.message);
         setRequests([]);
       } else {
-        setRequests(data as unknown as RequestWithDetails[]);
+        setRequests(data as unknown as RequestForList[]);
       }
       setLoading(false);
     };

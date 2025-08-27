@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
-import { RequestWithDetails, ReplyWithAuthor } from '@/types';
+import { RequestWithDetails, ReplyWithAuthor, Reply } from '@/types';
 import { Loader2, ArrowRight, Send, User, Landmark, Calendar, FileText, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -58,7 +58,7 @@ const RequestDetailsPage = () => {
           .order('created_at', { ascending: true });
 
         if (repliesError) throw repliesError;
-        setReplies(repliesData);
+        setReplies(repliesData as ReplyWithAuthor[]);
       } catch (error: any) {
         showError(`فشل في تحميل تفاصيل الطلب: ${error.message}`);
         setRequest(null);
@@ -75,7 +75,7 @@ const RequestDetailsPage = () => {
 
     const channel = supabase
       .channel(`replies-for-request-${id}`)
-      .on<ReplyWithAuthor>(
+      .on<Reply>(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'replies', filter: `request_id=eq.${id}` },
         async (payload) => {
