@@ -26,10 +26,10 @@ export function RequestsPage() {
         const { data: requestsData, error: requestsError } = await supabase
           .from("requests")
           .select(`
-            id, creator_id, court_id, type, case_number, section, details, status, created_at, lawyer_id, session_date, plaintiff_details, defendant_details,
+            *,
             court:courts(*),
-            creator:profiles!creator_id(*),
-            lawyer:profiles!lawyer_id(*)
+            creator:profiles!requests_creator_id_fkey(*),
+            lawyer:profiles!requests_lawyer_id_fkey(*)
           `)
           .order("created_at", { ascending: false });
         if (requestsError) throw requestsError;
