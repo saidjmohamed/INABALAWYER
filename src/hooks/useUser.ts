@@ -1,3 +1,3 @@
-import { useSession } from '@/contexts/SessionContext';
+import { useSession } from '../contexts/SessionContext';
 
 export const useUser = useSession;

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useSession } from '@/contexts/SessionContext';
+import { useSession } from '../contexts/SessionContext';
 import { Navigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ProfileEditForm } from '@/components/profiles/ProfileEditForm';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { ProfileEditForm } from '../components/profiles/ProfileEditForm';
 import { Loader2, ArrowRight, Edit } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '../components/ui/separator';
 
 const ProfilePage = () => {
   const { session, profile, loading: sessionLoading } = useSession();

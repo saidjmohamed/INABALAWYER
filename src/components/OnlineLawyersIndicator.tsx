@@ -1,4 +1,4 @@
-import { usePresence } from '@/contexts/PresenceContext';
+import { usePresence } from '../contexts/PresenceContext';
 import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "./ui/tooltip";
 
 export const OnlineLawyersIndicator = () => {
   const { onlineUsers } = usePresence();

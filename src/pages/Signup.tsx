@@ -1,5 +1,5 @@
-import { SignUpForm } from '@/components/auth/SignUpForm';
-import { useSession } from '@/contexts/SessionContext';
+import { SignUpForm } from '../components/auth/SignUpForm';
+import { useSession } from '../contexts/SessionContext';
 import { Navigate, Link } from 'react-router-dom';
 
 const Signup = () => {

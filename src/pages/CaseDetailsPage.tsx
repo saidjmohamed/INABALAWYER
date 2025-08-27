@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { CaseWithDetails } from '@/types';
+import { supabase } from '../integrations/supabase/client';
+import { CaseWithDetails } from '../types';
 import { Loader2, ArrowRight, User, Landmark, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { showError } from '@/utils/toast';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { showError } from '../utils/toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { CaseWithDetails } from "@/types";
+import { supabase } from "../integrations/supabase/client";
+import { CaseWithDetails } from "../types";
 import { CaseCard } from "../components/CaseCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "../components/ui/skeleton";
+import { Button } from "../components/ui/button";
 import { PlusCircle } from "lucide-react";
 
 export default function CasesPage() {

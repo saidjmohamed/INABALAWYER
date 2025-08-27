@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { supabase } from '../integrations/supabase/client';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { CaseCard } from '../components/CaseCard';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { Council, Court, CaseWithDetails } from '@/types';
+import { Council, Court, CaseWithDetails } from '../types';
 
 export default function CourtsListPage() {
   const [councils, setCouncils] = useState<Council[]>([]);

@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useSession } from '@/contexts/SessionContext';
-import { Profile } from '@/types';
-import { ChatWindow } from '@/components/chat/ChatWindow';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { supabase } from '../integrations/supabase/client';
+import { useSession } from '../contexts/SessionContext';
+import { Profile } from '../types';
+import { ChatWindow } from '../components/chat/ChatWindow';
+import { Button } from '../components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Loader2, ArrowRight, MessageSquare, MoreHorizontal, Trash2 } from 'lucide-react';
-import { showError, showSuccess } from '@/utils/toast';
-import { cn } from '@/lib/utils';
-import { usePresence } from '@/contexts/PresenceContext';
+import { showError, showSuccess } from '../utils/toast';
+import { cn } from '../lib/utils';
+import { usePresence } from '../contexts/PresenceContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '../components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '../components/ui/alert-dialog';
 
 interface Conversation {
   id: string;

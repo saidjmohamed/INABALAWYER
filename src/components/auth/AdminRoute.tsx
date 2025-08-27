@@ -1,4 +1,4 @@
-import { useSession } from '@/contexts/SessionContext';
+import { useSession } from '../../contexts/SessionContext';
 import { Navigate } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';

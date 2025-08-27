@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '../integrations/supabase/client';
 import { useSession } from './SessionContext';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
