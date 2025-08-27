@@ -9,16 +9,14 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ProfilePage from "@/pages/ProfilePage";
-import RequestDetailsPage from "@/pages/RequestDetailsPage";
 import CourtsListPage from "@/pages/CourtsListPage";
 import LawyersDirectory from "@/pages/LawyersDirectory";
 import ConversationsPage from "@/pages/ConversationsPage";
-import RepresentationCalendarPage from "@/pages/RepresentationCalendarPage";
 import AboutPage from "@/pages/AboutPage";
 import NotFound from "@/pages/NotFound";
-import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
-import { RequestsPage } from "@/pages/RequestsPage";
-import CreateRequestPage from "@/pages/CreateRequestPage";
+import CasesPage from "@/pages/CasesPage";
+import CreateCasePage from "@/pages/CreateCasePage";
+import CaseDetailsPage from "@/pages/CaseDetailsPage";
 
 // Auth wrappers
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -37,15 +35,13 @@ function App() {
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/requests" element={<ProtectedRoute><RequestsPage /></ProtectedRoute>} />
-            <Route path="/requests/new" element={<ProtectedRoute><CreateRequestPage /></ProtectedRoute>} />
-            <Route path="/requests/:id" element={<ProtectedRoute><RequestDetailsPage /></ProtectedRoute>} />
+            <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
+            <Route path="/cases/new" element={<ProtectedRoute><CreateCasePage /></ProtectedRoute>} />
+            <Route path="/cases/:id" element={<ProtectedRoute><CaseDetailsPage /></ProtectedRoute>} />
             <Route path="/courts" element={<ProtectedRoute><CourtsListPage /></ProtectedRoute>} />
-            <Route path="/courts/:courtId" element={<ProtectedRoute><RequestsByCourtPage /></ProtectedRoute>} />
             <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
             <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
             <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/representation-calendar" element={<ProtectedRoute><RepresentationCalendarPage /></ProtectedRoute>} />
             <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
             
             {/* Admin Routes */}

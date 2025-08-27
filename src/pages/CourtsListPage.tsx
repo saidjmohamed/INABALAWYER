@@ -1,78 +1,86 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { RequestCard } from '@/components/requests/RequestCard';
+import { CaseCard } from '@/components/CaseCard';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { Court, RequestWithDetails } from '@/types';
+import { Council, Court, CaseWithDetails } from '@/types';
 
-const CourtsListPage = () => {
+export default function CourtsListPage() {
+  const [councils, setCouncils] = useState<Council[]>([]);
   const [courts, setCourts] = useState<Court[]>([]);
-  const [parentCourts, setParentCourts] = useState<Court[]>([]);
-  const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [requests, setRequests] = useState<RequestWithDetails[]>([]);
-  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [cases, setCases] = useState<CaseWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBody, setSelectedBody] = useState<{ type: 'council' | 'court', id: string, name: string } | null>(null);
 
   useEffect(() => {
-    const fetchCourts = async () => {
-      const { data, error } = await supabase.from('courts').select('*');
-      if (error) {
-        console.error('Error fetching courts:', error);
-        toast.error('فشل في جلب المحاكم');
-      } else {
-        const allCourts = data as Court[];
-        setCourts(allCourts);
-        setParentCourts(allCourts.filter(c => c.parent_id === null));
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const { data: councilsData, error: councilsError } = await supabase.from('councils').select('*').order('name');
+        if (councilsError) throw councilsError;
+        setCouncils(councilsData || []);
+
+        const { data: courtsData, error: courtsError } = await supabase.from('courts').select('*').order('name');
+        if (courtsError) throw courtsError;
+        setCourts(courtsData || []);
+      } catch (error: any) {
+        toast.error('فشل في جلب الجهات القضائية');
       }
+      setLoading(false);
     };
-    fetchCourts();
+    fetchData();
   }, []);
 
-  const handleCourtSelect = async (court: Court) => {
-    setSelectedCourt(court);
-    setLoadingRequests(true);
-    const { data, error } = await supabase
-      .from('requests')
-      .select(`
-        *,
-        court:courts(*),
-        creator:profiles!requests_creator_id_fkey(*),
-        lawyer:profiles!requests_lawyer_id_fkey(*)
-      `)
-      .eq('court_id', court.id);
+  useEffect(() => {
+    const fetchCases = async () => {
+      if (!selectedBody) {
+        setCases([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        let query = supabase.from('cases').select(`*, court:courts(*), council:councils(*), creator:profiles!cases_creator_id_fkey(*)`);
+        if (selectedBody.type === 'council') {
+          query = query.eq('council_id', selectedBody.id);
+        } else {
+          query = query.eq('court_id', selectedBody.id);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+        setCases(data as any as CaseWithDetails[]);
+      } catch (error: any) {
+        toast.error(`فشل في جلب القضايا لـ ${selectedBody.name}`);
+      }
+      setLoading(false);
+    };
+    fetchCases();
+  }, [selectedBody]);
 
-    if (error) {
-      console.error('Error fetching requests:', error);
-      toast.error('فشل في جلب القضايا');
-      setRequests([]);
-    } else {
-      setRequests(data as any as RequestWithDetails[]);
-    }
-    setLoadingRequests(false);
-  };
+  if (loading && councils.length === 0) {
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-73px)]">
       <aside className="w-full md:w-1/3 md:max-w-xs border-r bg-white overflow-y-auto p-4">
-        <h2 className="text-lg font-semibold mb-4">اختر محكمة</h2>
-        <Accordion type="single" collapsible className="w-full">
-          {parentCourts.map(parent => (
-            <AccordionItem value={parent.id} key={parent.id}>
-              <AccordionTrigger>{parent.name}</AccordionTrigger>
+        <h2 className="text-lg font-semibold mb-4">الجهات القضائية</h2>
+        <Accordion type="multiple" className="w-full">
+          {councils.map(council => (
+            <AccordionItem value={council.id} key={council.id}>
+              <AccordionTrigger onClick={() => setSelectedBody({ type: 'council', id: council.id, name: council.name })}>
+                {council.name}
+              </AccordionTrigger>
               <AccordionContent>
                 <ul className="pl-4">
-                  <li
-                    key={parent.id}
-                    className={`cursor-pointer p-2 rounded ${selectedCourt?.id === parent.id ? 'bg-gray-200' : ''}`}
-                    onClick={() => handleCourtSelect(parent)}
-                  >
-                    {parent.name}
-                  </li>
-                  {courts.filter(court => court.parent_id === parent.id).map(court => (
+                  {courts.filter(c => c.council_id === council.id).map(court => (
                     <li
                       key={court.id}
-                      className={`cursor-pointer p-2 rounded ${selectedCourt?.id === court.id ? 'bg-gray-200' : ''}`}
-                      onClick={() => handleCourtSelect(court)}
+                      className={`cursor-pointer p-2 rounded hover:bg-gray-100 ${selectedBody?.id === court.id ? 'bg-gray-200' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedBody({ type: 'court', id: court.id, name: court.name });
+                      }}
                     >
                       {court.name}
                     </li>
@@ -83,32 +91,30 @@ const CourtsListPage = () => {
           ))}
         </Accordion>
       </aside>
-      <main className="flex-1 p-6 overflow-y-auto">
-        {selectedCourt ? (
+      <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
+        {selectedBody ? (
           <>
-            <h1 className="text-2xl font-bold mb-4">القضايا في {selectedCourt.name}</h1>
-            {loadingRequests ? (
+            <h1 className="text-2xl font-bold mb-4">القضايا في {selectedBody.name}</h1>
+            {loading ? (
               <div className="flex justify-center items-center h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
               </div>
-            ) : requests.length > 0 ? (
-              <div className="space-y-4">
-                {requests.map(request => (
-                  <RequestCard key={request.id} request={request} />
+            ) : cases.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                {cases.map(caseItem => (
+                  <CaseCard key={caseItem.id} case={caseItem} />
                 ))}
               </div>
             ) : (
-              <p>لا توجد قضايا في هذه المحكمة.</p>
+              <p>لا توجد قضايا في هذه الجهة القضائية.</p>
             )}
           </>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">الرجاء اختيار محكمة لعرض القضايا الخاصة بها.</p>
+            <p className="text-gray-500">الرجاء اختيار جهة قضائية لعرض القضايا الخاصة بها.</p>
           </div>
         )}
       </main>
     </div>
   );
-};
-
-export default CourtsListPage;
+}

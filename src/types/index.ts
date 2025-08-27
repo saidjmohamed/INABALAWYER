@@ -1,8 +1,5 @@
 export type UserRole = 'admin' | 'lawyer';
 export type UserStatus = 'pending' | 'active' | 'rejected' | 'disabled';
-export type RequestStatus = 'open' | 'closed' | 'in_progress' | 'assigned' | 'cancelled';
-export type RequestType = 'information_retrieval' | 'representation' | 'other';
-export type CourtLevel = 'first_instance' | 'appeal' | 'cassation';
 
 export type Profile = {
   id: string;
@@ -23,47 +20,32 @@ export type Profile = {
   organization: string | null;
 };
 
-export type Court = {
+export type Council = {
   id: string;
   name: string;
-  level: CourtLevel;
-  parent_id: string | null;
+  created_at: string;
 };
 
-export type Request = {
+export type Court = {
   id: string;
+  council_id: string;
+  name: string;
+  type: 'ابتدائية' | 'إدارية' | 'استئنافية' | 'مجلس';
+  created_at: string;
+};
+
+export type Case = {
+  id: string;
+  title: string;
+  description: string | null;
+  court_id: string | null;
+  council_id: string | null;
   creator_id: string;
-  court_id: string;
-  type: RequestType;
-  case_number: string;
-  section: string | null;
-  details: string | null;
-  status: RequestStatus;
   created_at: string;
-  lawyer_id: string | null;
-  session_date: string | null;
-  plaintiff_details: string | null;
-  defendant_details: string | null;
 };
 
-export type RequestWithDetails = Request & {
-  court: Court;
+export type CaseWithDetails = Case & {
+  court: Court | null;
+  council: Council | null;
   creator: Profile;
-  lawyer: Profile | null;
-};
-
-export type RequestForList = RequestWithDetails & {
-  replies: { count: number }[];
-};
-
-export type Reply = {
-  id: string;
-  author_id: string;
-  request_id: string;
-  content: string;
-  created_at: string;
-};
-
-export type ReplyWithAuthor = Reply & {
-  author: Profile;
 };

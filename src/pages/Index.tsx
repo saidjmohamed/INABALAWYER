@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, CalendarDays, Info, PlusCircle } from 'lucide-react';
+import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, Info, PlusCircle } from 'lucide-react';
 import { OnlineLawyersIndicator } from '@/components/OnlineLawyersIndicator';
 
 const Index = () => {
@@ -59,20 +59,20 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
               icon={<PlusCircle className="h-8 w-8 text-primary" />}
-              title="إنشاء طلب جديد"
-              description="قم بإضافة طلب إنابة أو معلومة جديد ليراه المحامون الآخرون."
-              link="/requests/new"
+              title="إضافة قضية جديدة"
+              description="قم بإضافة قضية جديدة ليراها المحامون الآخرون."
+              link="/cases/new"
             />
             <FeatureCard
               icon={<Briefcase className="h-8 w-8 text-primary" />}
-              title="إدارة الطلبات"
-              description="عرض وتتبع جميع الطلبات القانونية المتاحة والموكلة إليك."
-              link="/requests"
+              title="إدارة القضايا"
+              description="عرض وتتبع جميع القضايا القانونية المتاحة."
+              link="/cases"
             />
             <FeatureCard
               icon={<Landmark className="h-8 w-8 text-primary" />}
-              title="المحاكم"
-              description="تصفح قائمة المحاكم والطلبات المرتبطة بكل محكمة."
+              title="الجهات القضائية"
+              description="تصفح قائمة المجالس والمحاكم والقضايا المرتبطة بها."
               link="/courts"
             />
             <FeatureCard
@@ -86,12 +86,6 @@ const Index = () => {
               title="المحادثات"
               description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
               link="/conversations"
-            />
-            <FeatureCard
-              icon={<CalendarDays className="h-8 w-8 text-primary" />}
-              title="تقويم الإنابات"
-              description="عرض جميع طلبات الإنابة في تقويم تفاعلي."
-              link="/representation-calendar"
             />
             <FeatureCard
               icon={<Info className="h-8 w-8 text-primary" />}
