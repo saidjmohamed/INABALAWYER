@@ -1,80 +1,82 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useSession } from '@/contexts/SessionContext';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
+import { useSession } from '@/contexts/SessionContext';
+import { PlusCircle } from 'lucide-react';
+import { RequestList } from '@/components/requests/RequestList';
 
 const Index = () => {
-  const { session, profile, signOut } = useSession();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
+  const { session, profile } = useSession();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-primary text-primary-foreground p-4 shadow-md">
-        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
-          <nav className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            {session && profile ? (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm">
+        <div className="container mx-auto p-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-primary">LegalLink</h1>
+          <nav className="flex items-center gap-4">
+            {session ? (
               <>
-                <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
-                <Button variant="secondary" size="sm" asChild>
-                  <Link to="/profile">
-                    <span className="flex items-center">
-                      <User className="ml-2 h-4 w-4" /> ملفي الشخصي
-                    </span>
-                  </Link>
-                </Button>
-                <Button variant="secondary" size="sm" asChild>
-                  <Link to="/lawyers">جدول المحامين</Link>
-                </Button>
-                <Button variant="secondary" size="sm" onClick={handleSignOut}>
-                  <span className="flex items-center">
-                    <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
-                  </span>
-                </Button>
+                <span className="text-gray-700">
+                  {profile ? `مرحباً، ${profile.first_name}` : 'مرحباً بك'}
+                </span>
+                <Link to="/profile">
+                  <Button variant="outline">ملفي الشخصي</Button>
+                </Link>
               </>
-            ) : null}
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost">تسجيل الدخول</Button>
+                </Link>
+                <Link to="/register">
+                  <Button>إنشاء حساب</Button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
-      <main className="flex-grow container mx-auto p-4 text-center flex flex-col items-center justify-center">
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-4">منصة التواصل القانوني</h2>
-        <p className="text-lg text-gray-700 mb-8 max-w-2xl">
-          تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
-        </p>
-        {!session && (
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="w-full sm:w-auto" asChild>
-              <Link to="/login">تسجيل الدخول</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
-              <Link to="/signup">إنشاء حساب</Link>
-            </Button>
-          </div>
-        )}
-        {session && profile && (
-          <div className="space-y-4">
-            <p className="text-xl text-gray-800">
-              أهلاً بك في لوحة التحكم الخاصة بك.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" className="w-full sm:w-auto" asChild>
-                <Link to="/requests">عرض كل الطلبات</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
-                <Link to="/courts">عرض الطلبات حسب المحكمة</Link>
-              </Button>
+      <main className="flex-grow container mx-auto p-4">
+        {session ? (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-gray-800">الطلبات الحالية</h2>
+              {profile ? (
+                <Link to="/requests/new">
+                  <Button>
+                    <PlusCircle className="ml-2 h-4 w-4" />
+                    إضافة طلب جديد
+                  </Button>
+                </Link>
+              ) : (
+                <Button disabled title="يجب تفعيل حسابك أولاً">
+                  <PlusCircle className="ml-2 h-4 w-4" />
+                  إضافة طلب جديد
+                </Button>
+              )}
             </div>
+            {profile ? (
+              <RequestList />
+            ) : (
+              <div className="text-center p-8 border rounded-lg bg-yellow-50 text-yellow-800">
+                <p className="font-semibold">حسابك قيد المراجعة</p>
+                <p className="mt-2">
+                  ستتمكن من رؤية الطلبات وإنشاء طلبات جديدة بمجرد الموافقة على حسابك من قبل الإدارة.
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center flex flex-col items-center justify-center pt-16">
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">منصة التواصل القانوني</h2>
+            <p className="text-lg text-gray-700 mb-8 max-w-2xl">
+              تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
+            </p>
+            <Link to="/register">
+              <Button size="lg">ابدأ الآن</Button>
+            </Link>
           </div>
         )}
       </main>
-      <footer className="bg-gray-800 text-white p-4 text-center">
-        <p>&copy; 2024 إنابة و معلومة بين المحامين. جميع الحقوق محفوظة.</p>
-      </footer>
     </div>
   );
 };
