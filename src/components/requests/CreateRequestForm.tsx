@@ -146,11 +146,6 @@ export function CreateRequestForm({
     }
   }
 
-  const parentCourts = courts.filter((court) => !court.parent_id);
-  const getChildCourts = (parentId: string) => {
-    return courts.filter((court) => court.parent_id === parentId);
-  };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -167,18 +162,26 @@ export function CreateRequestForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {parentCourts.map((parent) => (
-                    <React.Fragment key={parent.id}>
-                      <SelectItem value={parent.id} className="font-semibold">
-                        {parent.name}
-                      </SelectItem>
-                      {getChildCourts(parent.id).map((child) => (
-                        <SelectItem key={child.id} value={child.id} className="pr-8">
-                          {child.name}
+                  {(() => {
+                    const algiersCouncil = courts.find(c => c.name === 'مجلس قضاء الجزائر');
+                    if (!algiersCouncil) {
+                      return <SelectItem value="no-algiers" disabled>لم يتم العثور على مجلس قضاء الجزائر</SelectItem>;
+                    }
+                    const algeriaCourts = courts.filter(c => c.parent_id === algiersCouncil.id);
+
+                    return (
+                      <React.Fragment>
+                        <SelectItem value={algiersCouncil.id} className="font-semibold">
+                          {algiersCouncil.name}
                         </SelectItem>
-                      ))}
-                    </React.Fragment>
-                  ))}
+                        {algeriaCourts.map((child) => (
+                          <SelectItem key={child.id} value={child.id} className="pr-8">
+                            {child.name}
+                          </SelectItem>
+                        ))}
+                      </React.Fragment>
+                    );
+                  })()}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -288,7 +291,7 @@ export function CreateRequestForm({
                     placeholder={
                       requestType === 'information_retrieval'
                         ? "اكتب تفاصيل المعلومة التي تريدها..."
-                        : "اكتب تفاصيل طلبك هنا..."
+                                                : "اكتب تفاصيل طلبك هنا..."
                     }
                     className="resize-none"
                     {...field}
