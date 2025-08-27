@@ -11,13 +11,13 @@ import { ar } from 'date-fns/locale';
 export interface RequestWithDetails {
   id: string;
   created_at: string;
-  type: 'information_request' | 'representation' | 'other_request'; // Updated type enum
+  type: 'information_request' | 'representation' | 'other_request';
   case_number: string;
   status: 'open' | 'closed' | 'in_progress';
   details?: string;
   section?: string;
   creator: {
-    id: string; // Added id here
+    id: string;
     first_name: string;
     last_name: string;
   } | null;
@@ -27,9 +27,9 @@ export interface RequestWithDetails {
 }
 
 const requestTypeTranslations = {
-  information_request: 'طلب معلومة من تطبيقة', // New translation
-  representation: 'طلب إنابة', // Updated translation
-  other_request: 'طلب آخر', // New translation
+  information_request: 'طلب معلومة من تطبيقة',
+  representation: 'طلب إنابة',
+  other_request: 'طلب آخر',
 };
 
 export interface RequestListProps {
