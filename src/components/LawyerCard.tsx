@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { useSession } from '../contexts/SessionContext';
 import { Profile } from '../types';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Briefcase, MessageSquare, Star, Loader2 } from 'lucide-react';
+import { Briefcase, MessageSquare, Star, Loader2, User } from 'lucide-react';
 import { showError, showSuccess } from '../utils/toast';
 
 interface LawyerCardProps {
@@ -53,11 +53,13 @@ export const LawyerCard = ({ lawyer }: LawyerCardProps) => {
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="items-center text-center">
-        <Avatar className="h-24 w-24 mb-4">
-          <AvatarImage src={lawyer.avatar_url || undefined} alt={`${lawyer.first_name} ${lawyer.last_name}`} />
-          <AvatarFallback className="text-3xl">{getInitials(lawyer.first_name, lawyer.last_name)}</AvatarFallback>
-        </Avatar>
-        <CardTitle>{lawyer.first_name} {lawyer.last_name}</CardTitle>
+        <Link to={`/lawyers/${lawyer.id}`}>
+          <Avatar className="h-24 w-24 mb-4 mx-auto">
+            <AvatarImage src={lawyer.avatar_url || undefined} alt={`${lawyer.first_name} ${lawyer.last_name}`} />
+            <AvatarFallback className="text-3xl">{getInitials(lawyer.first_name, lawyer.last_name)}</AvatarFallback>
+          </Avatar>
+          <CardTitle className="hover:underline">{lawyer.first_name} {lawyer.last_name}</CardTitle>
+        </Link>
       </CardHeader>
       <CardContent className="flex-grow space-y-3">
         {lawyer.specialties && lawyer.specialties.length > 0 && (
@@ -75,7 +77,13 @@ export const LawyerCard = ({ lawyer }: LawyerCardProps) => {
           </div>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col sm:flex-row gap-2">
+        <Button asChild variant="outline" className="w-full">
+          <Link to={`/lawyers/${lawyer.id}`}>
+            <User className="ml-2 h-4 w-4" />
+            عرض الملف الشخصي
+          </Link>
+        </Button>
         <Button className="w-full" onClick={handleStartConversation} disabled={isLoading || user?.id === lawyer.id}>
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

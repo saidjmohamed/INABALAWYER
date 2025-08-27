@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import CasesPage from "./pages/CasesPage";
 import CreateCasePage from "./pages/CreateCasePage";
 import CaseDetailsPage from "./pages/CaseDetailsPage";
+import LawyerProfilePage from "./pages/LawyerProfilePage";
 
 // Auth wrappers
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -42,6 +43,7 @@ function App() {
               <Route path="/cases/:id" element={<CaseDetailsPage />} />
               <Route path="/courts" element={<CourtsListPage />} />
               <Route path="/lawyers" element={<LawyersDirectory />} />
+              <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
               <Route path="/conversations" element={<ConversationsPage />} />
               <Route path="/conversations/:id" element={<ConversationsPage />} />
               <Route path="/about" element={<AboutPage />} />
