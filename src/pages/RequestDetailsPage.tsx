@@ -34,6 +34,7 @@ interface Reply {
     id: string;
     first_name: string;
     last_name: string;
+    avatar_url?: string | null;
   } | null;
 }
 
@@ -102,7 +103,7 @@ const RequestDetailsPage = () => {
       .from('replies')
       .select(`
         id, content, created_at,
-        author:profiles ( id, first_name, last_name )
+        author:author_id ( id, first_name, last_name, avatar_url )
       `)
       .eq('request_id', id)
       .order('created_at', { ascending: true });
@@ -134,7 +135,7 @@ const RequestDetailsPage = () => {
       })
       .select(`
         id, content, created_at,
-        author:profiles ( id, first_name, last_name )
+        author:author_id ( id, first_name, last_name, avatar_url )
       `)
       .single();
     setReplying(false);
@@ -305,7 +306,7 @@ const RequestDetailsPage = () => {
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-4 space-x-reverse flex-col sm:flex-row gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
                       <Avatar>
-                        <AvatarImage />
+                        <AvatarImage src={reply.author?.avatar_url || undefined} />
                         <AvatarFallback>
                           {reply.author?.first_name?.[0]}
                           {reply.author?.last_name?.[0]}
