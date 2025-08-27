@@ -138,12 +138,20 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {councils.map(council => (
-                    <SelectItem key={council.id} value={`council:${council.id}`}>{council.name} (مجلس)</SelectItem>
-                  ))}
-                  {courts.map(court => (
-                    <SelectItem key={court.id} value={`court:${court.id}`}>{court.name}</SelectItem>
-                  ))}
+                  {councils.length === 0 && courts.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      لا توجد جهات قضائية متاحة.
+                    </div>
+                  ) : (
+                    <>
+                      {councils.map(council => (
+                        <SelectItem key={council.id} value={`council:${council.id}`}>{council.name} (مجلس)</SelectItem>
+                      ))}
+                      {courts.map(court => (
+                        <SelectItem key={court.id} value={`court:${court.id}`}>{court.name}</SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -19,20 +19,28 @@ export default function CreateCasePage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data: councilsData, error: councilsError } = await supabase.from('councils').select('*');
-        if (councilsError) throw councilsError;
-        setCouncils(councilsData || []);
+        const [councilsRes, courtsRes] = await Promise.all([
+          supabase.from('councils').select('*'),
+          supabase.from('courts').select('*')
+        ]);
 
-        const { data: courtsData, error: courtsError } = await supabase.from('courts').select('*');
-        if (courtsError) throw courtsError;
-        setCourts(courtsData || []);
+        if (councilsRes.error) throw councilsRes.error;
+        if (courtsRes.error) throw courtsRes.error;
+
+        setCouncils(councilsRes.data || []);
+        setCourts(courtsRes.data || []);
       } catch (error: any) {
-        showError('فشل في جلب البيانات: ' + error.message);
+        console.error("Error fetching judicial bodies:", error);
+        showError('فشل في جلب بيانات الجهات القضائية: ' + error.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-    fetchData();
-  }, []);
+
+    if (profile) {
+      fetchData();
+    }
+  }, [profile]);
 
   if (loading || !profile) {
     return (
