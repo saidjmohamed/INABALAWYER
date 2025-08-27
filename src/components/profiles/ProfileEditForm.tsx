@@ -251,7 +251,9 @@ export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
           )}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'حفظ التغييرات'}
+          <span className="flex items-center justify-center">
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حفظ التغييرات'}
+          </span>
         </Button>
       </form>
     </Form>

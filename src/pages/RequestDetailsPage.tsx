@@ -287,8 +287,10 @@ const RequestDetailsPage = () => {
 
           {canAcceptRequest && (
             <div className="text-center">
-              <Button onClick={handleAcceptRequest} disabled={accepting} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
-                {accepting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'قبول الطلب'}
+              <Button onClick={handleAcceptRequest} disabled={accepting} className="w-full sm:w-auto">
+                <span className="flex items-center justify-center">
+                  {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'قبول الطلب'}
+                </span>
               </Button>
             </div>
           )}
@@ -339,8 +341,10 @@ const RequestDetailsPage = () => {
                   rows={4}
                   disabled={replying}
                 />
-                <Button type="submit" disabled={replying || !newReply.trim()} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
-                  {replying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'إرسال الرد'}
+                <Button type="submit" disabled={replying || !newReply.trim()} className="w-full sm:w-auto">
+                  <span className="flex items-center justify-center">
+                    {replying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'إرسال الرد'}
+                  </span>
                 </Button>
               </form>
             </div>
