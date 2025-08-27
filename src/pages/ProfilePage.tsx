@@ -37,7 +37,7 @@ const ProfilePage = () => {
           <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full sm:w-auto">
             <span className="flex items-center">
               <Edit className="mr-2 h-4 w-4" />
-              <span>{isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}</span>
+              {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
             </span>
           </Button>
           <Button variant="outline" asChild className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
