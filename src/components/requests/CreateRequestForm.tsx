@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,178 +20,193 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase";
+import { Textarea } from "@/components/ui/textarea";
+import { Court, Profile } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Court, Request } from "@/types";
+import { useNavigate } from "react-router-dom";
+import { DateTimePicker } from "@/components/ui/DateTimePicker";
+
+const requestTypes = [
+  { value: "first_instance", label: "درجة أولى" },
+  { value: "appeal", label: "استئناف" },
+  { value: "cassation", label: "نقض" },
+];
 
 const formSchema = z.object({
-  type: z.enum(["information_retrieval", "representation", "other"]),
-  case_number: z.string().min(1, "رقم القضية مطلوب"),
-  section: z.string().optional(),
+  court_id: z.string().uuid("الرجاء اختيار محكمة صالحة"),
+  type: z.enum(["first_instance", "appeal", "cassation"], {
+    required_error: "الرجاء اختيار نوع الطلب",
+  }),
+  case_number: z.string().min(1, "الرجاء إدخال رقم القضية"),
+  plaintiff_details: z.string().min(1, "الرجاء إدخال تفاصيل الطرف الأول"),
+  defendant_details: z.string().min(1, "الرجاء إدخال تفاصيل الطرف الثاني"),
+  session_date: z.date({ required_error: "الرجاء إدخال تاريخ ووقت الجلسة" }),
   details: z.string().optional(),
-  session_date: z.preprocess((arg) => {
-    if (typeof arg === "string" && arg) return new Date(arg);
-    if (arg instanceof Date) return arg;
-    return undefined;
-  }, z.date().optional()),
-  plaintiff_details: z.string().optional(),
-  defendant_details: z.string().optional(),
 });
 
-type CreateRequestFormProps = {
-  court: Court;
-  request?: Request;
-  onSuccess: () => void;
-};
+type CreateRequestFormValues = z.infer<typeof formSchema>;
 
-export function CreateRequestForm({ court, request, onSuccess }: CreateRequestFormProps) {
+interface CreateRequestFormProps {
+  courts: Court[];
+  currentProfile: Profile;
+  onFormSubmit?: () => void;
+}
+
+export function CreateRequestForm({
+  courts,
+  currentProfile,
+  onFormSubmit,
+}: CreateRequestFormProps) {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const navigate = useNavigate();
+
+  const form = useForm<CreateRequestFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: request?.type || "information_retrieval",
-      case_number: request?.case_number || "",
-      section: request?.section || "",
-      details: request?.details || "",
-      plaintiff_details: request?.plaintiff_details || "",
-      defendant_details: request?.defendant_details || "",
-      session_date: request?.session_date ? new Date(request.session_date) : undefined,
+      case_number: "",
+      plaintiff_details: "",
+      defendant_details: "",
+      details: "",
     },
   });
 
   const requestType = form.watch("type");
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({ title: "Error", description: "You must be logged in to create a request." });
-      return;
-    }
+  async function onSubmit(values: CreateRequestFormValues) {
+    try {
+      const { data, error } = await supabase.from("requests").insert([
+        {
+          creator_id: currentProfile.id,
+          court_id: values.court_id,
+          type: values.type,
+          case_number: values.case_number,
+          plaintiff_details: values.plaintiff_details,
+          defendant_details: values.defendant_details,
+          session_date: values.session_date.toISOString(),
+          details: values.details,
+          status: "open",
+        },
+      ]).select().single();
 
-    const requestData = {
-      ...values,
-      session_date: values.session_date ? values.session_date.toISOString() : null,
-      court_id: court.id,
-      creator_id: user.id,
-    };
+      if (error) {
+        throw error;
+      }
 
-    let response;
-    if (request) {
-      response = await supabase.from("requests").update(requestData).eq("id", request.id).select();
-    } else {
-      response = await supabase.from("requests").insert(requestData).select();
-    }
+      toast({
+        title: "تم بنجاح",
+        description: "تم إنشاء طلبك بنجاح.",
+      });
 
-    const { error } = response;
+      if (onFormSubmit) {
+        onFormSubmit();
+      }
+      
+      navigate(`/requests/${data.id}`);
 
-    if (error) {
-      toast({ title: "خطأ", description: "حدث خطأ أثناء حفظ الطلب. الرجاء المحاولة مرة أخرى." });
-      console.error("Error saving request:", error);
-    } else {
-      toast({ title: "نجاح", description: "تم حفظ الطلب بنجاح." });
-      onSuccess();
+    } catch (error: any) {
+      console.error("Error creating request:", error);
+      toast({
+        title: "حدث خطأ",
+        description: "فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
     }
   }
 
+  const parentCourts = courts.filter((court) => !court.parent_id);
+
+  const getChildCourts = (parentId: string) => {
+    return courts.filter((court) => court.parent_id === parentId);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="type"
+          name="court_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>نوع الطلب</FormLabel>
+              <FormLabel>المحكمة</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر نوع الطلب" />
+                    <SelectValue placeholder="اختر المحكمة المختصة" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="information_retrieval">اطلاع على معلومة من تطبيقة محامين</SelectItem>
-                  <SelectItem value="representation">طلب انابة في جلسة</SelectItem>
-                  <SelectItem value="other">طلب اخر</SelectItem>
+                  {parentCourts.map((parent) => (
+                    <optgroup label={parent.name} key={parent.id}>
+                      {getChildCourts(parent.id).map((child) => (
+                        <SelectItem key={child.id} value={child.id}>
+                          {child.name}
+                        </SelectItem>
+                      ))}
+                    </optgroup>
+                  ))}
+                   <SelectItem value="المحكمة العليا">المحكمة العليا</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="case_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>رقم القضية</FormLabel>
-              <FormControl>
-                <Input placeholder="ادخل رقم القضية" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="section"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الدائرة</FormLabel>
-              <FormControl>
-                <Input placeholder="ادخل اسم الدائرة" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {requestType === "representation" && (
-          <>
-            <FormField
-              control={form.control}
-              name="session_date"
-              render={({ field }) => {
-                const formatDateForInput = (date: any) => {
-                  if (!date) return '';
-                  try {
-                    const d = new Date(date);
-                    if (isNaN(d.getTime())) return '';
-                    
-                    const year = d.getFullYear();
-                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const day = d.getDate().toString().padStart(2, '0');
-                    const hours = d.getHours().toString().padStart(2, '0');
-                    const minutes = d.getMinutes().toString().padStart(2, '0');
-                    
-                    return `${year}-${month}-${day}T${hours}:${minutes}`;
-                  } catch (error) {
-                    return '';
-                  }
-                };
 
-                return (
-                  <FormItem>
-                    <FormLabel>تاريخ ووقت الجلسة</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="datetime-local"
-                        {...field}
-                        value={formatDateForInput(field.value)}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>نوع الطلب</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر نوع الطلب" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {requestTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="case_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>رقم القضية</FormLabel>
+                <FormControl>
+                  <Input placeholder="ادخل رقم القضية" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
               name="plaintiff_details"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>بيانات المدعي</FormLabel>
+                  <FormLabel>
+                    {requestType === 'appeal' ? 'المستأنف وممثله القانوني' : 'المدعي وممثله القانوني'}
+                  </FormLabel>
                   <FormControl>
-                    <Textarea placeholder="ادخل اسم المدعي وبياناته" {...field} value={field.value || ''} />
+                    <Input placeholder="الاسم الكامل، المحامي..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -203,32 +217,51 @@ export function CreateRequestForm({ court, request, onSuccess }: CreateRequestFo
               name="defendant_details"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>بيانات المدعى عليه</FormLabel>
+                  <FormLabel>
+                    {requestType === 'appeal' ? 'المستأنف عليه وممثله القانوني' : 'المدعى عليه وممثله القانوني'}
+                  </FormLabel>
                   <FormControl>
-                    <Textarea placeholder="ادخل اسم المدعى عليه وبياناته" {...field} value={field.value || ''} />
+                    <Input placeholder="الاسم الكامل، المحامي..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </>
-        )}
+        </div>
+
+        <FormField
+          control={form.control}
+          name="session_date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>تاريخ ووقت الجلسة</FormLabel>
+                <DateTimePicker date={field.value} setDate={field.onChange} />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="details"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>تفاصيل الطلب</FormLabel>
+              <FormLabel>تفاصيل إضافية</FormLabel>
               <FormControl>
-                <Textarea placeholder="ادخل تفاصيل الطلب" {...field} value={field.value || ''} />
+                <Textarea
+                  placeholder="اكتب أي تفاصيل إضافية هنا..."
+                  className="resize-none"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button type="submit">حفظ</Button>
-        </div>
+
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "جاري الإنشاء..." : "إنشاء الطلب"}
+        </Button>
       </form>
     </Form>
   );
