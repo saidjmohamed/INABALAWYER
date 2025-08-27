@@ -161,7 +161,7 @@ export function CreateRequestForm({
                       .filter((c) => c.parent_id === null)
                       .sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
-                    if (parentCourts.length === 0) {
+                    if (courts.length === 0) {
                       return <SelectItem value="no-courts" disabled>لا توجد محاكم متاحة</SelectItem>;
                     }
 
@@ -170,12 +170,19 @@ export function CreateRequestForm({
                         .filter((c) => c.parent_id === parent.id)
                         .sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
+                      if (childCourts.length === 0) {
+                        return (
+                          <SelectItem key={parent.id} value={parent.id}>
+                            {parent.name}
+                          </SelectItem>
+                        );
+                      }
+
                       return (
                         <SelectGroup key={parent.id}>
                           <SelectLabel>{parent.name}</SelectLabel>
-                          <SelectItem value={parent.id}>{parent.name}</SelectItem>
                           {childCourts.map((child) => (
-                            <SelectItem key={child.id} value={child.id} className="pr-8">
+                            <SelectItem key={child.id} value={child.id}>
                               {child.name}
                             </SelectItem>
                           ))}
