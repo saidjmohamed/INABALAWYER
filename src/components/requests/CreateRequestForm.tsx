@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
+  SelectLabel,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -146,7 +148,6 @@ export function CreateRequestForm({
   }
 
   const parentCourts = courts.filter((court) => !court.parent_id);
-
   const getChildCourts = (parentId: string) => {
     return courts.filter((court) => court.parent_id === parentId);
   };
@@ -167,16 +168,28 @@ export function CreateRequestForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {parentCourts.map((parent) => (
-                    <optgroup label={parent.name} key={parent.id}>
-                      {getChildCourts(parent.id).map((child) => (
-                        <SelectItem key={child.id} value={child.id}>
-                          {child.name}
+                  {parentCourts.map((parent) => {
+                    const childCourts = getChildCourts(parent.id);
+                    if (childCourts.length === 0) {
+                      // Render top-level courts that are not parents as simple items
+                      return (
+                        <SelectItem key={parent.id} value={parent.id}>
+                          {parent.name}
                         </SelectItem>
-                      ))}
-                    </optgroup>
-                  ))}
-                   <SelectItem value="المحكمة العليا">المحكمة العليا</SelectItem>
+                      );
+                    }
+                    // Render parent courts with children as groups
+                    return (
+                      <SelectGroup key={parent.id}>
+                        <SelectLabel>{parent.name}</SelectLabel>
+                        {childCourts.map((child) => (
+                          <SelectItem key={child.id} value={child.id}>
+                            {child.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               <FormMessage />
