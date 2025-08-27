@@ -52,6 +52,7 @@ export type Case = {
   legal_representative: string | null;
   status: CaseStatus;
   assignee_id: string | null;
+  section: string | null;
 };
 
 export type Reply = {

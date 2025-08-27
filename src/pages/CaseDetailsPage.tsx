@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { CaseWithDetails, Reply } from '@/types';
 import { useSession } from '@/contexts/SessionContext';
-import { Loader2, ArrowRight, User, Landmark, FileText, Calendar, Users, Briefcase, Info, Trash2, CheckCircle, Clock } from 'lucide-react';
+import { Loader2, ArrowRight, User, Landmark, FileText, Calendar, Users, Briefcase, Info, Trash2, CheckCircle, Clock, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -152,6 +152,7 @@ export default function CaseDetailsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3"><User className="h-4 w-4 text-gray-500" /><strong>إنشاء بواسطة:</strong> {caseItem.creator.first_name} {caseItem.creator.last_name}</div>
               <div className="flex items-center gap-3"><Landmark className="h-4 w-4 text-gray-500" /><strong>الجهة القضائية:</strong> {judicialBody}</div>
+              {caseItem.section && <div className="flex items-center gap-3"><GitBranch className="h-4 w-4 text-gray-500" /><strong>القسم/الفرع:</strong> {caseItem.section}</div>}
             </div>
             {caseItem.assignee && (
               <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-md">

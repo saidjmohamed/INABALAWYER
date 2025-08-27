@@ -12,10 +12,12 @@ import { supabase } from "../integrations/supabase/client";
 import { showSuccess, showError } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { JudicialBodySelector } from "./JudicialBodySelector";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const formSchema = z.object({
   title: z.string().min(1, "العنوان مطلوب"),
   judicial_body: z.string().min(1, "الرجاء اختيار جهة قضائية"),
+  section: z.string().optional(),
   request_type: z.enum(["representation", "information_retrieval"], {
     required_error: "الرجاء تحديد نوع الطلب",
   }),
@@ -76,6 +78,7 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
       description: values.description,
       council_id: councilId,
       court_id: courtId,
+      section: values.section || null,
       request_type: values.request_type as RequestType,
       case_number: values.case_number || null,
       session_date: values.session_date?.toISOString() || null,
@@ -156,6 +159,37 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
                   onChange={field.onChange}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="section"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>القسم / الفرع</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر القسم أو الفرع" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="القسم المدني">القسم المدني</SelectItem>
+                  <SelectItem value="القسم العقاري">القسم العقاري</SelectItem>
+                  <SelectItem value="قسم شؤون الأسرة">قسم شؤون الأسرة</SelectItem>
+                  <SelectItem value="القسم الاجتماعي">القسم الاجتماعي</SelectItem>
+                  <SelectItem value="القسم التجاري">القسم التجاري</SelectItem>
+                  <SelectItem value="القسم البحري">القسم البحري</SelectItem>
+                  <SelectItem value="القسم الاستعجالي">القسم الاستعجالي</SelectItem>
+                  <SelectItem value="قسم الجنح">قسم الجنح</SelectItem>
+                  <SelectItem value="غرفة الاتهام">غرفة الاتهام</SelectItem>
+                  <SelectItem value="قسم الأحداث">قسم الأحداث</SelectItem>
+                  <SelectItem value="الغرفة الإدارية">الغرفة الإدارية</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
