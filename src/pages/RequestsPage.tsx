@@ -1,98 +1,94 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Request, Court } from "@/types";
-import { RequestCard } from "@/components/requests/RequestCard";
-import { CreateRequestForm } from "@/components/requests/CreateRequestForm";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase";
+import { Court, RequestWithDetails } from "@/types";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CreateRequestForm } from "@/components/requests/CreateRequestForm";
+import { RequestCard } from "@/components/requests/RequestCard";
 import { PlusCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function RequestsPage() {
-  const [requests, setRequests] = useState<Request[]>([]);
+  const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [courts, setCourts] = useState<Court[]>([]);
+  const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateRequestOpen, setIsCreateRequestOpen] = useState(false);
 
-  const fetchRequests = useCallback(async () => {
+  const fetchData = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data: courtsData, error: courtsError } = await supabase.from("courts").select("*");
+    if (courtsError) console.error("Error fetching courts:", courtsError);
+    else setCourts(courtsData || []);
+
+    const { data: requestsData, error: requestsError } = await supabase
       .from("requests")
-      .select("*, creator:creator_id(*), court:courts(*), lawyer:lawyer_id(*)")
+      .select("*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching requests:", error);
-    } else {
-      setRequests(data as any);
-    }
+    if (requestsError) console.error("Error fetching requests:", requestsError);
+    else setRequests(requestsData as RequestWithDetails[] || []);
+    
     setLoading(false);
-  }, []);
-
-  const fetchCourts = useCallback(async () => {
-    const { data, error } = await supabase.from("courts").select("*");
-    if (error) {
-      console.error("Error fetching courts:", error);
-    } else {
-      setCourts(data);
-    }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchRequests();
-    fetchCourts();
-  }, [fetchRequests, fetchCourts]);
+    fetchData();
+  }, []);
 
   const handleRequestCreation = () => {
-    setIsDialogOpen(false);
-    fetchRequests();
+    setIsCreateRequestOpen(false);
+    fetchData();
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">جميع الطلبات</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              إنشاء طلب جديد
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>إنشاء طلب جديد</DialogTitle>
-            </DialogHeader>
-            <CreateRequestForm
-              courts={courts}
-              onSuccess={handleRequestCreation}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-48 w-full" />
-          ))}
+        <div className="flex items-center gap-4">
+          <Select onValueChange={(courtId) => setSelectedCourt(courts.find(c => c.id === courtId) || null)}>
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="اختر محكمة لإنشاء طلب" />
+            </SelectTrigger>
+            <SelectContent>
+              {courts.map(court => (
+                <SelectItem key={court.id} value={court.id}>{court.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Dialog open={isCreateRequestOpen} onOpenChange={setIsCreateRequestOpen}>
+            <DialogTrigger asChild>
+              <Button disabled={!selectedCourt}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                إنشاء طلب جديد
+              </Button>
+            </DialogTrigger>
+            {selectedCourt && (
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>إنشاء طلب جديد في {selectedCourt.name}</DialogTitle>
+                </DialogHeader>
+                <CreateRequestForm
+                  court={selectedCourt}
+                  onSuccess={handleRequestCreation}
+                />
+              </DialogContent>
+            )}
+          </Dialog>
         </div>
-      ) : requests.length > 0 ? (
+      </div>
+      {requests.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {requests.map((request) => (
-            <RequestCard key={request.id} request={request as any} />
+            <RequestCard key={request.id} request={request} />
           ))}
         </div>
       ) : (
-        <p>لا توجد طلبات حالياً.</p>
+        <p>لا توجد طلبات حتى الآن.</p>
       )}
     </div>
   );

@@ -1,152 +1,99 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Request, Court } from "@/types";
-import { RequestCard } from "@/components/requests/RequestCard";
-import { CreateRequestForm } from "@/components/requests/CreateRequestForm";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase";
+import { Court, RequestWithDetails } from "@/types";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { PlusCircle, ArrowRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CreateRequestForm } from "@/components/requests/CreateRequestForm";
+import { RequestCard } from "@/components/requests/RequestCard";
+import { PlusCircle } from "lucide-react";
 
 export default function RequestsByCourtPage() {
   const { courtId } = useParams<{ courtId: string }>();
-  const [requests, setRequests] = useState<Request[]>([]);
   const [court, setCourt] = useState<Court | null>(null);
-  const [courts, setCourts] = useState<Court[]>([]);
+  const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateRequestOpen, setIsCreateRequestOpen] = useState(false);
 
-  const fetchRequestsAndCourt = useCallback(async () => {
+  const fetchCourtAndRequests = async () => {
     if (!courtId) return;
     setLoading(true);
-
-    const requestsPromise = supabase
-      .from("requests")
-      .select("*, creator:creator_id(*), court:courts(*), lawyer:lawyer_id(*)")
-      .eq("court_id", courtId)
-      .order("created_at", { ascending: false });
-
-    const courtPromise = supabase
+    
+    const { data: courtData, error: courtError } = await supabase
       .from("courts")
       .select("*")
       .eq("id", courtId)
       .single();
 
-    const allCourtsPromise = supabase.from("courts").select("*");
-
-    const [requestsRes, courtRes, allCourtsRes] = await Promise.all([
-      requestsPromise,
-      courtPromise,
-      allCourtsPromise,
-    ]);
-
-    if (requestsRes.error) {
-      console.error("Error fetching requests:", requestsRes.error);
+    if (courtError || !courtData) {
+      console.error("Error fetching court:", courtError);
+      setCourt(null);
     } else {
-      setRequests(requestsRes.data as any);
+      setCourt(courtData);
     }
 
-    if (courtRes.error) {
-      console.error("Error fetching court:", courtRes.error);
-    } else {
-      setCourt(courtRes.data);
-    }
+    const { data: requestsData, error: requestsError } = await supabase
+      .from("requests")
+      .select("*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)")
+      .eq("court_id", courtId)
+      .order("created_at", { ascending: false });
 
-    if (allCourtsRes.error) {
-      console.error("Error fetching all courts:", allCourtsRes.error);
+    if (requestsError) {
+      console.error("Error fetching requests:", requestsError);
     } else {
-      setCourts(allCourtsRes.data);
+      setRequests(requestsData as RequestWithDetails[]);
     }
-
     setLoading(false);
-  }, [courtId]);
+  };
 
   useEffect(() => {
-    fetchRequestsAndCourt();
-  }, [fetchRequestsAndCourt]);
+    fetchCourtAndRequests();
+  }, [courtId]);
 
   const handleRequestCreation = () => {
-    setIsDialogOpen(false);
-    fetchRequestsAndCourt();
+    setIsCreateRequestOpen(false);
+    fetchCourtAndRequests();
   };
 
   if (loading) {
-    return (
-      <div className="container mx-auto p-4">
-        <Skeleton className="h-8 w-1/2 mb-6" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-48 w-full" />
-          ))}
-        </div>
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   if (!court) {
-    return (
-      <div className="container mx-auto p-4 text-center">
-        <h1 className="text-2xl font-bold">المحكمة غير موجودة</h1>
-        <Button asChild className="mt-4">
-          <Link to="/courts">العودة إلى قائمة المحاكم</Link>
-        </Button>
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Court not found.</div>;
   }
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">طلبات {court.name}</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <h1 className="text-3xl font-bold">الطلبات في {court.name}</h1>
+        <Dialog open={isCreateRequestOpen} onOpenChange={setIsCreateRequestOpen}>
           <DialogTrigger asChild>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
-              إنشاء طلب في هذه المحكمة
+              إنشاء طلب جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>إنشاء طلب جديد في {court.name}</DialogTitle>
             </DialogHeader>
-            {courtId && (
-              <CreateRequestForm
-                courts={courts}
-                onSuccess={handleRequestCreation}
-                courtId={courtId}
-              />
-            )}
+            <CreateRequestForm
+              court={court}
+              onSuccess={handleRequestCreation}
+            />
           </DialogContent>
         </Dialog>
       </div>
-
       {requests.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {requests.map((request) => (
-            <RequestCard key={request.id} request={request as any} />
+            <RequestCard key={request.id} request={request} />
           ))}
         </div>
       ) : (
-        <p>لا توجد طلبات في هذه المحكمة حالياً.</p>
+        <p>لا توجد طلبات في هذه المحكمة حتى الآن.</p>
       )}
-
-      <div className="mt-8 text-center">
-        <Button variant="outline" asChild>
-          <Link to="/courts">
-            عرض جميع المحاكم
-            <ArrowRight className="mr-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   );
 }
