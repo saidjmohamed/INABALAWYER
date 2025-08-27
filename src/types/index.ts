@@ -1,6 +1,7 @@
 export type UserRole = 'admin' | 'lawyer';
 export type UserStatus = 'pending' | 'active' | 'rejected' | 'disabled';
 export type RequestType = 'representation' | 'information_retrieval';
+export type CaseStatus = 'open' | 'assigned' | 'completed';
 
 export type Profile = {
   id: string;
@@ -49,10 +50,22 @@ export type Case = {
   plaintiff: string | null;
   defendant: string | null;
   legal_representative: string | null;
+  status: CaseStatus;
+  assignee_id: string | null;
+};
+
+export type Reply = {
+  id: string;
+  case_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  author: Pick<Profile, 'id' | 'first_name' | 'last_name' | 'avatar_url'>;
 };
 
 export type CaseWithDetails = Case & {
   court: Court | null;
   council: Council | null;
   creator: Profile;
+  assignee: Profile | null;
 };
