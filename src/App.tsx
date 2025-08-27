@@ -13,6 +13,7 @@ import LawyersDirectory from "./pages/LawyersDirectory";
 import CourtsListPage from "./pages/CourtsListPage";
 import RequestsByCourtPage from "./pages/RequestsByCourtPage";
 import { SessionProvider } from "./contexts/SessionContext";
+import AdminRoute from "./components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,14 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              } 
+            />
             <Route path="/requests/:id" element={<RequestDetailsPage />} />
             <Route path="/lawyers" element={<LawyersDirectory />} />
             <Route path="/courts" element={<CourtsListPage />} />
