@@ -4,7 +4,6 @@ import * as z from "zod";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { DateTimePicker } from "./ui/DateTimePicker";
@@ -12,6 +11,7 @@ import { Council, Court, Profile, RequestType } from "../types";
 import { supabase } from "../integrations/supabase/client";
 import { showSuccess, showError } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
+import { JudicialBodySelector } from "./JudicialBodySelector";
 
 const formSchema = z.object({
   title: z.string().min(1, "العنوان مطلوب"),
@@ -144,41 +144,14 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
           render={({ field }) => (
             <FormItem>
               <FormLabel>الجهة القضائية</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر مجلس أو محكمة" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {councils.map(council => {
-                    const councilCourts = courts.filter(court => court.council_id === council.id);
-                    
-                    if (council.name === 'مجلس الدولة' || council.name === 'المحكمة العليا') {
-                      const highCourt = councilCourts[0];
-                      if (highCourt) {
-                        return (
-                          <SelectGroup key={council.id}>
-                            <SelectLabel>{council.name}</SelectLabel>
-                            <SelectItem value={`court:${highCourt.id}`}>{highCourt.name}</SelectItem>
-                          </SelectGroup>
-                        );
-                      }
-                      return null;
-                    }
-
-                    return (
-                      <SelectGroup key={council.id}>
-                        <SelectLabel>{council.name}</SelectLabel>
-                        <SelectItem value={`council:${council.id}`}>{council.name} (مجلس)</SelectItem>
-                        {councilCourts.map(court => (
-                          <SelectItem key={court.id} value={`court:${court.id}`}>{court.name}</SelectItem>
-                        ))}
-                      </SelectGroup>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <JudicialBodySelector
+                  councils={councils}
+                  courts={courts}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
