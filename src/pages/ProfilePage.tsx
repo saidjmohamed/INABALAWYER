@@ -75,6 +75,12 @@ const ProfilePage = () => {
                     <p className="text-sm font-medium text-gray-500">العنوان</p>
                     <p className="text-gray-800">{profile.address || 'غير محدد'}</p>
                   </div>
+                  {profile.organization && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">المنظمة التابع لها</p>
+                      <p className="text-gray-800">{profile.organization}</p>
+                    </div>
+                  )}
                   {profile.role === 'lawyer' && (
                     <>
                       <div>

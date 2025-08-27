@@ -40,15 +40,19 @@ const Signup = () => {
                   loading_button_label: 'جارٍ إنشاء الحساب...',
                   social_provider_text: 'التسجيل عبر {{provider}}',
                   link_text: 'هل لديك حساب؟ سجل الدخول',
+                  // Custom labels for additional fields are not directly supported here.
+                  // The additionalData prop will ensure the fields are present.
                 },
               },
             }}
+            // Add the new 'organization' field to additionalData
             additionalData={{
               first_name: '',
               last_name: '',
               phone: '',
-              address: '',
+              address: '', // This will be used for 'العنوان المهني'
               username: '',
+              organization: '', // New field
             }}
           />
         </div>

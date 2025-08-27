@@ -25,6 +25,7 @@ const profileSchema = z.object({
   languages: z.string().optional(), // Storing as comma-separated string for simplicity
   bio: z.string().optional(),
   avatar_url: z.string().url('يجب أن يكون رابط الصورة صالحًا').optional().or(z.literal('')),
+  organization: z.string().optional(), // New field
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -50,6 +51,7 @@ export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
       languages: profile?.languages?.join(', ') || '',
       bio: profile?.bio || '',
       avatar_url: profile?.avatar_url || '',
+      organization: profile?.organization || '', // New field
     },
   });
 
@@ -66,6 +68,7 @@ export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
         languages: profile.languages?.join(', ') || '',
         bio: profile.bio || '',
         avatar_url: profile.avatar_url || '',
+        organization: profile.organization || '', // New field
       });
     }
   }, [profile, form]);
@@ -162,6 +165,19 @@ export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>العنوان</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="organization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>المنظمة التابع لها</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>

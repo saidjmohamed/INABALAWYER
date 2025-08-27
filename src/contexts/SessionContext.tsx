@@ -17,6 +17,7 @@ export interface Profile {
   languages: string[] | null; // New field
   bio: string | null; // New field
   avatar_url: string | null; // New field
+  organization: string | null; // New field
 }
 
 interface SessionContextValue {

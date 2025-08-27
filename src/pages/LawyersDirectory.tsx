@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { showError } from '@/utils/toast';
 import { Loader2, ArrowRight } from 'lucide-react';
 
-type LawyerProfile = Pick<Profile, 'id' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'specialties' | 'experience_years' | 'languages'>;
+type LawyerProfile = Pick<Profile, 'id' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'specialties' | 'experience_years' | 'languages' | 'organization'>;
 
 const LawyersDirectory = () => {
   const { session, loading: sessionLoading } = useSession();
@@ -27,7 +27,7 @@ const LawyersDirectory = () => {
       setLoadingData(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, phone, address, specialties, experience_years, languages')
+        .select('id, first_name, last_name, email, phone, address, specialties, experience_years, languages, organization')
         .eq('role', 'lawyer')
         .eq('status', 'active');
 
@@ -86,6 +86,7 @@ const LawyersDirectory = () => {
                       <TableHead>الاسم الكامل</TableHead>
                       <TableHead>البريد الإلكتروني</TableHead>
                       <TableHead>الهاتف</TableHead>
+                      <TableHead>المنظمة</TableHead> {/* New TableHead */}
                       <TableHead>التخصصات</TableHead>
                       <TableHead>سنوات الخبرة</TableHead>
                       <TableHead>اللغات</TableHead>
@@ -98,6 +99,7 @@ const LawyersDirectory = () => {
                         <TableCell>{lawyer.first_name} {lawyer.last_name}</TableCell>
                         <TableCell>{lawyer.email}</TableCell>
                         <TableCell>{lawyer.phone || 'غير محدد'}</TableCell>
+                        <TableCell>{lawyer.organization || 'غير محدد'}</TableCell> {/* New TableCell */}
                         <TableCell>{lawyer.specialties?.join(', ') || 'غير محددة'}</TableCell>
                         <TableCell>{lawyer.experience_years ?? 'غير محدد'}</TableCell>
                         <TableCell>{lawyer.languages?.join(', ') || 'غير محددة'}</TableCell>
