@@ -36,6 +36,27 @@ const formSchema = z.object({
   case_number: z.string().min(1, "الرجاء إدخال رقم القضية"),
   section: z.string().optional(),
   details: z.string().optional(),
+  session_date: z.string().optional(),
+  plaintiff_details: z.string().optional(),
+  defendant_details: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.type === RequestType.SessionRepresentation) {
+    if (!data.section?.trim()) {
+      ctx.addIssue({ code: "custom", message: "الفرع أو القسم مطلوب", path: ["section"] });
+    }
+    if (!data.session_date) {
+      ctx.addIssue({ code: "custom", message: "تاريخ ووقت الجلسة مطلوب", path: ["session_date"] });
+    }
+    if (!data.plaintiff_details?.trim()) {
+      ctx.addIssue({ code: "custom", message: "تفاصيل المدعي مطلوبة", path: ["plaintiff_details"] });
+    }
+    if (!data.defendant_details?.trim()) {
+      ctx.addIssue({ code: "custom", message: "تفاصيل المدعى عليه مطلوبة", path: ["defendant_details"] });
+    }
+    if (!data.details?.trim()) {
+      ctx.addIssue({ code: "custom", message: "تحديد الطلب في الإنابة مطلوب", path: ["details"] });
+    }
+  }
 });
 
 interface CreateRequestFormProps {
@@ -60,8 +81,13 @@ export function CreateRequestForm({
       case_number: "",
       section: "",
       details: "",
+      session_date: "",
+      plaintiff_details: "",
+      defendant_details: "",
     },
   });
+
+  const requestType = form.watch("type");
 
   useEffect(() => {
     if (courtId) {
@@ -162,36 +188,114 @@ export function CreateRequestForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="section"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الأطراف</FormLabel>
-              <FormControl>
-                <Input placeholder="ادخل أسماء الأطراف (اختياري)" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="details"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>تفاصيل إضافية</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="أضف أي تفاصيل إضافية هنا (اختياري)"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
+        {requestType === RequestType.SessionRepresentation ? (
+          <>
+            <FormField
+              control={form.control}
+              name="section"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الفرع أو القسم</FormLabel>
+                  <FormControl>
+                    <Input placeholder="ادخل الفرع أو القسم" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="session_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>تاريخ ووقت الجلسة</FormLabel>
+                  <FormControl>
+                    <Input type="datetime-local" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="plaintiff_details"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>اسم المدعي/المستأنف ومن يمثله</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="مثال: فلان الفلاني في حقه الأستاذ..." {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="defendant_details"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>اسم المدعى عليه/المستأنف عليه ومن يمثله</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="مثال: ضد علان العلاني في حقه الأستاذ..." {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="details"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>تحديد الطلب في الإنابة</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="حدد طلبك هنا (مثال: طلب تأجيل، تقديم مذكرة...)"
+                      className="resize-none"
+                      {...field}
+                      value={field.value || ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        ) : (
+          <>
+            <FormField
+              control={form.control}
+              name="section"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الأطراف</FormLabel>
+                  <FormControl>
+                    <Input placeholder="ادخل أسماء الأطراف (اختياري)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="details"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>تفاصيل إضافية</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="أضف أي تفاصيل إضافية هنا (اختياري)"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
         <Button type="submit">إنشاء الطلب</Button>
       </form>
     </Form>

@@ -24,4 +24,7 @@ export interface Request {
   status: RequestStatus;
   created_at: string;
   lawyer_id: string | null;
+  session_date: string | null;
+  plaintiff_details: string | null;
+  defendant_details: string | null;
 }

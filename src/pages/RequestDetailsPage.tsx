@@ -48,6 +48,9 @@ interface RequestDetails {
   court: CourtInfo | null;
   lawyer_id: string | null;
   assigned_lawyer: ProfileInfo | null;
+  session_date?: string | null;
+  plaintiff_details?: string | null;
+  defendant_details?: string | null;
 }
 
 interface Reply {
@@ -265,7 +268,38 @@ const RequestDetailsPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {request.details && <p className="text-gray-700 whitespace-pre-wrap">{request.details}</p>}
+              {request.type === 'representation' ? (
+                <>
+                  {request.details && (
+                    <p className="text-gray-700 whitespace-pre-wrap mb-4">
+                      <strong>الطلب في الإنابة:</strong> {request.details}
+                    </p>
+                  )}
+                  <div className="pt-4 border-t space-y-2">
+                    <h4 className="font-semibold text-md">تفاصيل الإنابة</h4>
+                    {request.session_date && (
+                      <p className="text-sm">
+                        <strong>تاريخ الجلسة:</strong> {format(new Date(request.session_date), 'd MMMM yyyy, h:mm a', { locale: ar })}
+                      </p>
+                    )}
+                    {request.plaintiff_details && (
+                      <p className="text-sm">
+                        <strong>المدعي/المستأنف:</strong> {request.plaintiff_details}
+                      </p>
+                    )}
+                    {request.defendant_details && (
+                      <p className="text-sm">
+                        <strong>المدعى عليه/المستأنف عليه:</strong> {request.defendant_details}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {request.details && <p className="text-gray-700 whitespace-pre-wrap">{request.details}</p>}
+                </>
+              )}
+
               {request.assigned_lawyer && (
                 <p className="mt-4 text-sm text-gray-600">
                   <span className="font-semibold">المحامي المعين:</span> {request.assigned_lawyer.first_name} {request.assigned_lawyer.last_name}
