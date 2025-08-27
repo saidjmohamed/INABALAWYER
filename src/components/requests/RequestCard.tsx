@@ -1,84 +1,72 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { RequestWithDetails, RequestStatus, Request } from "@/types";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
-import { User, Calendar, Gavel } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { RequestWithDetails } from '@/types';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { User, Calendar, FileText } from 'lucide-react';
 
-type RequestCardProps = {
-  request: RequestWithDetails;
+const statusTranslations: { [key: string]: string } = {
+  open: 'مفتوح',
+  closed: 'مغلق',
+  in_progress: 'قيد التنفيذ',
+  assigned: 'معين',
+  cancelled: 'ملغى',
 };
 
-const statusMap: Record<RequestStatus, string> = {
-  open: "مفتوح",
-  assigned: "معين",
-  closed: "مغلق",
-  cancelled: "ملغى",
-  in_progress: "قيد التنفيذ",
+const typeTranslations: { [key: string]: string } = {
+  information_retrieval: 'استخراج معلومات',
+  representation: 'تمثيل',
+  other: 'أخرى',
 };
 
-const statusColorMap: Record<RequestStatus, string> = {
-  open: "bg-green-500",
-  assigned: "bg-yellow-500",
-  closed: "bg-gray-500",
-  cancelled: "bg-red-500",
-  in_progress: "bg-blue-500",
-};
-
-const requestTypeMap: Record<string, string> = {
-  information_retrieval: "اطلاع على معلومة",
-  representation: "إنابة في جلسة",
-  other: "طلب اخر",
-};
-
-const requestTypeColorMap: Record<Request['type'], string> = {
-  representation: "bg-blue-50 hover:bg-blue-100",
-  information_retrieval: "bg-green-50 hover:bg-green-100",
-  other: "bg-gray-50 hover:bg-gray-100",
-};
-
-export function RequestCard({ request }: RequestCardProps) {
-  const creatorName = request.creator ? `${request.creator.first_name || ''} ${request.creator.last_name || ''}`.trim() : "غير معروف";
+const RequestCard = ({ request }: { request: RequestWithDetails }) => {
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'open': return 'default';
+      case 'assigned': return 'secondary';
+      case 'in_progress': return 'default';
+      case 'closed': return 'outline';
+      default: return 'destructive';
+    }
+  };
 
   return (
-    <Card className={cn("flex flex-col h-full transition-colors", requestTypeColorMap[request.type])}>
+    <Card className="w-full flex flex-col">
       <CardHeader>
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-bold mb-2">
-            {request.court.name} - {request.case_number}
-          </CardTitle>
-          <Badge className={`${statusColorMap[request.status]} text-white`}>
-            {statusMap[request.status]}
+          <div>
+            <CardTitle>طلب رقم: {request.case_number}</CardTitle>
+            <CardDescription>{typeTranslations[request.type] || request.type}</CardDescription>
+          </div>
+          <Badge variant={getStatusVariant(request.status)}>
+            {statusTranslations[request.status] || request.status}
           </Badge>
         </div>
-        <p className="text-sm text-gray-600">
-          {requestTypeMap[request.type] || request.type}
-        </p>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center">
-            <User className="w-4 h-4 mr-2 text-gray-500" />
-            <span>مقدم الطلب: {creatorName}</span>
-          </div>
-          <div className="flex items-center">
-            <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-            <span>تاريخ الإنشاء: {new Date(request.created_at).toLocaleDateString()}</span>
-          </div>
-          {request.lawyer && (
-            <div className="flex items-center">
-              <Gavel className="w-4 h-4 mr-2 text-gray-500" />
-              <span>المحامي: {request.lawyer.first_name} {request.lawyer.last_name}</span>
-            </div>
-          )}
+      <CardContent className="space-y-3 flex-grow">
+        <div className="flex items-center text-sm text-muted-foreground">
+          <User className="ml-2 h-4 w-4" />
+          <span>مقدم الطلب: {request.creator.first_name} {request.creator.last_name}</span>
         </div>
+        {request.session_date && (
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Calendar className="ml-2 h-4 w-4" />
+            <span>تاريخ الجلسة: {format(new Date(request.session_date), 'd MMMM yyyy', { locale: ar })}</span>
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">
-          <Link to={`/requests/${request.id}`}>عرض التفاصيل</Link>
+          <Link to={`/requests/${request.id}`}>
+            <FileText className="ml-2 h-4 w-4" />
+            عرض التفاصيل
+          </Link>
         </Button>
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default RequestCard;
