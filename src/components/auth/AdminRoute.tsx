@@ -1,20 +1,20 @@
-import { useAuth } from '@/hooks/useAuth';
+import { useSession } from '@/contexts/SessionContext';
 import { Navigate } from 'react-router-dom';
 import { ReactNode } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
   children: ReactNode;
 }
 
 const AdminRoute = ({ children }: AdminRouteProps) => {
-  const { profile, loading, session } = useAuth();
+  const { profile, loading, session } = useSession();
 
   if (loading) {
     return (
-       <div className="container mx-auto p-4">
-         <Skeleton className="h-screen w-full" />
-       </div>
+       <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 

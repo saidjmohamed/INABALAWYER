@@ -1,39 +1,60 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Navbar } from "@/components/layout/Navbar";
-import { HomePage } from "@/pages/HomePage";
-import { LoginPage } from "@/pages/LoginPage";
-import { RegisterPage } from "@/pages/RegisterPage";
-import { RequestsPage } from "@/pages/RequestsPage";
-import RequestDetailsPage from "@/pages/RequestDetailsPage";
-import ProfilePage from "@/pages/ProfilePage";
-import ConversationsPage from "@/pages/ConversationsPage";
-import ConversationPage from "@/pages/ConversationPage";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { SessionProvider } from "@/contexts/SessionContext";
+import { PresenceProvider } from "@/contexts/PresenceContext";
+
+// Pages
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import AdminDashboard from "@/pages/AdminDashboard";
+import ProfilePage from "@/pages/ProfilePage";
+import RequestDetailsPage from "@/pages/RequestDetailsPage";
+import CourtsListPage from "@/pages/CourtsListPage";
+import LawyersDirectory from "@/pages/LawyersDirectory";
+import ConversationsPage from "@/pages/ConversationsPage";
+import RepresentationCalendarPage from "@/pages/RepresentationCalendarPage";
+import AboutPage from "@/pages/AboutPage";
+import NotFound from "@/pages/NotFound";
+import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
+import { RequestsPage } from "@/pages/RequestsPage";
+
+// Auth wrappers
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Navbar />
-        <main className="pt-16">
+      <SessionProvider>
+        <PresenceProvider>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            {/* Protected Routes */}
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/requests" element={<ProtectedRoute><RequestsPage /></ProtectedRoute>} />
             <Route path="/requests/:id" element={<ProtectedRoute><RequestDetailsPage /></ProtectedRoute>} />
-            <Route path="/profile/:id" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/courts" element={<ProtectedRoute><CourtsListPage /></ProtectedRoute>} />
+            <Route path="/courts/:courtId" element={<ProtectedRoute><RequestsByCourtPage /></ProtectedRoute>} />
+            <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
             <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationPage /></ProtectedRoute>} />
+            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
+            <Route path="/representation-calendar" element={<ProtectedRoute><RepresentationCalendarPage /></ProtectedRoute>} />
+            <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
+            
+            {/* Admin Routes */}
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
+            {/* Not Found Route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
-        </main>
-        <Toaster />
-      </AuthProvider>
+          <Sonner />
+        </PresenceProvider>
+      </SessionProvider>
     </Router>
   );
 }

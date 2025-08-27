@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Court, Profile, Request } from "@/types";
-import { useAuth } from "@/hooks/useAuth";
+import { useSession } from "@/contexts/SessionContext";
 import { RequestCard } from "@/components/requests/RequestCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -12,7 +12,7 @@ type RequestWithDetails = Request & {
 };
 
 export function RequestsPage() {
-  const { profile } = useAuth();
+  const { profile } = useSession();
   const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export function RequestsPage() {
       try {
         const { data: requestsData, error: requestsError } = await supabase
           .from("requests")
-          .select("*, court:courts(*), creator:profiles(*), lawyer:profiles(*)")
+          .select("*, court:courts(*), creator:profiles!creator_id(*), lawyer:profiles!lawyer_id(*)")
           .order("created_at", { ascending: false });
         if (requestsError) throw requestsError;
         setRequests(requestsData as RequestWithDetails[]);
