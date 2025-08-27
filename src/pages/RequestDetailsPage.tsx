@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
 import { RequestWithDetails, ReplyWithAuthor } from '@/types';
-import { Loader2, ArrowRight, Send, User, Landmark, Calendar, FileText } from 'lucide-react';
+import { Loader2, ArrowRight, Send, User, Landmark, Calendar, FileText, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,6 +12,12 @@ import { showError, showSuccess } from '@/utils/toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { ReplyCard } from '@/components/ReplyCard';
+
+const requestTypeTranslations = {
+  representation: "انابة",
+  information_retrieval: "معلومة",
+  other: "طلب اخر من المحكمة",
+};
 
 const RequestDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -150,28 +156,63 @@ const RequestDetailsPage = () => {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="flex items-center gap-3 text-sm">
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex items-center gap-3">
               <User className="h-4 w-4 text-gray-500" />
               <strong>صاحب الطلب:</strong> {request.creator.first_name} {request.creator.last_name}
             </div>
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-3">
               <Landmark className="h-4 w-4 text-gray-500" />
               <strong>المحكمة:</strong> {request.court.name}
             </div>
+            <div className="flex items-center gap-3">
+              <Info className="h-4 w-4 text-gray-500" />
+              <strong>نوع الطلب:</strong> {requestTypeTranslations[request.type as keyof typeof requestTypeTranslations] || 'غير محدد'}
+            </div>
             {request.session_date && (
-              <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-3">
                 <Calendar className="h-4 w-4 text-gray-500" />
                 <strong>تاريخ الجلسة:</strong> {format(new Date(request.session_date), 'd MMMM yyyy, h:mm a', { locale: ar })}
               </div>
             )}
-            <div className="flex items-start gap-3 text-sm">
-              <FileText className="h-4 w-4 text-gray-500 mt-1" />
-              <div>
-                <strong>التفاصيل:</strong>
-                <p className="whitespace-pre-wrap text-gray-700">{request.details}</p>
+            
+            {(request.plaintiff_details || request.defendant_details) && (
+              <div className="pt-4 border-t">
+                <h4 className="font-semibold mb-2 text-base">تفاصيل الأطراف</h4>
+                <div className="space-y-3">
+                  {request.plaintiff_details && (
+                    <div className="flex items-start gap-3">
+                      <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <strong>الطرف الأول (المدعي/المستأنف):</strong>
+                        <p className="text-gray-700">{request.plaintiff_details}</p>
+                      </div>
+                    </div>
+                  )}
+                  {request.defendant_details && (
+                    <div className="flex items-start gap-3">
+                      <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <strong>الطرف الثاني (المدعى عليه/المستأنف عليه):</strong>
+                        <p className="text-gray-700">{request.defendant_details}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {request.details && (
+              <div className="pt-4 border-t">
+                <div className="flex items-start gap-3">
+                  <FileText className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                  <div>
+                    <strong className="text-base">التفاصيل الإضافية:</strong>
+                    <p className="whitespace-pre-wrap text-gray-700">{request.details}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
