@@ -77,11 +77,11 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
       council_id: councilId,
       court_id: courtId,
       request_type: values.request_type as RequestType,
-      case_number: values.request_type === 'representation' ? values.case_number : null,
-      session_date: values.request_type === 'representation' ? values.session_date?.toISOString() : null,
-      plaintiff: values.request_type === 'representation' ? values.plaintiff : null,
-      defendant: values.request_type === 'representation' ? values.defendant : null,
-      legal_representative: values.request_type === 'representation' ? values.legal_representative : null,
+      case_number: values.case_number || null,
+      session_date: values.session_date?.toISOString() || null,
+      plaintiff: values.plaintiff || null,
+      defendant: values.defendant || null,
+      legal_representative: values.legal_representative || null,
     };
 
     try {
@@ -161,7 +161,7 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
           )}
         />
 
-        {requestType === 'representation' && (
+        {requestType && (
           <div className="space-y-6 p-4 border rounded-md bg-gray-50">
             <FormField
               control={form.control}

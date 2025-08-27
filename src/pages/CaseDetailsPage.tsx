@@ -66,6 +66,7 @@ export default function CaseDetailsPage() {
 
   const judicialBody = caseItem.court?.name || caseItem.council?.name || 'غير محدد';
   const requestTypeDisplay = caseItem.request_type === 'representation' ? 'طلب إنابة' : 'طلب معلومة';
+  const hasRepresentationDetails = caseItem.case_number || caseItem.plaintiff || caseItem.defendant || caseItem.session_date;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -108,7 +109,7 @@ export default function CaseDetailsPage() {
               </div>
             </div>
             
-            {caseItem.request_type === 'representation' && (
+            {hasRepresentationDetails && (
               <div className="p-4 border rounded-md bg-gray-50 space-y-3">
                 <div className="flex items-center gap-3">
                   <FileText className="h-4 w-4 text-gray-500" />
