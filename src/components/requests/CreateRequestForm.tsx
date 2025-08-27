@@ -16,7 +16,9 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -155,24 +157,31 @@ export function CreateRequestForm({
                 </FormControl>
                 <SelectContent>
                   {(() => {
-                    const algiersCouncil = courts.find(c => c.name === 'مجلس قضاء الجزائر');
-                    if (!algiersCouncil) {
-                      return <SelectItem value="no-algiers" disabled>لم يتم العثور على مجلس قضاء الجزائر</SelectItem>;
-                    }
-                    const algeriaCourts = courts.filter(c => c.parent_id === algiersCouncil.id);
+                    const parentCourts = courts
+                      .filter((c) => c.parent_id === null)
+                      .sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
-                    return (
-                      <React.Fragment>
-                        <SelectItem value={algiersCouncil.id} className="font-semibold">
-                          {algiersCouncil.name}
-                        </SelectItem>
-                        {algeriaCourts.map((child) => (
-                          <SelectItem key={child.id} value={child.id} className="pr-8">
-                            {child.name}
-                          </SelectItem>
-                        ))}
-                      </React.Fragment>
-                    );
+                    if (parentCourts.length === 0) {
+                      return <SelectItem value="no-courts" disabled>لا توجد محاكم متاحة</SelectItem>;
+                    }
+
+                    return parentCourts.map((parent) => {
+                      const childCourts = courts
+                        .filter((c) => c.parent_id === parent.id)
+                        .sort((a, b) => a.name.localeCompare(b.name, "ar"));
+
+                      return (
+                        <SelectGroup key={parent.id}>
+                          <SelectLabel>{parent.name}</SelectLabel>
+                          <SelectItem value={parent.id}>{parent.name}</SelectItem>
+                          {childCourts.map((child) => (
+                            <SelectItem key={child.id} value={child.id} className="pr-8">
+                              {child.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      );
+                    });
                   })()}
                 </SelectContent>
               </Select>
