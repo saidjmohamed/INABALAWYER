@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { CaseWithDetails } from '../types';
-import { Loader2, ArrowRight, User, Landmark, FileText, Calendar, Users, Hash, Info } from 'lucide-react';
+import { Loader2, ArrowRight, User, Landmark, FileText, Calendar, Users, Briefcase, Info } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -111,12 +111,20 @@ export default function CaseDetailsPage() {
             {caseItem.request_type === 'representation' && (
               <div className="p-4 border rounded-md bg-gray-50 space-y-3">
                 <div className="flex items-center gap-3">
-                  <Hash className="h-4 w-4 text-gray-500" />
+                  <FileText className="h-4 w-4 text-gray-500" />
                   <strong>رقم القضية:</strong> {caseItem.case_number || 'غير محدد'}
                 </div>
                 <div className="flex items-center gap-3">
                   <Users className="h-4 w-4 text-gray-500" />
-                  <strong>الأطراف:</strong> {caseItem.parties || 'غير محدد'}
+                  <strong>المدعي:</strong> {caseItem.plaintiff || 'غير محدد'}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <strong>المدعى عليه:</strong> {caseItem.defendant || 'غير محدد'}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Briefcase className="h-4 w-4 text-gray-500" />
+                  <strong>الممثل القانوني:</strong> {caseItem.legal_representative || 'غير محدد'}
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-gray-500" />

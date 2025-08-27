@@ -21,16 +21,18 @@ const formSchema = z.object({
   }),
   description: z.string().optional(),
   case_number: z.string().optional(),
-  parties: z.string().optional(),
+  plaintiff: z.string().optional(),
+  defendant: z.string().optional(),
+  legal_representative: z.string().optional(),
   session_date: z.date().optional(),
 }).refine(data => {
   if (data.request_type === 'representation') {
-    return !!data.case_number && !!data.parties && !!data.session_date;
+    return !!data.case_number && !!data.plaintiff && !!data.defendant && !!data.session_date;
   }
   return true;
 }, {
-  message: "رقم القضية، الأطراف، وتاريخ الجلسة مطلوبة لطلب الإنابة",
-  path: ["session_date"],
+  message: "رقم القضية، المدعي، المدعى عليه، وتاريخ الجلسة مطلوبة لطلب الإنابة",
+  path: ["plaintiff"],
 });
 
 type CreateCaseFormValues = z.infer<typeof formSchema>;
@@ -76,8 +78,10 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
       court_id: courtId,
       request_type: values.request_type as RequestType,
       case_number: values.request_type === 'representation' ? values.case_number : null,
-      parties: values.request_type === 'representation' ? values.parties : null,
       session_date: values.request_type === 'representation' ? values.session_date?.toISOString() : null,
+      plaintiff: values.request_type === 'representation' ? values.plaintiff : null,
+      defendant: values.request_type === 'representation' ? values.defendant : null,
+      legal_representative: values.request_type === 'representation' ? values.legal_representative : null,
     };
 
     try {
@@ -174,12 +178,38 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
             />
             <FormField
               control={form.control}
-              name="parties"
+              name="plaintiff"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>الأطراف</FormLabel>
+                  <FormLabel>المدعي</FormLabel>
                   <FormControl>
-                    <Input placeholder="مثال: (مدعي) ضد (مدعى عليه)" {...field} />
+                    <Input placeholder="اسم المدعي" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="defendant"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>المدعى عليه</FormLabel>
+                  <FormControl>
+                    <Input placeholder="اسم المدعى عليه" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="legal_representative"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الممثل القانوني</FormLabel>
+                  <FormControl>
+                    <Input placeholder="اسم الممثل القانوني للأطراف" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

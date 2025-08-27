@@ -45,8 +45,10 @@ export type Case = {
   created_at: string;
   request_type: RequestType | null;
   case_number: string | null;
-  parties: string | null;
   session_date: string | null;
+  plaintiff: string | null;
+  defendant: string | null;
+  legal_representative: string | null;
 };
 
 export type CaseWithDetails = Case & {
