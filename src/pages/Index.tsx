@@ -18,24 +18,24 @@ const Index = () => {
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
           <nav className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            {profile && (
-              <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
-            )}
-            <Button variant="secondary" size="sm" asChild>
-              <Link to="/profile">
-                <span className="flex items-center">
-                  <User className="ml-2 h-4 w-4" /> ملفي الشخصي
-                </span>
-              </Link>
-            </Button>
-            <Button variant="secondary" size="sm" asChild>
-              <Link to="/lawyers">جدول المحامين</Link>
-            </Button>
-            {session && (
-              <Button variant="secondary" size="sm" onClick={handleSignOut} className="flex items-center">
-                <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
-              </Button>
-            )}
+            {session && profile ? (
+              <>
+                <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
+                <Button variant="secondary" size="sm" asChild>
+                  <Link to="/profile">
+                    <span className="flex items-center">
+                      <User className="ml-2 h-4 w-4" /> ملفي الشخصي
+                    </span>
+                  </Link>
+                </Button>
+                <Button variant="secondary" size="sm" asChild>
+                  <Link to="/lawyers">جدول المحامين</Link>
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleSignOut} className="flex items-center">
+                  <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
+                </Button>
+              </>
+            ) : null}
           </nav>
         </div>
       </header>
