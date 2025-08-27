@@ -1,22 +1,16 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { RequestCard, Request } from '@/components/RequestCard';
+import { RequestCard } from '@/components/requests/RequestCard';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-
-type Court = {
-  id: string;
-  name: string;
-  level: 'first_instance' | 'appeal' | 'supreme';
-  parent_id: string | null;
-};
+import { Court, RequestWithDetails } from '@/types';
 
 const CourtsListPage = () => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [parentCourts, setParentCourts] = useState<Court[]>([]);
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [requests, setRequests] = useState<Request[]>([]);
+  const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
 
   useEffect(() => {
@@ -41,14 +35,8 @@ const CourtsListPage = () => {
       .from('requests')
       .select(`
         *,
-        creator:profiles!creator_id (
-          first_name,
-          last_name
-        ),
-        lawyer:profiles!lawyer_id (
-          first_name,
-          last_name
-        )
+        creator:profiles!creator_id(*),
+        lawyer:profiles!lawyer_id(*)
       `)
       .eq('court_id', court.id);
 
@@ -57,11 +45,11 @@ const CourtsListPage = () => {
       toast.error('فشل في جلب القضايا');
       setRequests([]);
     } else {
-      const requestsWithCourtInfo = data.map(req => ({
+      const requestsWithCourt = data.map(req => ({
         ...req,
-        court: { name: court.name }
-      }));
-      setRequests(requestsWithCourtInfo as Request[]);
+        court: court,
+      })) as RequestWithDetails[];
+      setRequests(requestsWithCourt);
     }
     setLoadingRequests(false);
   };
