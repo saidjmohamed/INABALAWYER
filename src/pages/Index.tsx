@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, CalendarDays, Info } from 'lucide-react';
+import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, CalendarDays, Info, PlusCircle } from 'lucide-react';
 import { OnlineLawyersIndicator } from '@/components/OnlineLawyersIndicator';
 
 const Index = () => {
@@ -57,6 +57,12 @@ const Index = () => {
 
         {session && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={<PlusCircle className="h-8 w-8 text-primary" />}
+              title="إنشاء طلب جديد"
+              description="قم بإضافة طلب إنابة أو معلومة جديد ليراه المحامون الآخرون."
+              link="/requests/new"
+            />
             <FeatureCard
               icon={<Briefcase className="h-8 w-8 text-primary" />}
               title="إدارة الطلبات"

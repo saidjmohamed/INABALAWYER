@@ -18,6 +18,7 @@ import AboutPage from "@/pages/AboutPage";
 import NotFound from "@/pages/NotFound";
 import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
 import { RequestsPage } from "@/pages/RequestsPage";
+import CreateRequestPage from "@/pages/CreateRequestPage";
 
 // Auth wrappers
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -37,6 +38,7 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/requests" element={<ProtectedRoute><RequestsPage /></ProtectedRoute>} />
+            <Route path="/requests/new" element={<ProtectedRoute><CreateRequestPage /></ProtectedRoute>} />
             <Route path="/requests/:id" element={<ProtectedRoute><RequestDetailsPage /></ProtectedRoute>} />
             <Route path="/courts" element={<ProtectedRoute><CourtsListPage /></ProtectedRoute>} />
             <Route path="/courts/:courtId" element={<ProtectedRoute><RequestsByCourtPage /></ProtectedRoute>} />

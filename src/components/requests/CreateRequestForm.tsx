@@ -23,7 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Court, Profile, RequestType } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
 import React from "react";
@@ -89,7 +89,6 @@ export function CreateRequestForm({
   onFormSubmit,
   defaultCourtId,
 }: CreateRequestFormProps) {
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const form = useForm<CreateRequestFormValues>({
@@ -125,10 +124,7 @@ export function CreateRequestForm({
         throw error;
       }
 
-      toast({
-        title: "تم بنجاح",
-        description: "تم إنشاء طلبك بنجاح.",
-      });
+      showSuccess("تم إنشاء طلبك بنجاح.");
 
       if (onFormSubmit) {
         onFormSubmit();
@@ -138,11 +134,7 @@ export function CreateRequestForm({
 
     } catch (error: any) {
       console.error("Error creating request:", error);
-      toast({
-        title: "حدث خطأ",
-        description: "فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى.",
-        variant: "destructive",
-      });
+      showError("فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى.");
     }
   }
 
