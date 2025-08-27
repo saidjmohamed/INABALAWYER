@@ -100,8 +100,8 @@ export default function CaseDetailsPage() {
   const isOwner = profile?.id === caseItem.creator_id;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex justify-between items-center w-full max-w-4xl mx-auto py-4 border-b mb-8">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">تفاصيل الطلب</h1>
         <Button variant="outline" asChild>
           <Link to="/cases">
@@ -110,8 +110,8 @@ export default function CaseDetailsPage() {
             </span>
           </Link>
         </Button>
-      </header>
-      <main className="max-w-4xl mx-auto">
+      </div>
+      <main>
         <Card>
           <CardHeader>
             <div className="flex justify-between items-start">

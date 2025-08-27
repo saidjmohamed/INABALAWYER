@@ -1,108 +1,63 @@
 import { Link } from 'react-router-dom';
 import { useSession } from '../contexts/SessionContext';
-import { Button } from '../components/ui/button';
-import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users, Info, PlusCircle } from 'lucide-react';
-import { OnlineLawyersIndicator } from '../components/OnlineLawyersIndicator';
+import { Briefcase, Landmark, MessagesSquare, Users, Info, PlusCircle } from 'lucide-react';
 
 const Index = () => {
-  const { session, profile, signOut } = useSession();
+  const { session } = useSession();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary"></h1>
-          <nav className="flex items-center gap-4">
-            {session ? (
-              <>
-                <span className="text-gray-600">مرحباً، {profile?.first_name || 'مستخدم'}</span>
-                {profile?.role === 'admin' && (
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/admin">
-                      <Shield className="ml-2 h-4 w-4" />
-                      لوحة التحكم
-                    </Link>
-                  </Button>
-                )}
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/profile">
-                    <User className="ml-2 h-4 w-4" />
-                    ملفي الشخصي
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="ml-2 h-4 w-4" />
-                  تسجيل الخروج
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link to="/login">تسجيل الدخول</Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/signup">إنشاء حساب</Link>
-                </Button>
-              </>
-            )}
-          </nav>
+    <div className="container mx-auto p-8">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-4">معلومة و إنابة بين المحامين</h2>
+        <p className="text-xl text-gray-600">التطبيق لي يسهلك مهنتك و يوفرلك المعلومة</p>
+      </div>
+
+      {session && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FeatureCard
+            icon={<PlusCircle className="h-8 w-8 text-primary" />}
+            title="ايداع طلب جديد"
+            description="قم بإيداع طلب إنابة أو معلومة جديد ليطلع عليه الزملاء."
+            link="/cases/new"
+          />
+          <FeatureCard
+            icon={<Briefcase className="h-8 w-8 text-primary" />}
+            title="الاطلاع على طلبات الزملاء"
+            description="تصفح جميع الطلبات التي أودعها الزملاء المحامون."
+            link="/cases"
+          />
+          <FeatureCard
+            icon={<Landmark className="h-8 w-8 text-primary" />}
+            title="الجهات القضائية"
+            description="تصفح قائمة المجالس والمحاكم والقضايا المرتبطة بها."
+            link="/courts"
+          />
+          <FeatureCard
+            icon={<Users className="h-8 w-8 text-primary" />}
+            title="دليل المحامين"
+            description="تواصل مع زملائك المحامين النشطين على المنصة."
+            link="/lawyers"
+          />
+          <FeatureCard
+            icon={<MessagesSquare className="h-8 w-8 text-primary" />}
+            title="المحادثات"
+            description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
+            link="/conversations"
+          />
+          <FeatureCard
+            icon={<Info className="h-8 w-8 text-primary" />}
+            title="عن التطبيق"
+            description="معلومات عن التطبيق، المصمم، وكيفية التواصل."
+            link="/about"
+          />
         </div>
-      </header>
+      )}
 
-      <main className="container mx-auto p-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">معلومة و إنابة بين المحامين</h2>
-          <p className="text-xl text-gray-600">التطبيق لي يسهلك مهنتك و يوفرلك المعلومة</p>
+      {!session && (
+        <div className="text-center mt-8">
+          <p className="text-lg text-gray-700">يرجى تسجيل الدخول أو إنشاء حساب للوصول إلى ميزات المنصة.</p>
         </div>
-
-        {session && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={<PlusCircle className="h-8 w-8 text-primary" />}
-              title="ايداع طلب جديد"
-              description="قم بإيداع طلب إنابة أو معلومة جديد ليطلع عليه الزملاء."
-              link="/cases/new"
-            />
-            <FeatureCard
-              icon={<Briefcase className="h-8 w-8 text-primary" />}
-              title="الاطلاع على طلبات الزملاء"
-              description="تصفح جميع الطلبات التي أودعها الزملاء المحامون."
-              link="/cases"
-            />
-            <FeatureCard
-              icon={<Landmark className="h-8 w-8 text-primary" />}
-              title="الجهات القضائية"
-              description="تصفح قائمة المجالس والمحاكم والقضايا المرتبطة بها."
-              link="/courts"
-            />
-            <FeatureCard
-              icon={<Users className="h-8 w-8 text-primary" />}
-              title="دليل المحامين"
-              description="تواصل مع زملائك المحامين النشطين على المنصة."
-              link="/lawyers"
-            />
-            <FeatureCard
-              icon={<MessagesSquare className="h-8 w-8 text-primary" />}
-              title="المحادثات"
-              description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
-              link="/conversations"
-            />
-            <FeatureCard
-              icon={<Info className="h-8 w-8 text-primary" />}
-              title="عن التطبيق"
-              description="معلومات عن التطبيق، المصمم، وكيفية التواصل."
-              link="/about"
-            />
-          </div>
-        )}
-
-        {!session && (
-          <div className="text-center mt-8">
-            <p className="text-lg text-gray-700">يرجى تسجيل الدخول أو إنشاء حساب للوصول إلى ميزات المنصة.</p>
-          </div>
-        )}
-      </main>
-      {session && <OnlineLawyersIndicator />}
+      )}
     </div>
   );
 };

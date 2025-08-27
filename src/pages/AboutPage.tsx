@@ -1,23 +1,12 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 const AboutPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex justify-between items-center w-full max-w-4xl mx-auto py-4 border-b mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">عن التطبيق</h1>
-        <Button variant="outline" asChild>
-          <Link to="/">
-            <span className="flex items-center">
-              <ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية
-            </span>
-          </Link>
-        </Button>
-      </header>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">عن التطبيق</h1>
 
-      <main className="max-w-4xl mx-auto space-y-8">
+      <main className="space-y-8">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">عن التطبيق</CardTitle>

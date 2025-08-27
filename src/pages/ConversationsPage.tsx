@@ -6,7 +6,7 @@ import { Profile } from '../types';
 import { ChatWindow } from '../components/chat/ChatWindow';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Loader2, ArrowRight, MessageSquare, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Loader2, MessageSquare, MoreHorizontal, Trash2 } from 'lucide-react';
 import { showError, showSuccess } from '../utils/toast';
 import { cn } from '../lib/utils';
 import { usePresence } from '../contexts/PresenceContext';
@@ -136,18 +136,8 @@ const ConversationsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="flex justify-between items-center w-full mx-auto p-4 border-b bg-white">
-        <h1 className="text-2xl font-bold text-gray-900">محادثاتي</h1>
-        <Button variant="outline" asChild>
-          <Link to="/">
-            <span className="flex items-center">
-              <ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية
-            </span>
-          </Link>
-        </Button>
-      </header>
-      <div className="flex h-[calc(100vh-73px)]">
+    <div className="h-[calc(100vh-72px)]">
+      <div className="flex h-full border-t">
         <aside className="w-1/3 max-w-xs border-r bg-white overflow-y-auto">
           {conversations.length > 0 ? (
             <ul>

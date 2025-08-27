@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { useSession } from '../contexts/SessionContext';
 import { Profile } from '../types';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -17,8 +17,7 @@ import { showSuccess, showError } from '../utils/toast';
 import { Loader2 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { session, profile, loading: sessionLoading, signOut } = useSession();
-  const navigate = useNavigate();
+  const { session, profile, loading: sessionLoading } = useSession();
   const [pendingLawyers, setPendingLawyers] = useState<Profile[]>([]);
   const [managedLawyers, setManagedLawyers] = useState<Profile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -57,11 +56,6 @@ const AdminDashboard = () => {
       fetchLawyers();
     }
   }, [sessionLoading, session, profile]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
 
   if (sessionLoading) {
     return (
@@ -108,13 +102,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex justify-between items-center w-full max-w-6xl mx-auto py-4 border-b mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">لوحة تحكم المشرف</h1>
-        <Button onClick={handleSignOut} variant="outline">تسجيل الخروج</Button>
-      </header>
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">لوحة تحكم المشرف</h1>
 
-      <main className="max-w-6xl mx-auto space-y-8">
+      <main className="space-y-8">
         {loadingData ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

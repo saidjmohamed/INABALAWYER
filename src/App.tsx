@@ -21,6 +21,7 @@ import CaseDetailsPage from "./pages/CaseDetailsPage";
 // Auth wrappers
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
+import MainLayout from "./components/layout/MainLayout";
 
 function App() {
   return (
@@ -32,20 +33,22 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Protected Routes */}
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
-            <Route path="/cases/new" element={<ProtectedRoute><CreateCasePage /></ProtectedRoute>} />
-            <Route path="/cases/:id" element={<ProtectedRoute><CaseDetailsPage /></ProtectedRoute>} />
-            <Route path="/courts" element={<ProtectedRoute><CourtsListPage /></ProtectedRoute>} />
-            <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
-            <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            {/* Protected Routes with Layout */}
+            <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+              <Route path="/" element={<Index />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/cases" element={<CasesPage />} />
+              <Route path="/cases/new" element={<CreateCasePage />} />
+              <Route path="/cases/:id" element={<CaseDetailsPage />} />
+              <Route path="/courts" element={<CourtsListPage />} />
+              <Route path="/lawyers" element={<LawyersDirectory />} />
+              <Route path="/conversations" element={<ConversationsPage />} />
+              <Route path="/conversations/:id" element={<ConversationsPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            </Route>
 
             {/* Not Found Route */}
             <Route path="*" element={<NotFound />} />

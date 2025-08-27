@@ -62,7 +62,7 @@ export default function CourtsListPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-73px)]">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-72px)] border-t">
       <aside className="w-full md:w-1/3 md:max-w-xs border-r bg-white overflow-y-auto p-4">
         <h2 className="text-lg font-semibold mb-4">الجهات القضائية</h2>
         <Accordion type="multiple" className="w-full">

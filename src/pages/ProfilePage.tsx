@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useSession } from '../contexts/SessionContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { ProfileEditForm } from '../components/profiles/ProfileEditForm';
-import { Loader2, ArrowRight, Edit } from 'lucide-react';
+import { Loader2, Edit } from 'lucide-react';
 import { Separator } from '../components/ui/separator';
 
 const ProfilePage = () => {
@@ -93,27 +93,18 @@ const ProfilePage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex flex-col sm:flex-row justify-between items-center w-full max-w-4xl mx-auto py-4 border-b mb-8 gap-4">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold text-gray-900">ملفي الشخصي</h1>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full">
-            <span className="flex items-center justify-center">
-              <Edit className="mr-2 h-4 w-4" />
-              {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
-            </span>
-          </Button>
-          <Button variant="outline" asChild className="w-full">
-            <Link to="/">
-              <span className="flex items-center justify-center">
-                <ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية
-              </span>
-            </Link>
-          </Button>
-        </div>
-      </header>
+        <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full sm:w-auto">
+          <span className="flex items-center justify-center">
+            <Edit className="mr-2 h-4 w-4" />
+            {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
+          </span>
+        </Button>
+      </div>
 
-      <main className="max-w-4xl mx-auto">
+      <main>
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-bold">

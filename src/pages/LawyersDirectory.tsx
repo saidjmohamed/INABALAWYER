@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { Profile } from '../types';
 import { LawyerCard } from '../components/LawyerCard';
-import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, Search } from 'lucide-react';
 
@@ -89,15 +87,10 @@ const LawyersDirectory = () => {
   }, [searchTerm, organization]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <header className="flex justify-between items-center w-full max-w-7xl mx-auto py-4 border-b mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">جدول المحامين</h1>
-        <Button variant="outline" asChild>
-          <Link to="/profile">العودة للملف الشخصي</Link>
-        </Button>
-      </header>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">جدول المحامين</h1>
 
-      <main className="max-w-7xl mx-auto">
+      <main>
         <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center shadow-sm">
           <h2 className="text-lg font-semibold text-blue-800">
             إجمالي المحامين المسجلين: <span className="text-2xl font-bold">{totalLawyersCount}</span>
