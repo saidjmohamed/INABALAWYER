@@ -1,7 +1,7 @@
 export type UserRole = 'admin' | 'lawyer';
 export type UserStatus = 'pending' | 'active' | 'inactive';
-export type RequestStatus = 'open' | 'closed' | 'in_progress';
-export type RequestType = 'consultation' | 'representation';
+export type RequestStatus = 'open' | 'closed' | 'in_progress' | 'assigned' | 'cancelled';
+export type RequestType = 'information_retrieval' | 'representation' | 'other';
 export type CourtLevel = 'first_instance' | 'appeal' | 'cassation';
 
 export type Profile = {
