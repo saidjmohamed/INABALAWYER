@@ -214,13 +214,13 @@ const RequestDetailsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="flex justify-between items-center w-full py-4 border-b mb-8">
+        <header className="flex flex-col sm:flex-row justify-between items-center w-full py-4 border-b mb-8 gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
           <h1 className="text-2xl font-bold text-gray-900">تفاصيل الطلب</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
             {canDeleteRequest && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" disabled={deleting}>
+                  <Button variant="destructive" size="sm" disabled={deleting} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
                     {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                     حذف الطلب
                   </Button>
@@ -241,7 +241,7 @@ const RequestDetailsPage = () => {
                 </AlertDialogContent>
               </AlertDialog>
             )}
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
               <Link to="/"><ArrowRight className="ml-2 h-4 w-4" /> العودة للرئيسية</Link>
             </Button>
           </div>
@@ -250,7 +250,7 @@ const RequestDetailsPage = () => {
         <main className="space-y-8">
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
                 <CardTitle className="text-xl">{requestTypeTranslations[request.type]}</CardTitle>
                 <Badge variant="secondary">{request.court?.name}</Badge>
               </div>
@@ -269,7 +269,7 @@ const RequestDetailsPage = () => {
                 الحالة: {request.status === 'open' ? 'مفتوح' : request.status === 'in_progress' ? 'قيد التقدم' : 'مغلق'}
               </Badge>
             </CardContent>
-            <CardFooter className="flex justify-between items-center text-sm text-muted-foreground">
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
               <span>
                 نشر بواسطة: {request.creator?.first_name} {request.creator?.last_name}
               </span>
@@ -281,7 +281,7 @@ const RequestDetailsPage = () => {
 
           {canAcceptRequest && (
             <div className="text-center">
-              <Button onClick={handleAcceptRequest} disabled={accepting}>
+              <Button onClick={handleAcceptRequest} disabled={accepting} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
                 {accepting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'قبول الطلب'}
               </Button>
             </div>
@@ -293,7 +293,7 @@ const RequestDetailsPage = () => {
               replies.map((reply) => (
                 <Card key={reply.id}>
                   <CardContent className="p-4">
-                    <div className="flex items-start space-x-4 space-x-reverse">
+                    <div className="flex items-start space-x-4 space-x-reverse flex-col sm:flex-row gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
                       <Avatar>
                         <AvatarImage />
                         <AvatarFallback>
@@ -302,7 +302,7 @@ const RequestDetailsPage = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center"> {/* Added flex-col sm:flex-row and gap-2 */}
                           <p className="font-semibold">
                             {reply.author?.first_name} {reply.author?.last_name}
                           </p>
@@ -333,7 +333,7 @@ const RequestDetailsPage = () => {
                   rows={4}
                   disabled={replying}
                 />
-                <Button type="submit" disabled={replying || !newReply.trim()}>
+                <Button type="submit" disabled={replying || !newReply.trim()} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
                   {replying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'إرسال الرد'}
                 </Button>
               </form>

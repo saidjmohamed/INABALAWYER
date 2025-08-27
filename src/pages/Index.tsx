@@ -9,9 +9,9 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-primary text-primary-foreground p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
+        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
           <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
-          <nav className="flex items-center space-x-4 space-x-reverse">
+          <nav className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4"> {/* Added flex-col sm:flex-row and gap-2 sm:gap-4 */}
             {profile && (
               <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
             )}
@@ -37,12 +37,12 @@ const Index = () => {
           تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
         </p>
         {!session && (
-          <div className="space-x-4 space-x-reverse">
+          <div className="flex flex-col sm:flex-row gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
             <Link to="/login">
-              <Button size="lg">تسجيل الدخول</Button>
+              <Button size="lg" className="w-full sm:w-auto">تسجيل الدخول</Button>
             </Link>
             <Link to="/signup">
-              <Button size="lg" variant="outline">إنشاء حساب</Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">إنشاء حساب</Button>
             </Link>
           </div>
         )}
@@ -51,12 +51,12 @@ const Index = () => {
             <p className="text-xl text-gray-800">
               أهلاً بك في لوحة التحكم الخاصة بك.
             </p>
-            <div className="flex justify-center space-x-4 space-x-reverse">
+            <div className="flex flex-col sm:flex-row justify-center gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
               <Link to="/requests">
-                <Button size="lg">عرض طلبات الإنابة</Button>
+                <Button size="lg" className="w-full sm:w-auto">عرض طلبات الإنابة</Button>
               </Link>
               <Link to="/create-request">
-                <Button size="lg" variant="outline">إنشاء طلب إنابة جديد</Button>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">إنشاء طلب إنابة جديد</Button>
               </Link>
             </div>
           </div>
