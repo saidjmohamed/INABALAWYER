@@ -154,7 +154,7 @@ const AdminDashboard = () => {
                                 disabled={actionLoading === lawyer.id}
                               >
                                 <span className="flex items-center justify-center">
-                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'قبول'}
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>قبول</span>}
                                 </span>
                               </Button>
                               <Button
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
                                 disabled={actionLoading === lawyer.id}
                               >
                                 <span className="flex items-center justify-center">
-                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'رفض'}
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>رفض</span>}
                                 </span>
                               </Button>
                             </TableCell>
@@ -209,7 +209,7 @@ const AdminDashboard = () => {
                                   disabled={actionLoading === lawyer.id}
                                 >
                                   <span className="flex items-center justify-center">
-                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تعطيل'}
+                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>تعطيل</span>}
                                   </span>
                                 </Button>
                               ) : (
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
                                   disabled={actionLoading === lawyer.id}
                                 >
                                   <span className="flex items-center justify-center">
-                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تفعيل'}
+                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>تفعيل</span>}
                                   </span>
                                 </Button>
                               )}
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
                                 disabled={actionLoading === lawyer.id}
                               >
                                 <span className="flex items-center justify-center">
-                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حذف'}
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>حذف</span>}
                                 </span>
                               </Button>
                             </TableCell>
