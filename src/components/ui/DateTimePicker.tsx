@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
+import { Input } from "./input";
 
 interface DateTimePickerProps {
   date: Date | undefined;
@@ -21,36 +21,37 @@ interface DateTimePickerProps {
 }
 
 export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
-  const [time, setTime] = React.useState(date ? format(date, "HH:mm") : "09:00");
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
-  const handleDateSelect = (selectedDate: Date | undefined) => {
-    if (!selectedDate) {
+  const handleDateSelect = (selectedDay: Date | undefined) => {
+    if (!selectedDay) {
       setDate(undefined);
       return;
     }
+    
+    const newDate = new Date(
+      selectedDay.getFullYear(),
+      selectedDay.getMonth(),
+      selectedDay.getDate(),
+      date?.getHours() ?? 0,
+      date?.getMinutes() ?? 0
+    );
+    setDate(newDate);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = e.target.value;
+    if (!time) return;
+
     const [hours, minutes] = time.split(":").map(Number);
-    const newDate = new Date(selectedDate);
+    const newDate = date ? new Date(date) : new Date();
     newDate.setHours(hours);
     newDate.setMinutes(minutes);
     setDate(newDate);
   };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = e.target.value;
-    setTime(newTime);
-    if (date) {
-      const [hours, minutes] = newTime.split(":").map(Number);
-      const newDate = new Date(date);
-      if (!isNaN(hours) && !isNaN(minutes)) {
-        newDate.setHours(hours);
-        newDate.setMinutes(minutes);
-        setDate(newDate);
-      }
-    }
-  };
-
   return (
-    <Popover>
+    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
@@ -60,22 +61,28 @@ export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
           )}
         >
           <CalendarIcon className="ml-2 h-4 w-4" />
-          {date ? format(date, "PPP HH:mm", { locale: ar }) : <span>اختر تاريخ ووقت</span>}
+          {date ? (
+            format(date, "PPP HH:mm", { locale: ar })
+          ) : (
+            <span>اختر تاريخًا ووقتًا</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
           selected={date}
-          onSelect={handleDateSelect}
+          onSelect={(day) => {
+            handleDateSelect(day);
+          }}
           initialFocus
           locale={ar}
         />
         <div className="p-3 border-t border-border">
           <Input
             type="time"
-            value={time}
             onChange={handleTimeChange}
+            value={date ? format(date, "HH:mm") : ""}
           />
         </div>
       </PopoverContent>
