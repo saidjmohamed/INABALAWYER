@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession, Profile } from '@/contexts/SessionContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { session, profile, loading: sessionLoading, signOut } = useSession();
+  const navigate = useNavigate();
   const [pendingLawyers, setPendingLawyers] = useState<Profile[]>([]);
   const [managedLawyers, setManagedLawyers] = useState<Profile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -55,6 +56,11 @@ const AdminDashboard = () => {
       fetchLawyers();
     }
   }, [sessionLoading, session, profile]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   if (sessionLoading) {
     return (
@@ -104,7 +110,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <header className="flex justify-between items-center w-full max-w-6xl mx-auto py-4 border-b mb-8">
         <h1 className="text-3xl font-bold text-gray-900">لوحة تحكم المشرف</h1>
-        <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
+        <Button onClick={handleSignOut} variant="outline">تسجيل الخروج</Button>
       </header>
 
       <main className="max-w-6xl mx-auto space-y-8">

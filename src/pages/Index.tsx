@@ -1,10 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 
 const Index = () => {
   const { session, profile, signOut } = useSession();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,7 +30,7 @@ const Index = () => {
               <Button variant="secondary" size="sm">جدول المحامين</Button>
             </Link>
             {session && (
-              <Button variant="secondary" size="sm" onClick={signOut} className="flex items-center">
+              <Button variant="secondary" size="sm" onClick={handleSignOut} className="flex items-center">
                 <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
               </Button>
             )}
