@@ -25,7 +25,7 @@ import { Court, RequestType } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const formSchema = z.object({
@@ -50,7 +50,7 @@ export function CreateRequestForm({
   courtId,
 }: CreateRequestFormProps) {
   const { user } = useUser();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,7 +89,7 @@ export function CreateRequestForm({
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push("/requests");
+        navigate("/requests");
       }
     }
   }
