@@ -173,7 +173,7 @@ export const SignUpForm = () => {
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
           <span className="flex items-center justify-center">
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'إنشاء حساب'}
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إنشاء حساب</span>}
           </span>
         </Button>
       </form>

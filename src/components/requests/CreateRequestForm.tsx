@@ -188,7 +188,7 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
             />
             <Button type="submit" className="w-full" disabled={isLoading}>
               <span className="flex items-center justify-center">
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'إنشاء الطلب'}
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إنشاء الطلب</span>}
               </span>
             </Button>
           </form>
