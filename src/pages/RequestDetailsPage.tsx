@@ -238,7 +238,7 @@ const RequestDetailsPage = () => {
                     <AlertDialogCancel>إلغاء</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDeleteRequest} disabled={deleting}>
                       <span className="flex items-center justify-center">
-                        {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حذف'}
+                        {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>حذف</span>}
                       </span>
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -291,7 +291,7 @@ const RequestDetailsPage = () => {
             <div className="text-center">
               <Button onClick={handleAcceptRequest} disabled={accepting} className="w-full sm:w-auto">
                 <span className="flex items-center justify-center">
-                  {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'قبول الطلب'}
+                  {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>قبول الطلب</span>}
                 </span>
               </Button>
             </div>
@@ -345,7 +345,7 @@ const RequestDetailsPage = () => {
                 />
                 <Button type="submit" disabled={replying || !newReply.trim()} className="w-full sm:w-auto">
                   <span className="flex items-center justify-center">
-                    {replying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'إرسال الرد'}
+                    {replying ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إرسال الرد</span>}
                   </span>
                 </Button>
               </form>
