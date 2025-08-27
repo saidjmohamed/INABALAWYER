@@ -21,14 +21,16 @@ const Index = () => {
             {profile && (
               <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
             )}
-            <Link to="/profile">
-              <Button variant="secondary" size="sm" className="flex items-center">
-                <User className="ml-2 h-4 w-4" /> ملفي الشخصي
-              </Button>
-            </Link>
-            <Link to="/lawyers">
-              <Button variant="secondary" size="sm">جدول المحامين</Button>
-            </Link>
+            <Button variant="secondary" size="sm" asChild>
+              <Link to="/profile">
+                <span className="flex items-center">
+                  <User className="ml-2 h-4 w-4" /> ملفي الشخصي
+                </span>
+              </Link>
+            </Button>
+            <Button variant="secondary" size="sm" asChild>
+              <Link to="/lawyers">جدول المحامين</Link>
+            </Button>
             {session && (
               <Button variant="secondary" size="sm" onClick={handleSignOut} className="flex items-center">
                 <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
@@ -44,12 +46,12 @@ const Index = () => {
         </p>
         {!session && (
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/login">
-              <Button size="lg" className="w-full sm:w-auto">تسجيل الدخول</Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">إنشاء حساب</Button>
-            </Link>
+            <Button size="lg" className="w-full sm:w-auto" asChild>
+              <Link to="/login">تسجيل الدخول</Link>
+            </Button>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+              <Link to="/signup">إنشاء حساب</Link>
+            </Button>
           </div>
         )}
         {session && profile && (
@@ -58,12 +60,12 @@ const Index = () => {
               أهلاً بك في لوحة التحكم الخاصة بك.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/requests">
-                <Button size="lg" className="w-full sm:w-auto">عرض كل الطلبات</Button>
-              </Link>
-              <Link to="/courts">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">عرض الطلبات حسب المحكمة</Button>
-              </Link>
+              <Button size="lg" className="w-full sm:w-auto" asChild>
+                <Link to="/requests">عرض كل الطلبات</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+                <Link to="/courts">عرض الطلبات حسب المحكمة</Link>
+              </Button>
             </div>
           </div>
         )}
