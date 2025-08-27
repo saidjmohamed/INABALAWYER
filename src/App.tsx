@@ -36,6 +36,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route 
                 path="/admin" 
                 element={
@@ -52,7 +53,6 @@ const App = () => (
               <Route path="/conversations" element={<ConversationsPage />} />
               <Route path="/conversations/:id" element={<ConversationsPage />} />
               <Route path="/representation-calendar" element={<RepresentationCalendarPage />} />
-              <Route path="/about" element={<AboutPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

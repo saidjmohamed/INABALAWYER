@@ -55,48 +55,46 @@ const Index = () => {
           <p className="text-xl text-gray-600">التطبيق لي يسهلك مهنتك و يوفرلك المعلومة</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {session && (
-            <>
-              <FeatureCard
-                icon={<Briefcase className="h-8 w-8 text-primary" />}
-                title="إدارة الطلبات"
-                description="عرض وتتبع جميع الطلبات القانونية المتاحة والموكلة إليك."
-                link="/requests"
-              />
-              <FeatureCard
-                icon={<Landmark className="h-8 w-8 text-primary" />}
-                title="المحاكم"
-                description="تصفح قائمة المحاكم والطلبات المرتبطة بكل محكمة."
-                link="/courts"
-              />
-              <FeatureCard
-                icon={<Users className="h-8 w-8 text-primary" />}
-                title="دليل المحامين"
-                description="تواصل مع زملائك المحامين النشطين على المنصة."
-                link="/lawyers"
-              />
-              <FeatureCard
-                icon={<MessagesSquare className="h-8 w-8 text-primary" />}
-                title="المحادثات"
-                description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
-                link="/conversations"
-              />
-              <FeatureCard
-                icon={<CalendarDays className="h-8 w-8 text-primary" />}
-                title="تقويم الإنابات"
-                description="عرض جميع طلبات الإنابة في تقويم تفاعلي."
-                link="/representation-calendar"
-              />
-            </>
-          )}
-          <FeatureCard
-            icon={<Info className="h-8 w-8 text-primary" />}
-            title="عن التطبيق"
-            description="معلومات عن التطبيق والمصمم ومعلومات الاتصال."
-            link="/about"
-          />
-        </div>
+        {session && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={<Briefcase className="h-8 w-8 text-primary" />}
+              title="إدارة الطلبات"
+              description="عرض وتتبع جميع الطلبات القانونية المتاحة والموكلة إليك."
+              link="/requests"
+            />
+            <FeatureCard
+              icon={<Landmark className="h-8 w-8 text-primary" />}
+              title="المحاكم"
+              description="تصفح قائمة المحاكم والطلبات المرتبطة بكل محكمة."
+              link="/courts"
+            />
+            <FeatureCard
+              icon={<Users className="h-8 w-8 text-primary" />}
+              title="دليل المحامين"
+              description="تواصل مع زملائك المحامين النشطين على المنصة."
+              link="/lawyers"
+            />
+            <FeatureCard
+              icon={<MessagesSquare className="h-8 w-8 text-primary" />}
+              title="المحادثات"
+              description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
+              link="/conversations"
+            />
+            <FeatureCard
+              icon={<CalendarDays className="h-8 w-8 text-primary" />}
+              title="تقويم الإنابات"
+              description="عرض جميع طلبات الإنابة في تقويم تفاعلي."
+              link="/representation-calendar"
+            />
+            <FeatureCard
+              icon={<Info className="h-8 w-8 text-primary" />}
+              title="عن التطبيق"
+              description="معلومات عن التطبيق، المصمم، وكيفية التواصل."
+              link="/about"
+            />
+          </div>
+        )}
 
         {!session && (
           <div className="text-center mt-8">

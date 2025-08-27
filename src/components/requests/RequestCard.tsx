@@ -15,6 +15,7 @@ const statusMap: Record<RequestStatus, string> = {
   assigned: "معين",
   closed: "مغلق",
   cancelled: "ملغى",
+  in_progress: "قيد التنفيذ",
 };
 
 const statusColorMap: Record<RequestStatus, string> = {
@@ -22,6 +23,7 @@ const statusColorMap: Record<RequestStatus, string> = {
   assigned: "bg-yellow-500",
   closed: "bg-gray-500",
   cancelled: "bg-red-500",
+  in_progress: "bg-blue-500",
 };
 
 const requestTypeMap: Record<string, string> = {
