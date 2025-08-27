@@ -14,8 +14,8 @@ const LawyersDirectory = () => {
   const [totalLawyersCount, setTotalLawyersCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [experience, setExperience] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [organizations, setOrganizations] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchTotalCount = async () => {
@@ -31,7 +31,25 @@ const LawyersDirectory = () => {
         setTotalLawyersCount(count);
       }
     };
+    
+    const fetchOrganizations = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('organization')
+        .eq('role', 'lawyer')
+        .eq('status', 'active')
+        .not('organization', 'is', null);
+
+      if (error) {
+        console.error('Error fetching organizations:', error);
+      } else if (data) {
+        const uniqueOrgs = [...new Set(data.map(p => p.organization).filter(Boolean))];
+        setOrganizations(uniqueOrgs as string[]);
+      }
+    };
+
     fetchTotalCount();
+    fetchOrganizations();
   }, []);
 
   useEffect(() => {
@@ -44,13 +62,10 @@ const LawyersDirectory = () => {
         .eq('status', 'active');
 
       if (searchTerm) {
-        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`);
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`);
       }
-      if (specialty) {
-        query = query.contains('specialties', [specialty]);
-      }
-      if (experience) {
-        query = query.gte('experience_years', parseInt(experience));
+      if (organization) {
+        query = query.eq('organization', organization);
       }
 
       const { data, error } = await query;
@@ -71,11 +86,7 @@ const LawyersDirectory = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchTerm, specialty, experience]);
-
-  const specialties = [
-    'الجنائي', 'المدني', 'التجاري', 'الإداري', 'العقاري', 'الأحوال الشخصية', 'العمالي'
-  ];
+  }, [searchTerm, organization]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -94,35 +105,24 @@ const LawyersDirectory = () => {
         </div>
 
         <div className="mb-8 p-6 bg-white rounded-lg shadow-sm border">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
                 type="text"
-                placeholder="البحث بالاسم..."
+                placeholder="البحث بالاسم أو رقم الهاتف..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={specialty} onValueChange={(value) => setSpecialty(value === 'all' ? '' : value)}>
+            <Select value={organization} onValueChange={(value) => setOrganization(value === 'all' ? '' : value)}>
               <SelectTrigger>
-                <SelectValue placeholder="التخصص" />
+                <SelectValue placeholder="المجلس التابع له" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">الكل</SelectItem>
-                {specialties.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={experience} onValueChange={(value) => setExperience(value === 'all' ? '' : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="سنوات الخبرة" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">الكل</SelectItem>
-                <SelectItem value="5">5+ سنوات</SelectItem>
-                <SelectItem value="10">10+ سنوات</SelectItem>
-                <SelectItem value="15">15+ سنوات</SelectItem>
+                {organizations.map(org => <SelectItem key={org} value={org}>{org}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
