@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/integrations/supabase/client';
-import { useSession, Profile } from '@/contexts/SessionContext';
+import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,7 +35,7 @@ interface ProfileEditFormProps {
 }
 
 export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
-  const { profile, user } = useSession();
+  const { profile, user, refetchProfile } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ProfileFormValues>({
@@ -100,6 +100,7 @@ export const ProfileEditForm = ({ onSuccess }: ProfileEditFormProps) => {
       showError('فشل في تحديث الملف الشخصي: ' + error.message);
     } else {
       showSuccess('تم تحديث الملف الشخصي بنجاح.');
+      await refetchProfile();
       onSuccess();
     }
   };

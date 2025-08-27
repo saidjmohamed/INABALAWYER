@@ -12,12 +12,12 @@ export interface Profile {
   role: 'lawyer' | 'admin';
   email: string;
   username: string;
-  specialties: string[] | null; // New field
-  experience_years: number | null; // New field
-  languages: string[] | null; // New field
-  bio: string | null; // New field
-  avatar_url: string | null; // New field
-  organization: string | null; // New field
+  specialties: string[] | null;
+  experience_years: number | null;
+  languages: string[] | null;
+  bio: string | null;
+  avatar_url: string | null;
+  organization: string | null;
 }
 
 interface SessionContextValue {
@@ -26,6 +26,7 @@ interface SessionContextValue {
   profile: Profile | null;
   loading: boolean;
   signOut: () => void;
+  refetchProfile: () => Promise<void>;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -35,6 +36,26 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      setProfile(null);
+    } else if (profileData && (profileData.status === 'active' || profileData.role === 'admin')) {
+      setProfile(profileData as Profile);
+    } else {
+      setProfile(null);
+      if (profileData) {
+        await supabase.auth.signOut();
+      }
+    }
+  };
 
   useEffect(() => {
     const setData = async () => {
@@ -46,27 +67,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       }
 
       setSession(session);
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
 
-      if (session?.user) {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError) {
-          console.error("Error fetching profile:", profileError);
-          setProfile(null);
-        } else if (profileData && (profileData.status === 'active' || profileData.role === 'admin')) {
-          setProfile(profileData);
-        } else {
-          setProfile(null);
-          if (profileData) {
-            // If profile exists but is not active, sign the user out.
-            await supabase.auth.signOut();
-          }
-        }
+      if (currentUser) {
+        await fetchProfile(currentUser.id);
       }
       setLoading(false);
     };
@@ -74,8 +79,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED' || _event === 'USER_UPDATED') {
         setSession(session);
-        setUser(session?.user ?? null);
-        setData();
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          fetchProfile(currentUser.id);
+        }
       } else if (_event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
@@ -92,12 +100,19 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     await supabase.auth.signOut();
   };
 
+  const refetchProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
   const value = {
     session,
     user,
     profile,
     loading,
     signOut,
+    refetchProfile,
   };
 
   return (
