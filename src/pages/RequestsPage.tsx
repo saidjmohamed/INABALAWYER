@@ -15,7 +15,7 @@ const RequestsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-col sm:flex-row justify-between items-center w-full max-w-7xl mx-auto py-4 border-b mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">طلبات الإنابة</h1>
+        <h1 className="text-3xl font-bold text-gray-900">جميع طلبات الإنابة</h1>
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <CreateRequestForm onSuccess={handleRequestCreation} />
           <Button variant="outline" asChild className="w-full sm:w-auto">

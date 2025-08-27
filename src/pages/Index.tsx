@@ -53,7 +53,10 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/requests">
-                <Button size="lg" className="w-full sm:w-auto">عرض وإنشاء طلبات الإنابة</Button>
+                <Button size="lg" className="w-full sm:w-auto">عرض كل الطلبات</Button>
+              </Link>
+              <Link to="/courts">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">عرض الطلبات حسب المحكمة</Button>
               </Link>
             </div>
           </div>
