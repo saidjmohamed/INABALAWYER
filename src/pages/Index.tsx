@@ -3,7 +3,7 @@ import { useSession } from '@/contexts/SessionContext';
 import { Navigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CreateRequestForm } from '@/components/requests/CreateRequestForm';
-import { RequestList } from '@/components/requests/RequestList';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Index = () => {
   const { session, profile, signOut } = useSession();
@@ -50,12 +50,30 @@ const Index = () => {
           </div>
         </header>
         
-        <main>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-semibold">الطلبات المتاحة</h2>
-            <CreateRequestForm onSuccess={handleRequestSuccess} />
+        <main className="text-center mt-10">
+          <h2 className="text-3xl font-semibold mb-8">ماذا تريد أن تفعل؟</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="hover:shadow-xl transition-shadow flex flex-col justify-center items-center p-6">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle>إيداع طلب إنابة أو معلومة</CardTitle>
+                <CardDescription>أنشئ طلباً جديداً ليراه المحامون الآخرون.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0 w-full">
+                <CreateRequestForm onSuccess={handleRequestSuccess} />
+              </CardContent>
+            </Card>
+            <Link to="/courts" className="block">
+              <Card className="h-full hover:shadow-xl transition-shadow flex flex-col justify-center items-center p-6">
+                <CardHeader className="p-0 mb-4">
+                  <CardTitle>تصفح الطلبات وتقديم المساعدة</CardTitle>
+                  <CardDescription>اعثر على الطلبات حسب المحكمة وقدم المساعدة لزملائك.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0 w-full">
+                  <Button className="w-full">تصفح الطلبات حسب المحكمة</Button>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
-          <RequestList key={requestsVersion} />
         </main>
       </div>
     </div>

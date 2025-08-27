@@ -10,6 +10,8 @@ import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
 import RequestDetailsPage from "./pages/RequestDetailsPage";
 import LawyersDirectory from "./pages/LawyersDirectory";
+import CourtsListPage from "./pages/CourtsListPage";
+import RequestsByCourtPage from "./pages/RequestsByCourtPage";
 import { SessionProvider } from "./contexts/SessionContext";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/requests/:id" element={<RequestDetailsPage />} />
             <Route path="/lawyers" element={<LawyersDirectory />} />
+            <Route path="/courts" element={<CourtsListPage />} />
+            <Route path="/requests/court/:courtId" element={<RequestsByCourtPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

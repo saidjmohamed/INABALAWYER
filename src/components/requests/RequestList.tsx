@@ -32,14 +32,19 @@ const requestTypeTranslations = {
   other_request: 'طلب آخر', // New translation
 };
 
-export const RequestList = () => {
+export interface RequestListProps {
+  courtId?: string;
+}
+
+export const RequestList = ({ courtId }: RequestListProps) => {
   const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRequests = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      let query = supabase
         .from('requests')
         .select(`
           id,
@@ -50,8 +55,15 @@ export const RequestList = () => {
           creator:creator_id ( id, first_name, last_name ),
           court:courts ( name )
         `)
-        .eq('status', 'open')
-        .order('created_at', { ascending: false });
+        .eq('status', 'open');
+
+      if (courtId) {
+        query = query.eq('court_id', courtId);
+      }
+
+      query = query.order('created_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) {
         showError('Failed to fetch requests: ' + error.message);
@@ -63,7 +75,7 @@ export const RequestList = () => {
     };
 
     fetchRequests();
-  }, []);
+  }, [courtId]);
 
   if (loading) {
     return (
@@ -76,8 +88,8 @@ export const RequestList = () => {
   if (requests.length === 0) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-semibold">لا توجد طلبات حالياً</h2>
-        <p className="text-gray-600 mt-2">كن أول من يضيف طلباً جديداً!</p>
+        <h2 className="text-2xl font-semibold">لا توجد طلبات مفتوحة في هذه المحكمة حالياً</h2>
+        <p className="text-gray-600 mt-2">يمكنك إضافة طلب جديد من الصفحة الرئيسية.</p>
       </div>
     );
   }
