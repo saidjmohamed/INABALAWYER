@@ -153,14 +153,18 @@ const AdminDashboard = () => {
                                 onClick={() => handleUpdateStatus(lawyer.id, 'active')}
                                 disabled={actionLoading === lawyer.id}
                               >
-                                {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'قبول'}
+                                <span className="flex items-center justify-center">
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'قبول'}
+                                </span>
                               </Button>
                               <Button
                                 variant="destructive"
                                 onClick={() => handleUpdateStatus(lawyer.id, 'rejected')}
                                 disabled={actionLoading === lawyer.id}
                               >
-                                {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'رفض'}
+                                <span className="flex items-center justify-center">
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'رفض'}
+                                </span>
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -204,7 +208,9 @@ const AdminDashboard = () => {
                                   onClick={() => handleUpdateStatus(lawyer.id, 'disabled')}
                                   disabled={actionLoading === lawyer.id}
                                 >
-                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تعطيل'}
+                                  <span className="flex items-center justify-center">
+                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تعطيل'}
+                                  </span>
                                 </Button>
                               ) : (
                                 <Button
@@ -212,7 +218,9 @@ const AdminDashboard = () => {
                                   onClick={() => handleUpdateStatus(lawyer.id, 'active')}
                                   disabled={actionLoading === lawyer.id}
                                 >
-                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تفعيل'}
+                                  <span className="flex items-center justify-center">
+                                    {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تفعيل'}
+                                  </span>
                                 </Button>
                               )}
                               <Button
@@ -220,7 +228,9 @@ const AdminDashboard = () => {
                                 onClick={() => handleDeleteLawyer(lawyer.id)}
                                 disabled={actionLoading === lawyer.id}
                               >
-                                {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حذف'}
+                                <span className="flex items-center justify-center">
+                                  {actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حذف'}
+                                </span>
                               </Button>
                             </TableCell>
                           </TableRow>
