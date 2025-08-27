@@ -4,7 +4,7 @@ import * as z from "zod";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { DateTimePicker } from "./ui/DateTimePicker";
@@ -55,12 +55,25 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
     const [type, id] = values.judicial_body.split(':');
     const isCouncil = type === 'council';
 
+    let councilId: string | null = null;
+    let courtId: string | null = null;
+
+    if (isCouncil) {
+      councilId = id;
+    } else {
+      courtId = id;
+      const selectedCourt = courts.find(c => c.id === id);
+      if (selectedCourt) {
+        councilId = selectedCourt.council_id;
+      }
+    }
+
     const caseData = {
       creator_id: currentProfile.id,
       title: values.title,
       description: values.description,
-      council_id: isCouncil ? id : null,
-      court_id: !isCouncil ? id : null,
+      council_id: councilId,
+      court_id: courtId,
       request_type: values.request_type as RequestType,
       case_number: values.request_type === 'representation' ? values.case_number : null,
       parties: values.request_type === 'representation' ? values.parties : null,
@@ -138,20 +151,32 @@ export function CreateCaseForm({ councils, courts, currentProfile }: CreateCaseF
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {councils.length === 0 && courts.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-gray-500">
-                      لا توجد جهات قضائية متاحة.
-                    </div>
-                  ) : (
-                    <>
-                      {councils.map(council => (
-                        <SelectItem key={council.id} value={`council:${council.id}`}>{council.name} (مجلس)</SelectItem>
-                      ))}
-                      {courts.map(court => (
-                        <SelectItem key={court.id} value={`court:${court.id}`}>{court.name}</SelectItem>
-                      ))}
-                    </>
-                  )}
+                  {councils.map(council => {
+                    const councilCourts = courts.filter(court => court.council_id === council.id);
+                    
+                    if (council.name === 'مجلس الدولة' || council.name === 'المحكمة العليا') {
+                      const highCourt = councilCourts[0];
+                      if (highCourt) {
+                        return (
+                          <SelectGroup key={council.id}>
+                            <SelectLabel>{council.name}</SelectLabel>
+                            <SelectItem value={`court:${highCourt.id}`}>{highCourt.name}</SelectItem>
+                          </SelectGroup>
+                        );
+                      }
+                      return null;
+                    }
+
+                    return (
+                      <SelectGroup key={council.id}>
+                        <SelectLabel>{council.name}</SelectLabel>
+                        <SelectItem value={`council:${council.id}`}>{council.name} (مجلس)</SelectItem>
+                        {councilCourts.map(court => (
+                          <SelectItem key={court.id} value={`court:${court.id}`}>{court.name}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               <FormMessage />
