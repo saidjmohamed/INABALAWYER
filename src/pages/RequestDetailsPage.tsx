@@ -237,7 +237,9 @@ const RequestDetailsPage = () => {
                   <AlertDialogFooter>
                     <AlertDialogCancel>إلغاء</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDeleteRequest} disabled={deleting}>
-                      {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'حذف'}
+                      <span className="flex items-center justify-center">
+                        {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حذف'}
+                      </span>
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
