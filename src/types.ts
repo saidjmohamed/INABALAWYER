@@ -16,7 +16,7 @@ export type Request = {
   id: string;
   creator_id: string;
   court_id: string;
-  type: "consultation" | "representation" | "documentation";
+  type: "information_retrieval" | "representation" | "other";
   case_number: string;
   section: string | null;
   details: string | null;

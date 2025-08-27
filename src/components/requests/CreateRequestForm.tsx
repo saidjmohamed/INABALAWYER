@@ -26,7 +26,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Court, Request } from "@/types";
 
 const formSchema = z.object({
-  type: z.enum(["consultation", "representation", "documentation"]),
+  type: z.enum(["information_retrieval", "representation", "other"]),
   case_number: z.string().min(1, "رقم القضية مطلوب"),
   section: z.string().optional(),
   details: z.string().optional(),
@@ -50,7 +50,7 @@ export function CreateRequestForm({ court, request, onSuccess }: CreateRequestFo
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: request?.type || "consultation",
+      type: request?.type || "information_retrieval",
       case_number: request?.case_number || "",
       section: request?.section || "",
       details: request?.details || "",
@@ -110,9 +110,9 @@ export function CreateRequestForm({ court, request, onSuccess }: CreateRequestFo
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="consultation">طلب استشارة</SelectItem>
-                  <SelectItem value="representation">طلب إنابة</SelectItem>
-                  <SelectItem value="documentation">طلب توثيق</SelectItem>
+                  <SelectItem value="information_retrieval">اطلاع على معلومة من تطبيقة محامين</SelectItem>
+                  <SelectItem value="representation">طلب انابة في جلسة</SelectItem>
+                  <SelectItem value="other">طلب اخر</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
