@@ -1,5 +1,6 @@
 export type UserRole = 'admin' | 'lawyer';
 export type UserStatus = 'pending' | 'active' | 'rejected' | 'disabled';
+export type RequestType = 'representation' | 'information_retrieval';
 
 export type Profile = {
   id: string;
@@ -42,6 +43,10 @@ export type Case = {
   council_id: string | null;
   creator_id: string;
   created_at: string;
+  request_type: RequestType | null;
+  case_number: string | null;
+  parties: string | null;
+  session_date: string | null;
 };
 
 export type CaseWithDetails = Case & {
