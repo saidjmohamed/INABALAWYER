@@ -21,28 +21,56 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Court, Profile } from "@/types";
+import { Court, Profile, RequestType } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
 
-const requestTypes = [
-  { value: "first_instance", label: "درجة أولى" },
-  { value: "appeal", label: "استئناف" },
-  { value: "cassation", label: "نقض" },
+const requestTypes: { value: RequestType; label: string }[] = [
+  { value: "representation", label: "انابة" },
+  { value: "information_retrieval", label: "معلومة" },
+  { value: "other", label: "طلب اخر من المحكمة" },
 ];
 
 const formSchema = z.object({
   court_id: z.string().uuid("الرجاء اختيار محكمة صالحة"),
-  type: z.enum(["first_instance", "appeal", "cassation"], {
+  type: z.enum(["representation", "information_retrieval", "other"], {
     required_error: "الرجاء اختيار نوع الطلب",
   }),
   case_number: z.string().min(1, "الرجاء إدخال رقم القضية"),
-  plaintiff_details: z.string().min(1, "الرجاء إدخال تفاصيل الطرف الأول"),
-  defendant_details: z.string().min(1, "الرجاء إدخال تفاصيل الطرف الثاني"),
-  session_date: z.date({ required_error: "الرجاء إدخال تاريخ ووقت الجلسة" }),
+  plaintiff_details: z.string().optional(),
+  defendant_details: z.string().optional(),
+  session_date: z.date().optional(),
   details: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.type === 'representation') {
+    if (!data.plaintiff_details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "تفاصيل الطرف الأول مطلوبة", path: ['plaintiff_details'] });
+    }
+    if (!data.defendant_details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "تفاصيل الطرف الثاني مطلوبة", path: ['defendant_details'] });
+    }
+    if (!data.session_date) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "تاريخ ووقت الجلسة مطلوب", path: ['session_date'] });
+    }
+  }
+  if (data.type === 'information_retrieval') {
+     if (!data.plaintiff_details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "تفاصيل الطرف الأول مطلوبة", path: ['plaintiff_details'] });
+    }
+    if (!data.defendant_details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "تفاصيل الطرف الثاني مطلوبة", path: ['defendant_details'] });
+    }
+    if (!data.details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "الرجاء تحديد المعلومة المطلوبة", path: ['details'] });
+    }
+  }
+  if (data.type === 'other') {
+    if (!data.details) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "الرجاء إدخال تفاصيل الطلب", path: ['details'] });
+    }
+  }
 });
 
 type CreateRequestFormValues = z.infer<typeof formSchema>;
@@ -86,7 +114,7 @@ export function CreateRequestForm({
           case_number: values.case_number,
           plaintiff_details: values.plaintiff_details,
           defendant_details: values.defendant_details,
-          session_date: values.session_date.toISOString(),
+          session_date: values.session_date?.toISOString(),
           details: values.details,
           status: "open",
         },
@@ -199,68 +227,76 @@ export function CreateRequestForm({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="plaintiff_details"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {requestType === 'appeal' ? 'المستأنف وممثله القانوني' : 'المدعي وممثله القانوني'}
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="الاسم الكامل، المحامي..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="defendant_details"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {requestType === 'appeal' ? 'المستأنف عليه وممثله القانوني' : 'المدعى عليه وممثله القانوني'}
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="الاسم الكامل، المحامي..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-        </div>
+        {(requestType === 'representation' || requestType === 'information_retrieval') && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="plaintiff_details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الطرف الأول (المدعي/المستأنف)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="الاسم الكامل، المحامي..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="defendant_details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الطرف الثاني (المدعى عليه/المستأنف عليه)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="الاسم الكامل، المحامي..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
+        )}
 
-        <FormField
-          control={form.control}
-          name="session_date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>تاريخ ووقت الجلسة</FormLabel>
-                <DateTimePicker date={field.value} setDate={field.onChange} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {requestType === 'representation' && (
+          <FormField
+            control={form.control}
+            name="session_date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>تاريخ ووقت الجلسة</FormLabel>
+                  <DateTimePicker date={field.value} setDate={field.onChange} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
-        <FormField
-          control={form.control}
-          name="details"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>تفاصيل إضافية</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="اكتب أي تفاصيل إضافية هنا..."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {(requestType === 'information_retrieval' || requestType === 'other') && (
+          <FormField
+            control={form.control}
+            name="details"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  {requestType === 'information_retrieval' ? 'المعلومة المطلوبة' : 'تفاصيل الطلب'}
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={
+                      requestType === 'information_retrieval'
+                        ? "اكتب تفاصيل المعلومة التي تريدها..."
+                        : "اكتب تفاصيل طلبك هنا..."
+                    }
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "جاري الإنشاء..." : "إنشاء الطلب"}
