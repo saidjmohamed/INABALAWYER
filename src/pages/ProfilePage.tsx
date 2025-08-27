@@ -34,10 +34,10 @@ const ProfilePage = () => {
       <header className="flex flex-col sm:flex-row justify-between items-center w-full max-w-4xl mx-auto py-4 border-b mb-8 gap-4"> {/* Added flex-col sm:flex-row and gap-4 */}
         <h1 className="text-3xl font-bold text-gray-900">ملفي الشخصي</h1>
         <div className="flex flex-col sm:flex-row gap-2"> {/* Added flex-col sm:flex-row and gap-2 */}
-          <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
+          <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="w-full sm:w-auto">
             <span className="flex items-center">
               <Edit className="mr-2 h-4 w-4" />
-              {isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}
+              <span>{isEditing ? 'إلغاء التعديل' : 'تعديل الملف الشخصي'}</span>
             </span>
           </Button>
           <Button variant="outline" asChild className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
