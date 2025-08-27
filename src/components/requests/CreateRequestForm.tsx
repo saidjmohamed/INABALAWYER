@@ -16,8 +16,6 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
-  SelectLabel,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -28,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
+import React from "react";
 
 const requestTypes: { value: RequestType; label: string }[] = [
   { value: "representation", label: "انابة" },
@@ -168,28 +167,18 @@ export function CreateRequestForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {parentCourts.map((parent) => {
-                    const childCourts = getChildCourts(parent.id);
-                    if (childCourts.length === 0) {
-                      // Render top-level courts that are not parents as simple items
-                      return (
-                        <SelectItem key={parent.id} value={parent.id}>
-                          {parent.name}
+                  {parentCourts.map((parent) => (
+                    <React.Fragment key={parent.id}>
+                      <SelectItem value={parent.id} className="font-semibold">
+                        {parent.name}
+                      </SelectItem>
+                      {getChildCourts(parent.id).map((child) => (
+                        <SelectItem key={child.id} value={child.id} className="pr-8">
+                          {child.name}
                         </SelectItem>
-                      );
-                    }
-                    // Render parent courts with children as groups
-                    return (
-                      <SelectGroup key={parent.id}>
-                        <SelectLabel>{parent.name}</SelectLabel>
-                        {childCourts.map((child) => (
-                          <SelectItem key={child.id} value={child.id}>
-                            {child.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    );
-                  })}
+                      ))}
+                    </React.Fragment>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
