@@ -53,57 +53,17 @@ const LawyersDirectory = () => {
     setStartingChatId(otherLawyer.id);
 
     try {
-      // Step 1: Find conversations where the current user is a participant.
-      const { data: userParticipants, error: userParticipantsError } = await supabase
-        .from('participants')
-        .select('conversation_id')
-        .eq('user_id', user.id);
+      const { data: conversationId, error } = await supabase.rpc('start_conversation', {
+        other_user_id: otherLawyer.id,
+      });
 
-      if (userParticipantsError) throw userParticipantsError;
+      if (error) throw error;
 
-      const userConversationIds = userParticipants.map(p => p.conversation_id);
-
-      if (userConversationIds.length > 0) {
-        // Step 2: Check if any of these conversations also include the other lawyer.
-        const { data: existingParticipant, error: existingParticipantError } = await supabase
-          .from('participants')
-          .select('conversation_id')
-          .in('conversation_id', userConversationIds)
-          .eq('user_id', otherLawyer.id)
-          .limit(1)
-          .single();
-
-        if (existingParticipantError && existingParticipantError.code !== 'PGRST116') {
-          throw existingParticipantError;
-        }
-
-        if (existingParticipant) {
-          navigate(`/conversations/${existingParticipant.conversation_id}`);
-          return;
-        }
+      if (conversationId) {
+        navigate(`/conversations/${conversationId}`);
+      } else {
+        throw new Error("Could not start or find conversation.");
       }
-
-      // Step 3: If no existing conversation, create a new one.
-      const { data: newConversation, error: newConversationError } = await supabase
-        .from('conversations')
-        .insert({})
-        .select('id')
-        .single();
-
-      if (newConversationError) throw newConversationError;
-
-      // Step 4: Add both users as participants.
-      const { error: participantsError } = await supabase
-        .from('participants')
-        .insert([
-          { conversation_id: newConversation.id, user_id: user.id },
-          { conversation_id: newConversation.id, user_id: otherLawyer.id },
-        ]);
-
-      if (participantsError) throw participantsError;
-
-      // Step 5: Navigate to the new conversation.
-      navigate(`/conversations/${newConversation.id}`);
 
     } catch (error: any) {
       showError('فشل في بدء المحادثة: ' + error.message);
