@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Shield, Briefcase, Landmark, MessagesSquare, Users } from 'lucide-react';
+import { OnlineLawyersIndicator } from '@/components/OnlineLawyersIndicator';
 
 const Index = () => {
   const { session, profile, signOut } = useSession();
@@ -89,6 +90,7 @@ const Index = () => {
           </div>
         )}
       </main>
+      {session && <OnlineLawyersIndicator />}
     </div>
   );
 };
