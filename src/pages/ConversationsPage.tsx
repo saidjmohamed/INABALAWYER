@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, ArrowRight, MessageSquare } from 'lucide-react';
 import { showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
+import { usePresence } from '@/contexts/PresenceContext';
 
 interface Conversation {
   id: string;
@@ -21,6 +22,7 @@ const ConversationsPage = () => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState(true);
+  const { onlineUsers } = usePresence();
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -101,20 +103,26 @@ const ConversationsPage = () => {
         <aside className="w-1/3 max-w-xs border-r bg-white overflow-y-auto">
           {conversations.length > 0 ? (
             <ul>
-              {conversations.map(conv => (
-                <li key={conv.id}>
-                  <Link to={`/conversations/${conv.id}`} className={cn(
-                    "flex items-center gap-3 p-3 hover:bg-gray-100 transition-colors",
-                    activeConversationId === conv.id && "bg-gray-200"
-                  )}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={conv.participant.avatar_url || undefined} />
-                      <AvatarFallback>{getAvatarFallback(conv.participant)}</AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium">{conv.participant.first_name} {conv.participant.last_name}</span>
-                  </Link>
-                </li>
-              ))}
+              {conversations.map(conv => {
+                const isOnline = onlineUsers.includes(conv.participant.id);
+                return (
+                  <li key={conv.id}>
+                    <Link to={`/conversations/${conv.id}`} className={cn(
+                      "flex items-center gap-3 p-3 hover:bg-gray-100 transition-colors",
+                      activeConversationId === conv.id && "bg-gray-200"
+                    )}>
+                      <Avatar className="h-10 w-10 relative">
+                        <AvatarImage src={conv.participant.avatar_url || undefined} />
+                        <AvatarFallback>{getAvatarFallback(conv.participant)}</AvatarFallback>
+                        {isOnline && (
+                          <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white" />
+                        )}
+                      </Avatar>
+                      <span className="font-medium">{conv.participant.first_name} {conv.participant.last_name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <div className="p-4 text-center text-gray-500">

@@ -14,8 +14,9 @@ import CourtsListPage from "@/pages/CourtsListPage";
 import RequestsByCourtPage from "@/pages/RequestsByCourtPage";
 import ProfilePage from "@/pages/ProfilePage";
 import RequestsPage from "@/pages/RequestsPage";
-import ConversationsPage from "@/pages/ConversationsPage"; // Import the new page
+import ConversationsPage from "@/pages/ConversationsPage";
 import { SessionProvider } from "@/contexts/SessionContext";
+import { PresenceProvider } from "@/contexts/PresenceContext";
 import AdminRoute from "@/components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -27,29 +28,31 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SessionProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route 
-              path="/admin" 
-              element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              } 
-            />
-            <Route path="/requests" element={<RequestsPage />} />
-            <Route path="/requests/:id" element={<RequestDetailsPage />} />
-            <Route path="/lawyers" element={<LawyersDirectory />} />
-            <Route path="/courts" element={<CourtsListPage />} />
-            <Route path="/requests/court/:courtId" element={<RequestsByCourtPage />} />
-            <Route path="/conversations" element={<ConversationsPage />} />
-            <Route path="/conversations/:id" element={<ConversationsPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <PresenceProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route 
+                path="/admin" 
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                } 
+              />
+              <Route path="/requests" element={<RequestsPage />} />
+              <Route path="/requests/:id" element={<RequestDetailsPage />} />
+              <Route path="/lawyers" element={<LawyersDirectory />} />
+              <Route path="/courts" element={<CourtsListPage />} />
+              <Route path="/requests/court/:courtId" element={<RequestsByCourtPage />} />
+              <Route path="/conversations" element={<ConversationsPage />} />
+              <Route path="/conversations/:id" element={<ConversationsPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PresenceProvider>
         </SessionProvider>
       </BrowserRouter>
     </TooltipProvider>

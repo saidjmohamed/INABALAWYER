@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { showError } from '@/utils/toast';
 import { Loader2, ArrowRight, MessageSquare } from 'lucide-react';
+import { usePresence } from '@/contexts/PresenceContext';
 
 type LawyerProfile = Pick<Profile, 'id' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'specialties' | 'experience_years' | 'languages' | 'organization'>;
 
@@ -23,6 +24,7 @@ const LawyersDirectory = () => {
   const [lawyers, setLawyers] = useState<LawyerProfile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [startingChatId, setStartingChatId] = useState<string | null>(null);
+  const { onlineUsers } = usePresence();
 
   useEffect(() => {
     const fetchActiveLawyers = async () => {
@@ -161,28 +163,41 @@ const LawyersDirectory = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {lawyers.filter(l => l.id !== user?.id).map((lawyer) => (
-                      <TableRow key={lawyer.id}>
-                        <TableCell>{lawyer.first_name} {lawyer.last_name}</TableCell>
-                        <TableCell>{lawyer.email}</TableCell>
-                        <TableCell>{lawyer.phone || 'غير محدد'}</TableCell>
-                        <TableCell>{lawyer.organization || 'غير محدد'}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStartConversation(lawyer)}
-                            disabled={startingChatId === lawyer.id}
-                          >
-                            {startingChatId === lawyer.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <MessageSquare className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {lawyers.filter(l => l.id !== user?.id).map((lawyer) => {
+                      const isOnline = onlineUsers.includes(lawyer.id);
+                      return (
+                        <TableRow key={lawyer.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {lawyer.first_name} {lawyer.last_name}
+                              {isOnline && (
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{lawyer.email}</TableCell>
+                          <TableCell>{lawyer.phone || 'غير محدد'}</TableCell>
+                          <TableCell>{lawyer.organization || 'غير محدد'}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleStartConversation(lawyer)}
+                              disabled={startingChatId === lawyer.id}
+                            >
+                              {startingChatId === lawyer.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <MessageSquare className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
