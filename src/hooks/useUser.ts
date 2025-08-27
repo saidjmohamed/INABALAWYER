@@ -1,3 +1,3 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useSession } from '@/contexts/SessionContext';
 
-export const useUser = useAuth;
+export const useUser = useSession;
