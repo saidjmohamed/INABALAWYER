@@ -1,84 +1,70 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
-import { Navigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CreateRequestForm } from '@/components/requests/CreateRequestForm';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LogOut, User } from 'lucide-react';
 
 const Index = () => {
   const { session, profile, signOut } = useSession();
-  const [requestsVersion, setRequestsVersion] = useState(0);
-
-  const handleRequestSuccess = () => {
-    setRequestsVersion(v => v + 1);
-  };
-
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!profile) {
-     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">لا يمكن الوصول للحساب</h1>
-        <p className="text-gray-600 mb-6">
-          قد يكون حسابك معطلاً أو مرفوضاً. يرجى التواصل مع الإدارة.
-        </p>
-        <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="flex flex-wrap justify-between items-center gap-4 w-full py-4 border-b mb-8">
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-primary text-primary-foreground p-4 shadow-md">
+        <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">إنابة و معلومة بين المحامين</h1>
-          <div className="flex items-center gap-4">
+          <nav className="flex items-center space-x-4 space-x-reverse">
             {profile && (
-              <span className="text-sm sm:text-base">مرحباً، {profile.first_name}</span>
+              <span className="text-sm sm:text-base">مرحباً، المحامي {profile.first_name} {profile.last_name}</span>
             )}
-            <Link to="/profile"> {/* New link to ProfilePage */}
-              <Button variant="secondary">ملفي الشخصي</Button>
+            <Link to="/profile">
+              <Button variant="secondary" size="sm" className="flex items-center">
+                <User className="ml-2 h-4 w-4" /> ملفي الشخصي
+              </Button>
             </Link>
-            <Link to="/lawyers">
-              <Button variant="secondary">جدول المحامين</Button>
+            <Link to="/lawyers-directory">
+              <Button variant="secondary" size="sm">جدول المحامين</Button>
             </Link>
-            {profile?.role === 'admin' && (
-              <Link to="/admin">
-                <Button variant="secondary">لوحة تحكم المشرف</Button>
+            {session && (
+              <Button variant="secondary" size="sm" onClick={signOut} className="flex items-center">
+                <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
+              </Button>
+            )}
+          </nav>
+        </div>
+      </header>
+      <main className="flex-grow container mx-auto p-4 text-center flex flex-col items-center justify-center">
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-4">منصة التواصل القانوني</h2>
+        <p className="text-lg text-gray-700 mb-8 max-w-2xl">
+          تواصل مع زملائك المحامين، شارك المعلومات، واطلب الإنابة في القضايا بسهولة وفعالية.
+        </p>
+        {!session && (
+          <div className="space-x-4 space-x-reverse">
+            <Link to="/login">
+              <Button size="lg">تسجيل الدخول</Button>
+            </Link>
+            <Link to="/signup">
+              <Button size="lg" variant="outline">إنشاء حساب</Button>
+            </Link>
+          </div>
+        )}
+        {session && profile && (
+          <div className="space-y-4">
+            <p className="text-xl text-gray-800">
+              أهلاً بك في لوحة التحكم الخاصة بك.
+            </p>
+            <div className="flex justify-center space-x-4 space-x-reverse">
+              <Link to="/requests">
+                <Button size="lg">عرض طلبات الإنابة</Button>
               </Link>
-            )}
-            <Button onClick={signOut} variant="outline">تسجيل الخروج</Button>
+              <Link to="/create-request">
+                <Button size="lg" variant="outline">إنشاء طلب إنابة جديد</Button>
+              </Link>
+            </div>
           </div>
-        </header>
-        
-        <main className="text-center mt-10">
-          <h2 className="text-3xl font-semibold mb-8">ماذا تريد أن تفعل؟</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="hover:shadow-xl transition-shadow flex flex-col justify-center items-center p-6">
-              <CardHeader className="p-0 mb-4">
-                <CardTitle>إيداع طلب إنابة أو معلومة</CardTitle>
-                <CardDescription>أنشئ طلباً جديداً ليراه المحامون الآخرون.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0 w-full">
-                <CreateRequestForm onSuccess={handleRequestSuccess} />
-              </CardContent>
-            </Card>
-            <Link to="/courts" className="block">
-              <Card className="h-full hover:shadow-xl transition-shadow flex flex-col justify-center items-center p-6">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle>تصفح الطلبات وتقديم المساعدة</CardTitle>
-                  <CardDescription>اعثر على الطلبات حسب المحكمة وقدم المساعدة لزملائك.</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0 w-full">
-                  <Button className="w-full">تصفح الطلبات حسب المحكمة</Button>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </main>
-      </div>
+        )}
+      </main>
+      <footer className="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2024 إنابة و معلومة بين المحامين. جميع الحقوق محفوظة.</p>
+      </footer>
     </div>
   );
 };
