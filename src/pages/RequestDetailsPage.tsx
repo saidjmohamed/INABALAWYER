@@ -308,8 +308,9 @@ const RequestDetailsPage = () => {
                       <Avatar>
                         <AvatarImage src={reply.author?.avatar_url || undefined} />
                         <AvatarFallback>
-                          {reply.author?.first_name?.[0]}
-                          {reply.author?.last_name?.[0]}
+                          {reply.author
+                            ? `${reply.author.first_name?.[0] || ''}${reply.author.last_name?.[0] || ''}`.toUpperCase()
+                            : '??'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
