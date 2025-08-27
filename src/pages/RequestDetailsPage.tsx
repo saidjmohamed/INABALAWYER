@@ -220,9 +220,11 @@ const RequestDetailsPage = () => {
             {canDeleteRequest && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" disabled={deleting} className="w-full sm:w-auto"> {/* Added w-full sm:w-auto */}
-                    {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                    حذف الطلب
+                  <Button variant="destructive" size="sm" disabled={deleting} className="w-full sm:w-auto">
+                    <span className="flex items-center">
+                      {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                      حذف الطلب
+                    </span>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

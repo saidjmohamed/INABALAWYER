@@ -89,8 +89,10 @@ export const CreateRequestForm = ({ onSuccess }: CreateRequestFormProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          إضافة طلب جديد
+          <span className="flex items-center">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            إضافة طلب جديد
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
