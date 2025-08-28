@@ -15,37 +15,37 @@ const Index = () => {
       {session && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
-            icon={<PlusCircle className="h-8 w-8 text-primary" />}
+            icon={<PlusCircle className="h-8 w-8 text-accent" />}
             title="ايداع طلب جديد"
             description="قم بإيداع طلب إنابة أو معلومة جديد ليطلع عليه الزملاء."
             link="/cases/new"
           />
           <FeatureCard
-            icon={<Briefcase className="h-8 w-8 text-primary" />}
+            icon={<Briefcase className="h-8 w-8 text-accent" />}
             title="الاطلاع على طلبات الزملاء"
             description="تصفح جميع الطلبات التي أودعها الزملاء المحامون."
             link="/cases"
           />
           <FeatureCard
-            icon={<Landmark className="h-8 w-8 text-primary" />}
+            icon={<Landmark className="h-8 w-8 text-accent" />}
             title="الجهات القضائية"
             description="تصفح قائمة المجالس والمحاكم والقضايا المرتبطة بها."
             link="/courts"
           />
           <FeatureCard
-            icon={<Users className="h-8 w-8 text-primary" />}
+            icon={<Users className="h-8 w-8 text-accent" />}
             title="دليل المحامين"
             description="تواصل مع زملائك المحامين النشطين على المنصة."
             link="/lawyers"
           />
           <FeatureCard
-            icon={<MessagesSquare className="h-8 w-8 text-primary" />}
+            icon={<MessagesSquare className="h-8 w-8 text-accent" />}
             title="المحادثات"
             description="الوصول إلى جميع محادثاتك مع المحامين الآخرين."
             link="/conversations"
           />
           <FeatureCard
-            icon={<Info className="h-8 w-8 text-primary" />}
+            icon={<Info className="h-8 w-8 text-accent" />}
             title="عن التطبيق"
             description="معلومات عن التطبيق، المصمم، وكيفية التواصل."
             link="/about"
