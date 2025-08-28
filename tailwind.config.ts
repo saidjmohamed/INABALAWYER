@@ -56,6 +56,10 @@ export default {
           DEFAULT: "hsl(142.1 76.2% 36.3%)",
           foreground: "hsl(210 40% 98%)",
         },
+        header: {
+          DEFAULT: "hsl(var(--header))",
+          foreground: "hsl(var(--header-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

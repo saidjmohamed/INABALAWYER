@@ -14,7 +14,30 @@ const MainLayout = () => {
   const { session, profile, signOut } = useSession();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const navLinks = (
+  const headerNavLinks = (
+    <>
+      {profile?.role === 'admin' && (
+        <Button variant="ghost" size="sm" asChild className="hover:bg-white/10 hover:text-header-foreground">
+          <Link to="/admin">
+            <Shield className="ml-2 h-4 w-4" />
+            لوحة التحكم
+          </Link>
+        </Button>
+      )}
+      <Button variant="ghost" size="sm" asChild className="hover:bg-white/10 hover:text-header-foreground">
+        <Link to="/profile">
+          <User className="ml-2 h-4 w-4" />
+          ملفي الشخصي
+        </Link>
+      </Button>
+      <Button variant="ghost" size="sm" onClick={signOut} className="hover:bg-white/10 hover:text-header-foreground">
+        <LogOut className="ml-2 h-4 w-4" />
+        تسجيل الخروج
+      </Button>
+    </>
+  );
+
+  const sheetNavLinks = (
     <>
       {profile?.role === 'admin' && (
         <Button variant="ghost" size="sm" asChild onClick={() => setIsSheetOpen(false)}>
@@ -38,10 +61,10 @@ const MainLayout = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-40 h-[72px] flex items-center">
+    <div className="min-h-screen bg-background">
+      <header className="bg-header text-header-foreground shadow-md sticky top-0 z-40 h-[72px] flex items-center">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <Button variant="ghost" asChild>
+          <Button variant="ghost" asChild className="hover:bg-white/10 hover:text-header-foreground">
             <Link to="/">
               <Home className="ml-2 h-4 w-4" />
               الرئيسية
@@ -50,8 +73,8 @@ const MainLayout = () => {
           <nav className="hidden md:flex items-center gap-2">
             {session && (
               <>
-                <span className="text-sm text-gray-600">مرحباً، {profile?.first_name || 'مستخدم'}</span>
-                {navLinks}
+                <span className="text-sm text-header-foreground/80">مرحباً، {profile?.first_name || 'مستخدم'}</span>
+                {headerNavLinks}
               </>
             )}
           </nav>
@@ -59,13 +82,13 @@ const MainLayout = () => {
             {session && (
               <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" className="text-header-foreground border-header-foreground/50 hover:bg-white/10">
                     <Menu className="h-4 w-4" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
                   <nav className="flex flex-col items-start gap-4 pt-8">
-                    {navLinks}
+                    {sheetNavLinks}
                   </nav>
                 </SheetContent>
               </Sheet>
