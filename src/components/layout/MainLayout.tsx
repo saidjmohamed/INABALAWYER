@@ -9,7 +9,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from 'react';
-import { Chatbot } from '../chatbot/Chatbot';
 
 const MainLayout = () => {
   const { session, profile, signOut } = useSession();
@@ -101,7 +100,6 @@ const MainLayout = () => {
         <Outlet />
       </main>
       {session && <OnlineLawyersIndicator />}
-      {session && <Chatbot />}
     </div>
   );
 };
