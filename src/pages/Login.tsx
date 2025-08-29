@@ -14,7 +14,10 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-6">تسجيل الدخول إلى إنابة و معلومة بين المحامين</h1>
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold mb-2">مرحبا بك استاذ في تطبيقك</h1>
+          <p className="text-gray-600">سجل الدخول الى حسابك او انشئ حسابا جديدا</p>
+        </div>
         <div className="bg-white p-8 rounded-lg shadow-md">
           <Auth
             supabaseClient={supabase}
