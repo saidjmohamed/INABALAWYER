@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
-import { CaseCard } from '../components/CaseCard';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-import { Council, Court, CaseWithDetails } from '../types';
+import { Loader2, ChevronLeft } from 'lucide-react';
+import { Council, Court } from '../types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function CourtsListPage() {
   const [councils, setCouncils] = useState<Council[]>([]);
   const [courts, setCourts] = useState<Court[]>([]);
-  const [cases, setCases] = useState<CaseWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBody, setSelectedBody] = useState<{ type: 'council' | 'court', id: string, name: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,57 +35,33 @@ export default function CourtsListPage() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchCases = async () => {
-      if (!selectedBody) {
-        setCases([]);
-        return;
-      }
-      setLoading(true);
-      try {
-        let query = supabase.from('cases').select(`*, court:courts(*), council:councils(*), creator:profiles!cases_creator_id_fkey(*)`);
-        if (selectedBody.type === 'council') {
-          query = query.eq('council_id', selectedBody.id);
-        } else {
-          query = query.eq('court_id', selectedBody.id);
-        }
-        const { data, error } = await query;
-        if (error) throw error;
-        setCases(data as any as CaseWithDetails[]);
-      } catch (error: any) {
-        toast.error(`فشل في جلب القضايا لـ ${selectedBody.name}`);
-      }
-      setLoading(false);
-    };
-    fetchCases();
-  }, [selectedBody]);
-
-  if (loading && councils.length === 0) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  if (loading) {
+    return <div className="flex justify-center items-center h-[calc(100vh-150px)]"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-72px)] border-t">
-      <aside className="w-full md:w-1/3 md:max-w-xs border-r bg-white overflow-y-auto p-4">
-        <h2 className="text-lg font-semibold mb-4">الجهات القضائية</h2>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">قائمة الجهات القضائية</h1>
+      <div className="bg-white p-6 rounded-lg shadow-md border">
         <Accordion type="multiple" className="w-full">
           {councils.map(council => (
             <AccordionItem value={council.id} key={council.id}>
-              <AccordionTrigger onClick={() => setSelectedBody({ type: 'council', id: council.id, name: council.name })}>
-                {council.name}
+              <AccordionTrigger className="hover:no-underline">
+                <Link to={`/courts/council:${council.id}`} className="font-semibold text-lg flex-grow text-right hover:text-primary">
+                  {council.name}
+                </Link>
               </AccordionTrigger>
               <AccordionContent>
-                <ul className="pl-4">
+                <ul className="pr-6 space-y-2">
                   {courts.filter(c => c.council_id === council.id).map(court => (
-                    <li
-                      key={court.id}
-                      className={`cursor-pointer p-2 rounded hover:bg-gray-100 ${selectedBody?.id === court.id ? 'bg-gray-200' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedBody({ type: 'court', id: court.id, name: court.name });
-                      }}
-                    >
-                      {court.name}
+                    <li key={court.id}>
+                      <Link
+                        to={`/courts/court:${court.id}`}
+                        className="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        <span>{court.name}</span>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -90,31 +69,7 @@ export default function CourtsListPage() {
             </AccordionItem>
           ))}
         </Accordion>
-      </aside>
-      <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-        {selectedBody ? (
-          <>
-            <h1 className="text-2xl font-bold mb-4">القضايا في {selectedBody.name}</h1>
-            {loading ? (
-              <div className="flex justify-center items-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-              </div>
-            ) : cases.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-                {cases.map(caseItem => (
-                  <CaseCard key={caseItem.id} case={caseItem} />
-                ))}
-              </div>
-            ) : (
-              <p>لا توجد قضايا في هذه الجهة القضائية.</p>
-            )}
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">الرجاء اختيار جهة قضائية لعرض القضايا الخاصة بها.</p>
-          </div>
-        )}
-      </main>
+      </div>
     </div>
   );
 }

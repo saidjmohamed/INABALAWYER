@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import CourtsListPage from "./pages/CourtsListPage";
+import CourtDetailsPage from "./pages/CourtDetailsPage";
 import LawyersDirectory from "./pages/LawyersDirectory";
 import ConversationsPage from "./pages/ConversationsPage";
 import AboutPage from "./pages/AboutPage";
@@ -42,6 +43,7 @@ function App() {
               <Route path="/cases/new" element={<CreateCasePage />} />
               <Route path="/cases/:id" element={<CaseDetailsPage />} />
               <Route path="/courts" element={<CourtsListPage />} />
+              <Route path="/courts/:id" element={<CourtDetailsPage />} />
               <Route path="/lawyers" element={<LawyersDirectory />} />
               <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
               <Route path="/conversations" element={<ConversationsPage />} />
