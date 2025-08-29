@@ -19,6 +19,7 @@ import CasesPage from "./pages/CasesPage";
 import CreateCasePage from "./pages/CreateCasePage";
 import CaseDetailsPage from "./pages/CaseDetailsPage";
 import LawyerProfilePage from "./pages/LawyerProfilePage";
+import AdminEditCasePage from "./pages/AdminEditCasePage";
 
 // Auth wrappers
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -52,6 +53,7 @@ function App() {
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/cases/:id/edit" element={<AdminRoute><AdminEditCasePage /></AdminRoute>} />
             </Route>
 
             {/* Not Found Route */}
