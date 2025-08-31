@@ -3,6 +3,7 @@ import { useSession } from '../contexts/SessionContext';
 import MaintenancePage from '../pages/MaintenancePage';
 import { Loader2 } from 'lucide-react';
 import { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface AppWrapperProps {
   children: ReactNode;
@@ -11,6 +12,14 @@ interface AppWrapperProps {
 const AppWrapper = ({ children }: AppWrapperProps) => {
   const { isMaintenanceMode, loading: settingsLoading } = useSettings();
   const { profile, loading: sessionLoading } = useSession();
+  const location = useLocation();
+
+  const publicPaths = ['/login', '/signup'];
+
+  // Allow access to public pages even in maintenance mode
+  if (publicPaths.includes(location.pathname)) {
+    return <>{children}</>;
+  }
 
   // عرض شاشة تحميل أثناء جلب الإعدادات وحالة المستخدم
   if (settingsLoading || sessionLoading) {
