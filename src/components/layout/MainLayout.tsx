@@ -9,24 +9,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from 'react';
-import { useSettings } from '../../contexts/SettingsContext';
-import MaintenancePage from '../../pages/MaintenancePage';
 
 const MainLayout = () => {
   const { session, profile, signOut, loading: sessionLoading } = useSession();
-  const { isMaintenanceMode, loading: settingsLoading } = useSettings();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  if (sessionLoading || settingsLoading) {
+  if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
-  }
-
-  if (isMaintenanceMode && profile?.role !== 'admin') {
-    return <MaintenancePage />;
   }
 
   const headerNavLinks = (

@@ -26,6 +26,7 @@ import AdminEditCasePage from "./pages/AdminEditCasePage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 import MainLayout from "./components/layout/MainLayout";
+import AppWrapper from "./components/AppWrapper";
 
 function App() {
   return (
@@ -33,34 +34,36 @@ function App() {
       <SessionProvider>
         <SettingsProvider>
           <PresenceProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+            <AppWrapper>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
 
-              {/* Protected Routes with Layout */}
-              <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-                <Route path="/" element={<Index />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/cases" element={<CasesPage />} />
-                <Route path="/cases/new" element={<CreateCasePage />} />
-                <Route path="/cases/:id" element={<CaseDetailsPage />} />
-                <Route path="/courts" element={<CourtsListPage />} />
-                <Route path="/courts/:id" element={<CourtDetailsPage />} />
-                <Route path="/lawyers" element={<LawyersDirectory />} />
-                <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
-                <Route path="/conversations" element={<ConversationsPage />} />
-                <Route path="/conversations/:id" element={<ConversationsPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="/cases/:id/edit" element={<AdminRoute><AdminEditCasePage /></AdminRoute>} />
-              </Route>
+                {/* Protected Routes with Layout */}
+                <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/cases" element={<CasesPage />} />
+                  <Route path="/cases/new" element={<CreateCasePage />} />
+                  <Route path="/cases/:id" element={<CaseDetailsPage />} />
+                  <Route path="/courts" element={<CourtsListPage />} />
+                  <Route path="/courts/:id" element={<CourtDetailsPage />} />
+                  <Route path="/lawyers" element={<LawyersDirectory />} />
+                  <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
+                  <Route path="/conversations" element={<ConversationsPage />} />
+                  <Route path="/conversations/:id" element={<ConversationsPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                  <Route path="/cases/:id/edit" element={<AdminRoute><AdminEditCasePage /></AdminRoute>} />
+                </Route>
 
-              {/* Not Found Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                {/* Not Found Route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AppWrapper>
             <Sonner />
           </PresenceProvider>
         </SettingsProvider>
