@@ -1,7 +1,7 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useSession } from '../../contexts/SessionContext';
 import { Button } from '../ui/button';
-import { LogOut, User, Shield, Home, Menu } from 'lucide-react';
+import { LogOut, User, Shield, Home, Menu, Loader2 } from 'lucide-react';
 import { OnlineLawyersIndicator } from '../OnlineLawyersIndicator';
 import {
   Sheet,
@@ -9,10 +9,25 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from 'react';
+import { useSettings } from '../../contexts/SettingsContext';
+import MaintenancePage from '../../pages/MaintenancePage';
 
 const MainLayout = () => {
-  const { session, profile, signOut } = useSession();
+  const { session, profile, signOut, loading: sessionLoading } = useSession();
+  const { isMaintenanceMode, loading: settingsLoading } = useSettings();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  if (sessionLoading || settingsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isMaintenanceMode && profile?.role !== 'admin') {
+    return <MaintenancePage />;
+  }
 
   const headerNavLinks = (
     <>

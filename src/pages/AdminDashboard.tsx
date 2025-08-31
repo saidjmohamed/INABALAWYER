@@ -15,6 +15,7 @@ import { DesignerAvatarManager } from '@/components/admin/DesignerAvatarManager'
 import { ProfileEditForm } from '@/components/profiles/ProfileEditForm';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { MaintenanceModeManager } from '@/components/admin/MaintenanceModeManager';
 
 const AdminDashboard = () => {
   const { session, profile, loading: sessionLoading } = useSession();
@@ -176,7 +177,10 @@ const AdminDashboard = () => {
             </TabsContent>
 
             <TabsContent value="settings">
-              <DesignerAvatarManager />
+              <div className="grid gap-6">
+                <MaintenanceModeManager />
+                <DesignerAvatarManager />
+              </div>
             </TabsContent>
           </>
         }
