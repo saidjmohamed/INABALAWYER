@@ -188,7 +188,7 @@ export const SignUpForm = () => {
                     <SelectValue placeholder={councilsLoading ? "جار التحميل..." : "اختر المجلس القضائي"} />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent position="popper"> {/* Added position="popper" */}
                   {councils.map((council) => (
                     <SelectItem key={council.id} value={council.name}>
                       {council.name}

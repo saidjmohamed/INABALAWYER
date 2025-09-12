@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSession } from '../contexts/SessionContext';
 import { Briefcase, Landmark, MessagesSquare, Users, Info, PlusCircle } from 'lucide-react';
+import { Button } from '../components/ui/button'; // Import Button component
 
 const Index = () => {
   const { session } = useSession();
@@ -54,8 +55,16 @@ const Index = () => {
       )}
 
       {!session && (
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 space-y-4">
           <p className="text-lg text-gray-700">يرجى تسجيل الدخول أو إنشاء حساب للوصول إلى ميزات المنصة.</p>
+          <div className="flex justify-center gap-4">
+            <Button asChild>
+              <Link to="/login">تسجيل الدخول</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/signup">إنشاء حساب جديد</Link>
+            </Button>
+          </div>
         </div>
       )}
     </div>
