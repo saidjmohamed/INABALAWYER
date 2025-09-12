@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppWrapper } from './components/AppWrapper';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { SessionProvider } from './contexts/SessionContext';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
@@ -25,27 +26,29 @@ function App() {
   return (
     <BrowserRouter>
       <SettingsProvider>
-        <AppWrapper>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
-            <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
-            <Route path="/cases/new" element={<ProtectedRoute><CreateCasePage /></ProtectedRoute>} />
-            <Route path="/cases/:id" element={<ProtectedRoute><CaseDetailsPage /></ProtectedRoute>} />
-            <Route path="/cases/:id/edit" element={<ProtectedRoute><AdminEditCasePage /></ProtectedRoute>} />
-            <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-            <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/courts" element={<CourtsListPage />} />
-            <Route path="/courts/:id" element={<CourtDetailsPage />} />
-            <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AppWrapper>
+        <SessionProvider>
+          <AppWrapper>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
+              <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
+              <Route path="/cases/new" element={<ProtectedRoute><CreateCasePage /></ProtectedRoute>} />
+              <Route path="/cases/:id" element={<ProtectedRoute><CaseDetailsPage /></ProtectedRoute>} />
+              <Route path="/cases/:id/edit" element={<ProtectedRoute><AdminEditCasePage /></ProtectedRoute>} />
+              <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
+              <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
+              <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/courts" element={<CourtsListPage />} />
+              <Route path="/courts/:id" element={<CourtDetailsPage />} />
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppWrapper>
+        </SessionProvider>
       </SettingsProvider>
     </BrowserRouter>
   );
