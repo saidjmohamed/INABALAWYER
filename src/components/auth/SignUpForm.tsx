@@ -5,10 +5,12 @@ import { supabase } from '../../integrations/supabase/client';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { showSuccess, showError } from '../../utils/toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Council } from '../../types';
 
 const signUpSchema = z.object({
   email: z.string().email({ message: 'الرجاء إدخال بريد إلكتروني صالح.' }),
@@ -24,8 +26,24 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const SignUpForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [councils, setCouncils] = useState<Council[]>([]);
+  const [councilsLoading, setCouncilsLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCouncils = async () => {
+      setCouncilsLoading(true);
+      const { data, error } = await supabase.from('councils').select('*').order('name');
+      if (error) {
+        showError('فشل في جلب قائمة المجالس القضائية');
+      } else {
+        setCouncils(data);
+      }
+      setCouncilsLoading(false);
+    };
+    fetchCouncils();
+  }, []);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -42,7 +60,7 @@ export const SignUpForm = () => {
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
-    setIsLoading(true);
+    setIsSubmitting(true);
     const { email, password, ...metaData } = values;
     const { error } = await supabase.auth.signUp({
       email,
@@ -51,7 +69,7 @@ export const SignUpForm = () => {
         data: metaData,
       },
     });
-    setIsLoading(false);
+    setIsSubmitting(false);
 
     if (error) {
       showError(error.message);
@@ -163,17 +181,28 @@ export const SignUpForm = () => {
           name="organization"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>المنظمة التابع لها</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+              <FormLabel>المجلس القضائي التابع له</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={councilsLoading}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={councilsLoading ? "جار التحميل..." : "اختر المجلس القضائي"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {councils.map((council) => (
+                    <SelectItem key={council.id} value={council.name}>
+                      {council.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
           <span className="flex items-center justify-center">
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إنشاء حساب</span>}
+            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>إنشاء حساب</span>}
           </span>
         </Button>
       </form>

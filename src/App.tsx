@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster as Sonner } from "./components/ui/sonner";
 import { SessionProvider } from "./contexts/SessionContext";
-import { PresenceProvider } from "./contexts/PresenceContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { PresenceProvider } from "./contexts/PresenceContext";
+import { AppWrapper } from "./components/AppWrapper";
+import { Notification } from "./components/ui/notification";
 
 // Pages
 import Index from "./pages/Index";
@@ -22,12 +23,6 @@ import CaseDetailsPage from "./pages/CaseDetailsPage";
 import LawyerProfilePage from "./pages/LawyerProfilePage";
 import AdminEditCasePage from "./pages/AdminEditCasePage";
 
-// Auth wrappers
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import AdminRoute from "./components/auth/AdminRoute";
-import MainLayout from "./components/layout/MainLayout";
-import AppWrapper from "./components/AppWrapper";
-
 function App() {
   return (
     <Router>
@@ -35,6 +30,7 @@ function App() {
         <SettingsProvider>
           <PresenceProvider>
             <AppWrapper>
+              <Notification />
               <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
@@ -64,7 +60,6 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AppWrapper>
-            <Sonner />
           </PresenceProvider>
         </SettingsProvider>
       </SessionProvider>
