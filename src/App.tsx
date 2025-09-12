@@ -1,56 +1,74 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AppWrapper } from './components/AppWrapper';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { SettingsProvider } from './contexts/SettingsContext';
-import { SessionProvider } from './contexts/SessionContext';
-import Index from './pages/Index';
-import NotFound from './pages/NotFound';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ProfilePage from './pages/ProfilePage';
-import LawyerProfilePage from './pages/LawyerProfilePage';
-import CasesPage from './pages/CasesPage';
-import ConversationsPage from './pages/ConversationsPage';
-import CreateCasePage from './pages/CreateCasePage';
-import LawyersDirectory from './pages/LawyersDirectory';
-import AboutPage from './pages/AboutPage';
-import CourtDetailsPage from './pages/CourtDetailsPage';
-import CourtsListPage from './pages/CourtsListPage';
-import CaseDetailsPage from './pages/CaseDetailsPage';
-import AdminEditCasePage from './pages/AdminEditCasePage';
-import AdminDashboard from './pages/AdminDashboard';
-import MaintenancePage from './pages/MaintenancePage';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster as Sonner } from "./components/ui/sonner";
+import { SessionProvider } from "./contexts/SessionContext";
+import { PresenceProvider } from "./contexts/PresenceContext";
+import { SettingsProvider } from "./contexts/SettingsContext";
+
+// Pages
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProfilePage from "./pages/ProfilePage";
+import CourtsListPage from "./pages/CourtsListPage";
+import CourtDetailsPage from "./pages/CourtDetailsPage";
+import LawyersDirectory from "./pages/LawyersDirectory";
+import ConversationsPage from "./pages/ConversationsPage";
+import AboutPage from "./pages/AboutPage";
+import NotFound from "./pages/NotFound";
+import CasesPage from "./pages/CasesPage";
+import CreateCasePage from "./pages/CreateCasePage";
+import CaseDetailsPage from "./pages/CaseDetailsPage";
+import LawyerProfilePage from "./pages/LawyerProfilePage";
+import AdminEditCasePage from "./pages/AdminEditCasePage";
+
+// Auth wrappers
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import AdminRoute from "./components/auth/AdminRoute";
+import MainLayout from "./components/layout/MainLayout";
+import AppWrapper from "./components/AppWrapper";
 
 function App() {
   return (
-    <BrowserRouter>
-      <SettingsProvider>
-        <SessionProvider>
-          <AppWrapper>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
-              <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
-              <Route path="/cases/new" element={<ProtectedRoute><CreateCasePage /></ProtectedRoute>} />
-              <Route path="/cases/:id" element={<ProtectedRoute><CaseDetailsPage /></ProtectedRoute>} />
-              <Route path="/cases/:id/edit" element={<ProtectedRoute><AdminEditCasePage /></ProtectedRoute>} />
-              <Route path="/conversations" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-              <Route path="/conversations/:id" element={<ProtectedRoute><ConversationsPage /></ProtectedRoute>} />
-              <Route path="/lawyers" element={<ProtectedRoute><LawyersDirectory /></ProtectedRoute>} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/courts" element={<CourtsListPage />} />
-              <Route path="/courts/:id" element={<CourtDetailsPage />} />
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppWrapper>
-        </SessionProvider>
-      </SettingsProvider>
-    </BrowserRouter>
+    <Router>
+      <SessionProvider>
+        <SettingsProvider>
+          <PresenceProvider>
+            <AppWrapper>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {/* Protected Routes with Layout */}
+                <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/cases" element={<CasesPage />} />
+                  <Route path="/cases/new" element={<CreateCasePage />} />
+                  <Route path="/cases/:id" element={<CaseDetailsPage />} />
+                  <Route path="/courts" element={<CourtsListPage />} />
+                  <Route path="/courts/:id" element={<CourtDetailsPage />} />
+                  <Route path="/lawyers" element={<LawyersDirectory />} />
+                  <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
+                  <Route path="/conversations" element={<ConversationsPage />} />
+                  <Route path="/conversations/:id" element={<ConversationsPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                  <Route path="/cases/:id/edit" element={<AdminRoute><AdminEditCasePage /></AdminRoute>} />
+                </Route>
+
+                {/* Not Found Route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AppWrapper>
+            <Sonner />
+          </PresenceProvider>
+        </SettingsProvider>
+      </SessionProvider>
+    </Router>
   );
 }
 

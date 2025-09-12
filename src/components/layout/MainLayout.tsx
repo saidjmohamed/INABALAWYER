@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useSession } from '../../contexts/SessionContext';
 import { Button } from '../ui/button';
 import { LogOut, User, Shield, Home, Menu, Loader2 } from 'lucide-react';
@@ -9,26 +9,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from 'react';
-import { Image } from '../ui/image';
 
 const MainLayout = () => {
   const { session, profile, signOut, loading: sessionLoading } = useSession();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const location = useLocation();
-
-  const getBackgroundClass = (pathname: string) => {
-    if (pathname === '/') return 'bg-sky-50';
-    if (pathname === '/cases') return 'bg-amber-50';
-    if (pathname === '/cases/new') return 'bg-emerald-50';
-    if (pathname.startsWith('/cases/')) return 'bg-amber-50';
-    if (pathname === '/courts' || pathname.startsWith('/courts/')) return 'bg-indigo-50';
-    if (pathname === '/lawyers' || pathname.startsWith('/lawyers/')) return 'bg-rose-50';
-    if (pathname === '/conversations' || pathname.startsWith('/conversations/')) return 'bg-purple-50';
-    if (pathname === '/profile') return 'bg-zinc-50';
-    if (pathname === '/about') return 'bg-teal-50';
-    if (pathname === '/admin') return 'bg-slate-50';
-    return 'bg-background';
-  };
 
   if (sessionLoading) {
     return (
@@ -85,7 +69,7 @@ const MainLayout = () => {
   );
 
   return (
-    <div className={`min-h-screen ${getBackgroundClass(location.pathname)}`}>
+    <div className="min-h-screen bg-background">
       <header className="bg-header text-header-foreground shadow-md sticky top-0 z-40 h-[72px] flex items-center">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Button variant="ghost" asChild className="hover:bg-white/10 hover:text-header-foreground">
@@ -118,7 +102,6 @@ const MainLayout = () => {
               </Sheet>
             )}
           </div>
-          <Image src="/logo.png" alt="Logo" className="h-8 w-8 ml-4" />
         </div>
       </header>
       <main className="relative">
