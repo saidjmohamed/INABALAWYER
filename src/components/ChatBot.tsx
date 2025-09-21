@@ -6,6 +6,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { showError } from '@/utils/toast';
+import { supabase } from '@/integrations/supabase/client'; // استيراد عميل Supabase
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,11 +25,33 @@ export const ChatBot = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState<string | null>(null); // حالة لتخزين مفتاح API
+  const [isFetchingApiKey, setIsFetchingApiKey] = useState(true); // حالة لتحميل المفتاح
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
   // تم تحديث اسم النموذج من gemini-pro إلى gemini-1.0-pro
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${API_KEY}`;
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent`;
+
+  useEffect(() => {
+    const fetchGeminiApiKey = async () => {
+      setIsFetchingApiKey(true);
+      const { data, error } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'google_gemini_api_key')
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        showError('فشل في جلب مفتاح Gemini API من قاعدة البيانات.');
+        console.error('Error fetching Gemini API key:', error);
+      } else if (data) {
+        setGeminiApiKey(data.value);
+      }
+      setIsFetchingApiKey(false);
+    };
+
+    fetchGeminiApiKey();
+  }, []);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -40,10 +63,10 @@ export const ChatBot = () => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+    if (!inputMessage.trim() || isLoading || isFetchingApiKey) return;
 
-    if (!API_KEY) {
-      showError('مفتاح Google Gemini API غير موجود. يرجى تعيينه في متغيرات البيئة.');
+    if (!geminiApiKey) {
+      showError('مفتاح Google Gemini API غير موجود. يرجى التأكد من إعداده في إعدادات التطبيق.');
       return;
     }
 
@@ -60,7 +83,7 @@ export const ChatBot = () => {
     try {
       console.log('Sending request to Gemini API...');
       
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}?key=${geminiApiKey}`, { // استخدام المفتاح من الحالة
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -221,7 +244,7 @@ export const ChatBot = () => {
                       )}
                     </div>
                   ))}
-                  {isLoading && (
+                  {(isLoading || isFetchingApiKey) && (
                     <div className="flex gap-3 justify-start">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <Bot className="h-4 w-4 text-blue-600" />
@@ -245,12 +268,12 @@ export const ChatBot = () => {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="اكتب رسالتك هنا..."
-                    disabled={isLoading}
+                    disabled={isLoading || isFetchingApiKey || !geminiApiKey}
                     className="flex-1"
                   />
                   <Button
                     onClick={handleSendMessage}
-                    disabled={isLoading || !inputMessage.trim()}
+                    disabled={isLoading || isFetchingApiKey || !inputMessage.trim() || !geminiApiKey}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   >
                     <Send className="h-4 w-4" />
