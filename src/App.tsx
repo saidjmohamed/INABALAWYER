@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "./components/ui/sonner";
 import { SessionProvider } from "./contexts/SessionContext";
 import { PresenceProvider } from "./contexts/PresenceContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
-import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 // Pages
 import Index from "./pages/Index";
@@ -64,7 +63,6 @@ function App() {
                 {/* Not Found Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <PWAInstallPrompt />
             </AppWrapper>
             <Sonner />
           </PresenceProvider>
