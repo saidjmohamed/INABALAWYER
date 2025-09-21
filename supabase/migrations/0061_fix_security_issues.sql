@@ -1,145 +1,60 @@
--- إصلاح مشكلة search_path في الدالة is_admin
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS boolean
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1 
-    FROM profiles 
-    WHERE id = auth.uid() 
-    AND role = 'admin'
-    AND status = 'active'
-  );
-$$;
+-- إصلاح مشاكل الأمان في جداول التطبيق
 
--- تحديث سياسات RLS للجداول لمنع الوصول للمستخدمين المجهولين
+-- تحديث سياسات الجداول لضمان الأمان
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.replies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.courts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.councils ENABLE ROW LEVEL SECURITY;
 
--- 1. جدول app_settings
-DROP POLICY IF EXISTS "Public can read app settings" ON app_settings;
-CREATE POLICY "Only authenticated users can read app settings"
-ON app_settings FOR SELECT
-TO authenticated
-USING (true);
+-- إنشاء سياسات آمنة لجدول الملفات الشخصية
+DROP POLICY IF EXISTS "_profiles_select_policy" ON public.profiles;
+CREATE POLICY "profiles_select_policy" ON public.profiles 
+FOR SELECT TO authenticated USING (true);
 
--- 2. جدول cases
-DROP POLICY IF EXISTS "Users can view all cases" ON cases;
-CREATE POLICY "Only authenticated users can view cases"
-ON cases FOR SELECT
-TO authenticated
-USING (true);
+DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
+CREATE POLICY "profiles_update_policy" ON public.profiles 
+FOR UPDATE TO authenticated USING (auth.uid() = id);
 
--- 3. جدول chatbot_conversations
-DROP POLICY IF EXISTS "Users can manage their own chat messages" ON chatbot_conversations;
-CREATE POLICY "Only authenticated users can manage their chat messages"
-ON chatbot_conversations FOR ALL
-TO authenticated
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
+-- إنشاء سياسات آمنة لجدول القضايا
+DROP POLICY IF EXISTS "cases_select_policy" ON public.cases;
+CREATE POLICY "cases_select_policy" ON public.cases 
+FOR SELECT TO authenticated USING (true);
 
--- 4. جدول conversations
-DROP POLICY IF EXISTS "Allow access to own conversations" ON conversations;
-CREATE POLICY "Only authenticated users can access their conversations"
-ON conversations FOR ALL
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM participants 
-  WHERE participants.conversation_id = conversations.id 
-  AND participants.user_id = auth.uid()
+DROP POLICY IF EXISTS "cases_insert_policy" ON public.cases;
+CREATE POLICY "cases_insert_policy" ON public.cases 
+FOR INSERT TO authenticated WITH CHECK (auth.uid() = creator_id);
+
+DROP POLICY IF EXISTS "cases_update_policy" ON public.cases;
+CREATE POLICY "cases_update_policy" ON public.cases 
+FOR UPDATE TO authenticated USING (auth.uid() = creator_id OR EXISTS (
+  SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
 ));
 
--- 5. جدول councils
-DROP POLICY IF EXISTS "Authenticated users can view councils" ON councils;
-CREATE POLICY "Only authenticated users can view councils"
-ON councils FOR SELECT
-TO authenticated
-USING (true);
+-- إنشاء سياسات آمنة لجدول الردود
+DROP POLICY IF EXISTS "replies_select_policy" ON public.replies;
+CREATE POLICY "replies_select_policy" ON public.replies 
+FOR SELECT TO authenticated USING (true);
 
--- 6. جدول courts
-DROP POLICY IF EXISTS "Authenticated users can view courts" ON courts;
-CREATE POLICY "Only authenticated users can view courts"
-ON courts FOR SELECT
-TO authenticated
-USING (true);
+DROP POLICY IF EXISTS "replies_insert_policy" ON public.replies;
+CREATE POLICY "replies_insert_policy" ON public.replies 
+FOR INSERT TO authenticated WITH CHECK (auth.uid() = author_id);
 
--- 7. جدول faq
-DROP POLICY IF EXISTS "Authenticated users can read FAQs" ON faq;
-CREATE POLICY "Only authenticated users can read FAQs"
-ON faq FOR SELECT
-TO authenticated
-USING (true);
-
--- 8. جدول messages
-DROP POLICY IF EXISTS "Allow access to messages in own conversations" ON messages;
-CREATE POLICY "Only authenticated users can access messages in their conversations"
-ON messages FOR ALL
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM participants p
-  JOIN conversations c ON c.id = p.conversation_id
-  WHERE p.conversation_id = messages.conversation_id
-  AND p.user_id = auth.uid()
+DROP POLICY IF EXISTS "replies_update_policy" ON public.replies;
+CREATE POLICY "replies_update_policy" ON public.replies 
+FOR UPDATE TO authenticated USING (auth.uid() = author_id OR EXISTS (
+  SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
 ));
 
--- 9. جدول participants
-DROP POLICY IF EXISTS "Users can view participants of their own conversations" ON participants;
-CREATE POLICY "Only authenticated users can view participants of their conversations"
-ON participants FOR SELECT
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM participants p2
-  WHERE p2.conversation_id = participants.conversation_id
-  AND p2.user_id = auth.uid()
-));
+-- إنشاء سياسات آمنة للمحاكم
+DROP POLICY IF EXISTS "courts_select_policy" ON public.courts;
+CREATE POLICY "courts_select_policy" ON public.courts 
+FOR SELECT TO authenticated USING (true);
 
--- 10. جدول profiles
-DROP POLICY IF EXISTS "Authenticated users can view all profiles" ON profiles;
-CREATE POLICY "Only authenticated users can view profiles"
-ON profiles FOR SELECT
-TO authenticated
-USING (true);
+-- إنشاء سياسات آمنة للمجالس
+DROP POLICY IF EXISTS "councils_select_policy" ON public.councils;
+CREATE POLICY "councils_select_policy" ON public.councils 
+FOR SELECT TO authenticated USING (true);
 
--- 11. جدول replies
-DROP POLICY IF EXISTS "Public can read all replies" ON replies;
-CREATE POLICY "Only authenticated users can read replies"
-ON replies FOR SELECT
-TO authenticated
-USING (true);
-
--- 12. جدول realtime.messages (إذا كان موجودًا)
-DROP POLICY IF EXISTS "Allow access to messages in own conversations" ON realtime.messages;
-CREATE POLICY "Only authenticated users can access messages in their conversations"
-ON realtime.messages FOR ALL
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM participants p
-  JOIN conversations c ON c.id = p.conversation_id
-  WHERE p.conversation_id = realtime.messages.conversation_id
-  AND p.user_id = auth.uid()
-));
-
--- 13. جدول storage.objects
-DROP POLICY IF EXISTS "Public can read app assets" ON storage.objects;
-CREATE POLICY "Only authenticated users can read app assets"
-ON storage.objects FOR SELECT
-TO authenticated
-USING (bucket_id = 'app_assets');
-
--- إضافة سياسة للتحميل للمستخدمين المصادقين فقط
-CREATE POLICY "Only authenticated users can upload app assets"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = 'app_assets');
-
--- إضافة سياسة للتحديث للمستخدمين المصادقين فقط
-CREATE POLICY "Only authenticated users can update app assets"
-ON storage.objects FOR UPDATE
-TO authenticated
-USING (bucket_id = 'app_assets');
-
--- إضافة سياسة للحذف للمستخدمين المصادقين فقط
-CREATE POLICY "Only authenticated users can delete app assets"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (bucket_id = 'app_assets');
+-- تحديث إعدادات المصادقة
+ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
