@@ -26,7 +26,7 @@ export const ChatBot = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const API_KEY = 'AIzaSyAgWpv8aKP17gOqI43IxZ-1jE0Xkrymrgc';
-  const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -51,7 +51,7 @@ export const ChatBot = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +66,10 @@ export const ChatBot = () => {
           }]
         })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       
