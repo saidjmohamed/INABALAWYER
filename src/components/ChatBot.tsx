@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { showError } from '@/utils/toast';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -51,6 +52,8 @@ export const ChatBot = () => {
     setIsLoading(true);
 
     try {
+      console.log('Sending request to Gemini API...');
+      
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -61,17 +64,29 @@ export const ChatBot = () => {
             parts: [{
               text: `أنت مساعد ذكي لتطبيق إنابة ومعلومة للمحامين. التطبيق يسمح للمحامين بتبادل المعلومات والإنابات القضائية. 
               الميزات الرئيسية: إيداع طلبات إنابة، طلبات معلومات، دليل المحامين، محادثات بين المحامين، إدارة القضايا.
-              أجب باللغة العربية دائمًا. سؤال المستخدم: ${inputMessage}`
+              أجب باللغة العربية دائمًا. كن مفيداً ودقيقاً في إجاباتك.
+              سؤال المستخدم: ${inputMessage}`
             }]
-          }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
         })
       });
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('API Response:', data);
       
       if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
         const botResponse = data.candidates[0].content.parts[0].text;
@@ -83,19 +98,33 @@ export const ChatBot = () => {
         };
         
         setMessages(prev => [...prev, assistantMessage]);
+      } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+        throw new Error(`تم حظر الطلب بسبب: ${data.promptFeedback.blockReason}`);
       } else {
-        throw new Error('No response from AI');
+        console.error('Unexpected API response structure:', data);
+        throw new Error('استجابة غير متوقعة من الخادم');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calling Gemini API:', error);
       
-      const errorMessage: Message = {
+      let errorMessage = 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى لاحقاً.';
+      
+      if (error.message.includes('blockReason')) {
+        errorMessage = 'عذراً، تم حظر طلبك لاحتوائه على محتوى غير مسموح.';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'عذراً، تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.';
+      } else if (error.message.includes('403')) {
+        errorMessage = 'عذراً، خطأ في صلاحية المفتاح أو الوصول إلى API.';
+      }
+      
+      const errorMessageObj: Message = {
         role: 'assistant',
-        content: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى لاحقاً.',
+        content: errorMessage,
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMessageObj]);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
