@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail, MessageCircle, Globe } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { ChatBot } from '@/components/ChatBot';
 
 const AboutPage = () => {
   const [designerAvatarUrl, setDesignerAvatarUrl] = useState<string | null>(null);
@@ -84,14 +86,37 @@ const AboutPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              <div>
+                <strong>واتساب:</strong> 00213558357689
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
               <Mail className="h-5 w-5 text-primary" />
               <div>
                 <strong>البريد الإلكتروني:</strong> saidj.mohamed@gmail.com
               </div>
             </div>
+            <div className="flex items-center gap-4">
+              <Globe className="h-5 w-5 text-primary" />
+              <div>
+                <strong>الموقع الرسمي:</strong>{' '}
+                <a 
+                  href="https://saidj.netlify.app" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  saidj.netlify.app
+                </a>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </main>
+
+      {/* شات بوت عائم */}
+      <ChatBot />
     </div>
   );
 };
