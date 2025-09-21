@@ -26,7 +26,8 @@ export const ChatBot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const API_KEY = 'AIzaSyAgWpv8aKP17gOqI43IxZ-1jE0Xkrymrgc';
+  // استخدام متغير بيئة لمفتاح API
+  const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
   useEffect(() => {
@@ -40,6 +41,11 @@ export const ChatBot = () => {
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    if (!API_KEY) {
+      showError('مفتاح Google Gemini API غير موجود. يرجى تعيينه في متغيرات البيئة.');
+      return;
+    }
 
     const userMessage: Message = {
       role: 'user',
