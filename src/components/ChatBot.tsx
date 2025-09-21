@@ -27,7 +27,8 @@ export const ChatBot = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+  // تم تحديث اسم النموذج من gemini-pro إلى gemini-1.0-pro
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${API_KEY}`;
 
   useEffect(() => {
     if (scrollAreaRef.current) {
