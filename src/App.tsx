@@ -28,6 +28,10 @@ import AdminRoute from "./components/auth/AdminRoute";
 import MainLayout from "./components/layout/MainLayout";
 import AppWrapper from "./components/AppWrapper";
 
+// Components
+import { OnlineLawyersIndicator } from "./components/OnlineLawyersIndicator";
+import { ChatBot } from "./components/ChatBot";
+
 function App() {
   return (
     <Router>
@@ -63,6 +67,12 @@ function App() {
                 {/* Not Found Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              
+              {/* Global Components */}
+              <ProtectedRoute>
+                <OnlineLawyersIndicator />
+                <ChatBot />
+              </ProtectedRoute>
             </AppWrapper>
             <Sonner />
           </PresenceProvider>
