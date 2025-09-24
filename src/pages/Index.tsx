@@ -115,12 +115,7 @@ const Index = () => {
               title="آمن ومحمي"
               description="بياناتك محمية بأعلى معايير الأمان"
             />
-            <StatCard
-              icon={<Users className="h-8 w-8 text-green-600" />}
-              number="+500"
-              title="محامٍ نشط"
-              description="مجتمع متنامي من المحامين المحترفين"
-            />
+            {/* Removed the '500+ محامٍ نشط' StatCard */}
             <StatCard
               icon={<Heart className="h-8 w-8 text-red-600" />}
               number="24/7"
