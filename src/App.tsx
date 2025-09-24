@@ -29,8 +29,9 @@ import MainLayout from "./components/layout/MainLayout";
 import AppWrapper from "./components/AppWrapper";
 
 // Components
-// import { OnlineLawyersIndicator } from "./components/OnlineLawyersIndicator"; // Removed
+import { WhatsAppButton } from "./components/WhatsAppButton";
 
+// Removed OnlineLawyersIndicator import and usage
 
 function App() {
   return (
@@ -70,7 +71,7 @@ function App() {
               
               {/* Global Components */}
               <ProtectedRoute>
-                {/* <OnlineLawyersIndicator /> */} {/* Removed */}
+                <WhatsAppButton />
               </ProtectedRoute>
             </AppWrapper>
             <Sonner />
