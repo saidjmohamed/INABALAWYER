@@ -1,39 +1,52 @@
-import * as React from "react";
-import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-import { cn } from "@/lib/utils";
-
-const Avatar = AvatarPrimitive.Root;
-
-const AvatarImage = AvatarPrimitive.Image;
-AvatarImage.displayName = AvatarPrimitive.Image.displayName;
-
-const AvatarFallback = AvatarPrimitive.Fallback;
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
-
-const AvatarFallbackInner = React.forwardRef<
+const Avatar = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
 >(({ className, ...props }, ref) => (
   <span
     ref={ref}
-    className={cn("flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-gray-600", className)}
+    className={cn(
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      className
+    )}
     {...props}
   />
-));
-AvatarFallbackInner.displayName = "AvatarFallbackInner";
+))
+Avatar.displayName = "Avatar"
 
-const AvatarWithFallback = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+const AvatarImage = React.forwardRef<
+  HTMLImageElement,
+  React.ImgHTMLAttributes<HTMLImageElement>
+>(({ className, ...props }, ref) => (
+  <img
+    ref={ref}
+    className={cn("aspect-square h-full w-full", className)}
+    {...props}
+  />
+))
+AvatarImage.displayName = "AvatarImage"
+
+interface AvatarFallbackProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children?: React.ReactNode
+}
+
+const AvatarFallback = React.forwardRef<
+  HTMLSpanElement,
+  AvatarFallbackProps
 >(({ className, children, ...props }, ref) => (
-  <Avatar {...props} ref={ref} className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className)}>
+  <span
+    ref={ref}
+    className={cn(
+      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      className
+    )}
+    {...props}
+  >
     {children}
-    <AvatarFallbackInner>
-      {props.children}
-    </AvatarFallbackInner>
-  </Avatar>
-));
-AvatarWithFallback.displayName = "AvatarWithFallback";
+  </span>
+))
+AvatarFallback.displayName = "AvatarFallback"
 
-export { Avatar, AvatarImage, AvatarFallback, AvatarFallbackInner, AvatarWithFallback };
+export { Avatar, AvatarImage, AvatarFallback }
