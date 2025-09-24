@@ -11,7 +11,8 @@ import { showError } from '@/utils/toast';
 import { useSession } from '@/contexts/SessionContext';
 import { CourtInfoEditor } from '@/components/courts/CourtInfoEditor';
 
-type JudicialBody = (Court & { type: 'court' }) | (Council & { type: 'council' });
+// استخدام 'kind' كخاصية مميزة لتجنب التضارب مع خاصية 'type' الموجودة في Court
+type JudicialBody = (Court & { kind: 'court' }) | (Council & { kind: 'council' });
 
 export default function CourtDetailsPage() {
   const { id: paramId } = useParams<{ id: string }>();
@@ -32,15 +33,15 @@ export default function CourtDetailsPage() {
       const [type, id] = paramId.split(':');
 
       try {
-        let bodyData = null;
+        let bodyData: JudicialBody | null = null;
         if (type === 'council') {
           const { data, error } = await supabase.from('councils').select('*').eq('id', id).single();
           if (error) throw error;
-          bodyData = { ...data, type: 'council' };
+          bodyData = { ...data, kind: 'council' }; // تعيين 'kind' هنا
         } else if (type === 'court') {
           const { data, error } = await supabase.from('courts').select('*').eq('id', id).single();
           if (error) throw error;
-          bodyData = { ...data, type: 'court' };
+          bodyData = { ...data, kind: 'court' }; // تعيين 'kind' هنا
         }
         setJudicialBody(bodyData);
 
@@ -75,7 +76,7 @@ export default function CourtDetailsPage() {
       if (type === 'court') {
         const { data, error } = await supabase.from('courts').select('*').eq('id', id).single();
         if (!error && data) {
-          setJudicialBody({ ...data, type: 'court' });
+          setJudicialBody({ ...data, kind: 'court' }); // تحديث 'kind' عند إعادة الجلب
         }
       }
     };
@@ -95,8 +96,9 @@ export default function CourtDetailsPage() {
     );
   }
 
-  const isCourt = judicialBody.type === 'court';
-  const court = isCourt ? judicialBody as Court : null;
+  // استخدام 'kind' للتمييز وتضييق النوع
+  const isCourt = judicialBody.kind === 'court';
+  const court: Court | null = isCourt ? judicialBody : null; // TypeScript سيقوم بتضييق النوع بشكل صحيح هنا
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
