@@ -3,9 +3,33 @@ import { useSession } from '../contexts/SessionContext';
 import { Briefcase, Landmark, MessagesSquare, Users, Info, PlusCircle, ArrowRight, Star, Shield, Heart } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { useEffect, useState } from 'react';
+import { supabase } from '../integrations/supabase/client';
+import { showError } from '../utils/toast';
 
 const Index = () => {
   const { session, profile } = useSession();
+  const [activeLawyersCount, setActiveLawyersCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchActiveLawyersCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'lawyer')
+          .eq('status', 'active');
+
+        if (error) throw error;
+        setActiveLawyersCount(count);
+      } catch (error: any) {
+        console.error('Error fetching active lawyers count:', error);
+        showError('فشل في جلب عدد المحامين النشطين.');
+      }
+    };
+
+    fetchActiveLawyersCount();
+  }, []);
 
   return (
     <div className="min-h-screen relative">
@@ -115,7 +139,14 @@ const Index = () => {
               title="آمن ومحمي"
               description="بياناتك محمية بأعلى معايير الأمان"
             />
-            {/* Removed the '500+ محامٍ نشط' StatCard */}
+            {activeLawyersCount !== null && (
+              <StatCard
+                icon={<Users className="h-8 w-8 text-green-600" />}
+                number={`${activeLawyersCount}+`}
+                title="محامٍ نشط"
+                description="مجتمع متنامي من المحامين المحترفين"
+              />
+            )}
             <StatCard
               icon={<Heart className="h-8 w-8 text-red-600" />}
               number="24/7"
