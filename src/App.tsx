@@ -30,6 +30,7 @@ import AppWrapper from "./components/AppWrapper";
 
 // Components
 import { OnlineLawyersIndicator } from "./components/OnlineLawyersIndicator";
+import { ChatBot } from "./components/ChatBot";
 
 
 function App() {
@@ -71,6 +72,7 @@ function App() {
               {/* Global Components */}
               <ProtectedRoute>
                 <OnlineLawyersIndicator />
+                <ChatBot />
               </ProtectedRoute>
             </AppWrapper>
             <Sonner />
