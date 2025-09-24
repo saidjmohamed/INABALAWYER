@@ -29,8 +29,7 @@ import MainLayout from "./components/layout/MainLayout";
 import AppWrapper from "./components/AppWrapper";
 
 // Components
-import { OnlineLawyersIndicator } from "./components/OnlineLawyersIndicator";
-import { ChatBot } from "./components/ChatBot";
+// import { OnlineLawyersIndicator } from "./components/OnlineLawyersIndicator"; // Removed
 
 
 function App() {
@@ -71,8 +70,7 @@ function App() {
               
               {/* Global Components */}
               <ProtectedRoute>
-                <OnlineLawyersIndicator />
-                <ChatBot />
+                {/* <OnlineLawyersIndicator /> */} {/* Removed */}
               </ProtectedRoute>
             </AppWrapper>
             <Sonner />
