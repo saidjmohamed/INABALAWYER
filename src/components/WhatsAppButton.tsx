@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 export const WhatsAppButton = () => {
   return (
@@ -12,7 +12,9 @@ export const WhatsAppButton = () => {
         animation: 'bounce 1s infinite'
       }}
     >
-      <Phone className="h-6 w-6 text-white" />
+      <div className="w-full h-full flex items-center justify-center">
+        <MessageCircle className="h-6 w-6 text-white" />
+      </div>
     </Link>
   );
 };
