@@ -1,0 +1,4 @@
+ALTER TABLE public.requests
+ADD COLUMN IF NOT EXISTS session_date TIMESTAMP WITH TIME ZONE,
+ADD COLUMN IF NOT EXISTS plaintiff_details TEXT,
+ADD COLUMN IF NOT EXISTS defendant_details TEXT;

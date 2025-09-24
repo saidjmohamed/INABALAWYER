@@ -1,0 +1,77 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../integrations/supabase/client';
+import { useSession } from '../contexts/SessionContext';
+import { Council, Court } from '../types';
+import { CreateCaseForm } from '../components/CreateCaseForm';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Loader2, ArrowRight } from 'lucide-react';
+import { showError } from '../utils/toast';
+
+export default function CreateCasePage() {
+  const { profile } = useSession();
+  const [councils, setCouncils] = useState<Council[]>([]);
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [councilsRes, courtsRes] = await Promise.all([
+          supabase.from('councils').select('*'),
+          supabase.from('courts').select('*')
+        ]);
+
+        if (councilsRes.error) throw councilsRes.error;
+        if (courtsRes.error) throw courtsRes.error;
+
+        setCouncils(councilsRes.data || []);
+        setCourts(courtsRes.data || []);
+      } catch (error: any) {
+        console.error("Error fetching judicial bodies:", error);
+        showError('فشل في جلب بيانات الجهات القضائية: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (profile) {
+      fetchData();
+    }
+  }, [profile]);
+
+  if (loading || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">إيداع طلب جديد</h1>
+        <Button variant="outline" asChild>
+          <Link to="/cases">
+            <span className="flex items-center">
+              <ArrowRight className="ml-2 h-4 w-4" /> العودة للطلبات
+            </span>
+          </Link>
+        </Button>
+      </div>
+      <main>
+        <Card>
+          <CardHeader>
+            <CardTitle>املأ تفاصيل الطلب</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CreateCaseForm councils={councils} courts={courts} currentProfile={profile} />
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

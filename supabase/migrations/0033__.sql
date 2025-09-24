@@ -1,0 +1,1 @@
+ALTER TYPE public.court_level ADD VALUE IF NOT EXISTS 'cassation';
