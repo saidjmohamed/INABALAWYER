@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../co
 import { useEffect, useState } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { showError } from '../utils/toast';
+import { RatingModal } from '../components/feedback/RatingModal';
+import { SuggestionModal } from '../components/feedback/SuggestionModal';
+import { ThumbsUp, Lightbulb } from 'lucide-react';
 
 const Index = () => {
   const { session, profile } = useSession();
@@ -156,10 +159,25 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* أزرار عائمة للتقييم والاقتراحات - متاحة للجميع */}
+      <div className="fixed bottom-24 right-6 space-y-3 z-40">
+        <RatingModal trigger={
+          <Button size="icon" className="w-14 h-14 bg-yellow-500 hover:bg-yellow-600 shadow-lg">
+            <ThumbsUp className="h-5 w-5 text-white" />
+          </Button>
+        } />
+        <SuggestionModal trigger={
+          <Button size="icon" className="w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg">
+            <Lightbulb className="h-5 w-5 text-white" />
+          </Button>
+        } />
+      </div>
     </div>
   );
 };
 
+// ... (باقي الكود كما هو - FeatureCard و StatCard)
 const FeatureCard = ({ icon, title, description, link, color }: { icon: React.ReactNode, title: string, description: string, link: string, color?: string }) => (
   <Link to={link}>
     <Card className="h-full group hover:border-primary/50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 bg-white/80 backdrop-blur-sm border border-white/20">
