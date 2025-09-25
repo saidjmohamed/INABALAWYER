@@ -7,7 +7,7 @@ import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { showSuccess, showError } from '../../utils/toast';
 import { useState } from 'react';
-import { Loader2, User, Mail, Lock, Phone, MapPin, Briefcase, AtSign } from 'lucide-react';
+import { Loader2, User, Mail, Lock, Phone, MapPin, Briefcase, AtSign, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const signUpSchema = z.object({
@@ -50,18 +50,28 @@ export const SignUpForm = ({ onError }: SignUpFormProps) => {
   const onSubmit = async (values: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      const { email, password, ...metaData } = values;
-      
+      // إعداد البيانات الإضافية للمحامي
+      const metaData = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone: values.phone,
+        address: values.address,
+        username: values.username,
+        organization: values.organization,
+      };
+
+      console.log('البيانات المرسلة للتسجيل:', { email: values.email, metaData }); // تسجيل للتحقق
+
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: values.email,
+        password: values.password,
         options: {
-          data: metaData,
+          data: metaData, // هذه ستُحفظ كـ raw_user_meta_data وتُستخدم في handle_new_user
         },
       });
 
       if (error) {
-        // معالجة أخطاء Supabase المحددة
+        console.error('خطأ في التسجيل:', error); // تسجيل الخطأ للتحقق
         let errorMessage = 'حدث خطأ غير متوقع.';
         if (error.message.includes('User already registered')) {
           errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر.';
@@ -79,15 +89,17 @@ export const SignUpForm = ({ onError }: SignUpFormProps) => {
       }
 
       if (data.user) {
-        showSuccess('تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.');
+        console.log('تم إنشاء المستخدم بنجاح، ID:', data.user.id); // تسجيل نجاح
+        showSuccess('تم إنشاء الحساب بنجاح! معلوماتك المهنية (الاسم، الهاتف، العنوان، المنظمة) تم حفظها تلقائيًا. يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.');
         form.reset();
-        setTimeout(() => navigate('/login'), 2000); // تأخير قصير لقراءة الرسالة
+        setTimeout(() => navigate('/login'), 3000); // تأخير أطول لقراءة الرسالة
       } else {
         const errorMessage = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
         showError(errorMessage);
         onError?.(errorMessage);
       }
     } catch (error: any) {
+      console.error('خطأ عام في التسجيل:', error); // تسجيل الخطأ العام
       const errorMessage = `فشل في إنشاء الحساب: ${error.message}`;
       showError(errorMessage);
       onError?.(errorMessage);
@@ -242,7 +254,7 @@ export const SignUpForm = ({ onError }: SignUpFormProps) => {
           disabled={isLoading}
         >
           <span className="flex items-center justify-center gap-2">
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <User className="h-4 w-4" />}
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
             {isLoading ? 'جاري الإنشاء...' : 'إنشاء حساب جديد'}
           </span>
         </Button>
