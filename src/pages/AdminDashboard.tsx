@@ -139,8 +139,17 @@ const AdminDashboard = () => {
                           <TableCell>{lawyer.status}</TableCell>
                           <TableCell className="text-right space-x-2">
                             <Dialog open={editingLawyer?.id === lawyer.id} onOpenChange={(isOpen) => !isOpen && setEditingLawyer(null)}>
-                              <DialogTrigger asChild><Button variant="outline" size="sm" onClick={() => setEditingLawyer(lawyer)}><Edit className="h-4 w-4" /></Button></DialogTrigger>
-                              <DialogContent><DialogHeader><DialogTitle>تعديل ملف المحامي</DialogTitle></DialogHeader>{editingLawyer && <ProfileEditForm profileToEdit={editingLawyer} onSuccess={() => { setEditingLawyer(null); fetchData(); }} />}</DialogContent>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" onClick={() => setEditingLawyer(lawyer)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>تعديل ملف المحامي</DialogTitle> {/* إضافة DialogTitle لإصلاح التحذير */}
+                                </DialogHeader>
+                                {editingLawyer && <ProfileEditForm profileToEdit={editingLawyer} onSuccess={() => { setEditingLawyer(null); fetchData(); }} />}
+                              </DialogContent>
                             </Dialog>
                             {lawyer.status === 'active' ? <Button variant="secondary" size="sm" onClick={() => handleUpdateStatus(lawyer.id, 'disabled')} disabled={actionLoading === lawyer.id}>{actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تعطيل'}</Button> : <Button variant="success" size="sm" onClick={() => handleUpdateStatus(lawyer.id, 'active')} disabled={actionLoading === lawyer.id}>{actionLoading === lawyer.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تفعيل'}</Button>}
                           </TableCell>

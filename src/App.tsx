@@ -31,8 +31,6 @@ import AppWrapper from "./components/AppWrapper";
 // Components
 import { WhatsAppButton } from "./components/WhatsAppButton";
 
-// Removed OnlineLawyersIndicator import and usage
-
 function App() {
   return (
     <Router>
@@ -40,7 +38,7 @@ function App() {
         <SettingsProvider>
           <PresenceProvider>
             <AppWrapper>
-              <Routes>
+              <Routes key="main-routes"> {/* إضافة key لتجنب إعادة الرسم */}
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
@@ -69,10 +67,8 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               
-              {/* Global Components */}
-              <ProtectedRoute>
-                <WhatsAppButton />
-              </ProtectedRoute>
+              {/* Global Components - WhatsAppButton الآن خارج ProtectedRoute ليكون مرئيًا دائمًا */}
+              <WhatsAppButton />
             </AppWrapper>
             <Sonner />
           </PresenceProvider>

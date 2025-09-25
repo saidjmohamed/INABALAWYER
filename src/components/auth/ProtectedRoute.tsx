@@ -19,7 +19,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (!session) {
+  // تجنب الحلقة: لا تُعد التوجيه إذا كنا بالفعل على صفحة تسجيل الدخول
+  if (!session && location.pathname !== '/login' && location.pathname !== '/signup') {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
