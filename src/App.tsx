@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "./components/ui/sonner";
 import { SessionProvider } from "./contexts/SessionContext";
 import { PresenceProvider } from "./contexts/PresenceContext";
@@ -22,9 +22,9 @@ import CaseDetailsPage from "./pages/CaseDetailsPage";
 import LawyerProfilePage from "./pages/LawyerProfilePage";
 import AdminEditCasePage from "./pages/AdminEditCasePage";
 
-// Auth wrappers
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import AdminRoute from "./components/auth/AdminRoute";
+// Auth wrappers (معطلة مؤقتًا)
+// import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+// import AdminRoute from "./components/auth/AdminRoute";
 import MainLayout from "./components/layout/MainLayout";
 import AppWrapper from "./components/AppWrapper";
 
@@ -38,13 +38,13 @@ function App() {
         <SettingsProvider>
           <PresenceProvider>
             <AppWrapper>
-              <Routes key="main-routes"> {/* إضافة key لتجنب إعادة الرسم */}
-                {/* Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+              <Routes>
+                {/* Public Routes - محولة إلى الصفحة الرئيسية مؤقتًا */}
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/signup" element={<Navigate to="/" replace />} />
 
-                {/* Protected Routes with Layout */}
-                <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                {/* جميع الطرق متاحة بدون تحقق (مؤقتًا) */}
+                <Route element={<MainLayout />}>
                   <Route path="/" element={<Index />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/cases" element={<CasesPage />} />
@@ -58,16 +58,16 @@ function App() {
                   <Route path="/conversations/:id" element={<ConversationsPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   
-                  {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                  <Route path="/cases/:id/edit" element={<AdminRoute><AdminEditCasePage /></AdminRoute>} />
+                  {/* لوحة التحكم متاحة بدون تحقق (مؤقتًا) */}
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/cases/:id/edit" element={<AdminEditCasePage />} />
                 </Route>
 
                 {/* Not Found Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
               
-              {/* Global Components - WhatsAppButton الآن خارج ProtectedRoute ليكون مرئيًا دائمًا */}
+              {/* Global Components */}
               <WhatsAppButton />
             </AppWrapper>
             <Sonner />
