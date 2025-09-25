@@ -23,6 +23,7 @@ const Login = () => {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             providers={[]}
+            view="sign_in" // تحديد عرض نموذج تسجيل الدخول فقط
             localization={{
               variables: {
                 sign_in: {
@@ -31,11 +32,9 @@ const Login = () => {
                   button_label: 'تسجيل الدخول',
                   loading_button_label: 'جارٍ تسجيل الدخول...',
                   social_provider_text: 'تسجيل الدخول عبر {{provider}}',
-                  link_text: 'هل لديك حساب؟ سجل الدخول',
+                  link_text: 'هل لديك حساب؟ سجل الدخول', // هذا الرابط سيقوم بتحديث عرض تسجيل الدخول فقط
                 },
-                sign_up: {
-                  link_text: 'ليس لديك حساب؟ أنشئ واحداً',
-                }
+                // تم إزالة متغيرات sign_up لأننا نستخدم صفحة تسجيل مخصصة
               },
             }}
           />
