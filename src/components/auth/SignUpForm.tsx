@@ -25,7 +25,11 @@ const signUpSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-export const SignUpForm = () => {
+interface SignUpFormProps {
+  onError?: (error: string) => void;
+}
+
+export const SignUpForm = ({ onError }: SignUpFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -58,25 +62,35 @@ export const SignUpForm = () => {
 
       if (error) {
         // معالجة أخطاء Supabase المحددة
+        let errorMessage = 'حدث خطأ غير متوقع.';
         if (error.message.includes('User already registered')) {
-          showError('هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر.');
+          errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر.';
         } else if (error.message.includes('Invalid phone')) {
-          showError('رقم الهاتف غير صالح. يرجى التحقق من التنسيق.');
+          errorMessage = 'رقم الهاتف غير صالح. يرجى التحقق من التنسيق.';
+        } else if (error.message.includes('Password should be at least 6 characters')) {
+          errorMessage = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
         } else {
-          showError(`حدث خطأ: ${error.message}`);
+          errorMessage = `حدث خطأ: ${error.message}`;
         }
+        
+        showError(errorMessage);
+        onError?.(errorMessage);
         return;
       }
 
       if (data.user) {
         showSuccess('تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.');
         form.reset();
-        navigate('/login');
+        setTimeout(() => navigate('/login'), 2000); // تأخير قصير لقراءة الرسالة
       } else {
-        showError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+        const errorMessage = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+        showError(errorMessage);
+        onError?.(errorMessage);
       }
     } catch (error: any) {
-      showError(`فشل في إنشاء الحساب: ${error.message}`);
+      const errorMessage = `فشل في إنشاء الحساب: ${error.message}`;
+      showError(errorMessage);
+      onError?.(errorMessage);
     } finally {
       setIsLoading(false);
     }
