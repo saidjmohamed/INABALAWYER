@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Lightbulb } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label'; // إضافة الاستيراد المفقود
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
