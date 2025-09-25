@@ -76,6 +76,10 @@ export const SignUpForm = ({ onError }: SignUpFormProps) => {
         let errorMessage = 'حدث خطأ غير متوقع.';
         if (error.message.includes('User already registered')) {
           errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر.';
+        } else if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'بيانات تسجيل الدخول غير صحيحة. تحقق من البريد وكلمة المرور.';
+        } else if (error.message.includes('Database error saving new user')) {
+          errorMessage = 'خطأ في حفظ بيانات المستخدم في قاعدة البيانات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.';
         } else if (error.message.includes('Password should be at least 6 characters')) {
           errorMessage = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
         } else {
@@ -89,7 +93,21 @@ export const SignUpForm = ({ onError }: SignUpFormProps) => {
 
       if (data.user) {
         console.log('تم إنشاء المستخدم بنجاح، ID:', data.user.id); // تسجيل نجاح
-        showSuccess('تم إنشاء الحساب بنجاح! معلوماتك المهنية (الاسم، الهاتف، العنوان، المنظمة) تم حفظها تلقائيًا إذا أدخلتها. يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.');
+        // التحقق الإضافي من حفظ الملف في profiles
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+        
+        if (profileError) {
+          console.error('خطأ في التحقق من الملف:', profileError);
+          showError('تم إنشاء الحساب، لكن حدث خطأ في حفظ الملف الشخصي. يرجى تسجيل الدخول وتحديث الملف لاحقًا.');
+        } else {
+          console.log('تم حفظ الملف الشخصي بنجاح:', profileData);
+          showSuccess('تم إنشاء الحساب بنجاح! معلوماتك المهنية تم حفظها تلقائيًا. يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.');
+        }
+        
         form.reset();
         setTimeout(() => navigate('/login'), 3000); // تأخير أطول لقراءة الرسالة
       } else {
