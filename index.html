@@ -1,22 +1,301 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>إنابةو معلومة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>إنابةو معلومة - منصة المحامين الجزائريين</title>
+    
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0066cc" />
+    <meta name="theme-color" content="#2563EB" />
+    <meta name="background-color" content="#ffffff" />
+    
+    <!-- iOS Safari PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="إنابة ومعلومة" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+    
+    <!-- Standard Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    
+    <!-- Microsoft Edge/Windows Support -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144.png" />
+    <meta name="msapplication-TileColor" content="#2563EB" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="التطبيق الرائد لتبادل الإنابات والمعلومات بين المحامين في الجزائر. منصة آمنة ومتطورة للتواصل بين المحامين ومشاركة الخبرات." />
+    <meta name="keywords" content="إنابة, معلومة, محامين, جزائر, قانون, محاكم, قضايا, lawyers, algeria, legal, law" />
+    <meta name="author" content="فريق إنابة ومعلومة" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="إنابة ومعلومة - منصة المحامين الجزائريين" />
+    <meta property="og:description" content="التطبيق الرائد لتبادل الإنابات والمعلومات بين المحامين في الجزائر" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://saidjmohamed.github.io/INABALAWYER/" />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta property="og:locale" content="ar_DZ" />
+    <meta property="og:site_name" content="إنابة ومعلومة" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="إنابة ومعلومة - منصة المحامين" />
+    <meta name="twitter:description" content="التطبيق الرائد لتبادل الإنابات والمعلومات بين المحامين" />
+    <meta name="twitter:image" content="/icons/icon-512.png" />
+    
+    <!-- Mobile-Specific Meta Tags -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="إنابة ومعلومة" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- Performance Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="//supabase.co" />
+    <link rel="dns-prefetch" href="//github.com" />
+    
+    <!-- Arabic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+    
+    <!-- Critical CSS for faster loading -->
+    <style>
+      /* أنماط حرجة للتحميل السريع */
+      body {
+        font-family: 'Cairo', 'Amiri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        direction: rtl;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* شاشة التحميل */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 9999;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* إخفاء شاشة التحميل عند الانتهاء */
+      .app-loaded .loading-screen {
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.5s ease-out;
+      }
+    </style>
   </head>
 
   <body>
+    <!-- شاشة التحميل -->
+    <div class="loading-screen" id="loading-screen">
+      <div class="spinner"></div>
+      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 600;">إنابة ومعلومة</h2>
+      <p style="margin: 10px 0 0 0; opacity: 0.8;">جاري تحضير التطبيق...</p>
+    </div>
+
     <div id="root"></div>
+    
+    <!-- Main App Script -->
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
     <script>
+      // تسجيل Service Worker للـ PWA
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-          .then(() => console.log('Service Worker registered'))
-          .catch(err => console.log('Service Worker registration failed', err));
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('✅ Service Worker تم تسجيله بنجاح:', registration.scope);
+              
+              // فحص التحديثات
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      // إظهار رسالة التحديث
+                      if (confirm('يوجد تحديث جديد للتطبيق. هل تريد تحديثه الآن؟')) {
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                        window.location.reload();
+                      }
+                    }
+                  });
+                }
+              });
+            })
+            .catch((error) => {
+              console.error('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
       }
+      
+      // إعداد زر التنصيب للـ PWA
+      let deferredPrompt;
+      let installButton;
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('📦 تم عرض رسالة تنصيب التطبيق');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // إظهار زر التنصيب بعد 3 ثوانٍ
+        setTimeout(() => {
+          showInstallButton();
+        }, 3000);
+      });
+      
+      function showInstallButton() {
+        if (deferredPrompt && !localStorage.getItem('app-install-dismissed')) {
+          const installBanner = document.createElement('div');
+          installBanner.innerHTML = `
+            <div style="
+              position: fixed;
+              bottom: 20px;
+              left: 20px;
+              right: 20px;
+              background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+              color: white;
+              padding: 16px;
+              border-radius: 16px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+              z-index: 1000;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              backdrop-filter: blur(10px);
+              animation: slideUp 0.3s ease-out;
+            " id="install-banner">
+              <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">📦 تنصيب التطبيق</div>
+                <div style="font-size: 14px; opacity: 0.9;">استمتع بتجربة أفضل بتنصيب التطبيق على جهازع!</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button onclick="installApp()" style="
+                  background: rgba(255,255,255,0.2);
+                  border: 1px solid rgba(255,255,255,0.3);
+                  color: white;
+                  padding: 8px 16px;
+                  border-radius: 8px;
+                  font-weight: 500;
+                  cursor: pointer;
+                  backdrop-filter: blur(10px);
+                ">تنصيب</button>
+                <button onclick="dismissInstall()" style="
+                  background: transparent;
+                  border: 1px solid rgba(255,255,255,0.3);
+                  color: white;
+                  padding: 8px 12px;
+                  border-radius: 8px;
+                  cursor: pointer;
+                ">×</button>
+              </div>
+            </div>
+            <style>
+              @keyframes slideUp {
+                from { transform: translateY(100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+              }
+            </style>
+          `;
+          document.body.appendChild(installBanner);
+        }
+      }
+      
+      function installApp() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((result) => {
+            if (result.outcome === 'accepted') {
+              console.log('🎉 تم قبول تنصيب التطبيق');
+            } else {
+              console.log('❌ تم رفض تنصيب التطبيق');
+            }
+            deferredPrompt = null;
+            document.getElementById('install-banner')?.remove();
+          });
+        }
+      }
+      
+      function dismissInstall() {
+        localStorage.setItem('app-install-dismissed', 'true');
+        document.getElementById('install-banner')?.remove();
+      }
+      
+      // إخفاء شاشة التحميل عند تحميل التطبيق
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.body.classList.add('app-loaded');
+          setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+              loadingScreen.style.display = 'none';
+            }
+          }, 500);
+        }, 1000);
+      });
+      
+      // معالجة أحداث التطبيق عند تنصيبه
+      window.addEventListener('appinstalled', () => {
+        console.log('🎉 تم تنصيب التطبيق بنجاح!');
+        localStorage.setItem('app-installed', 'true');
+        document.getElementById('install-banner')?.remove();
+      });
+      
+      // فحص الاتصال بالإنترنت
+      function updateOnlineStatus() {
+        if (navigator.onLine) {
+          document.body.classList.remove('offline');
+          console.log('🟢 تم استعادة الاتصال بالإنترنت');
+        } else {
+          document.body.classList.add('offline');
+          console.log('🔴 فقدان الاتصال بالإنترنت');
+        }
+      }
+      
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
     </script>
   </body>
 </html>
