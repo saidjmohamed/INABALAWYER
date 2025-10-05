@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Link } from 'react-router-dom';
 import { Profile } from '../types';
-import { MessageCircle, MapPin, Phone, Mail, Star, Award, Calendar, Users, Scale } from 'lucide-react';
+import { MessageCircle, MapPin, Phone, Mail, Award, Users, Scale } from 'lucide-react';
 
 interface LawyerCardProps {
   lawyer: Profile;
@@ -36,10 +36,6 @@ export const LawyerCard = ({ lawyer }: LawyerCardProps) => {
         return 'غير محدد';
     }
   };
-
-  const experienceYears = lawyer.experience_years || Math.floor(Math.random() * 15) + 1;
-  const rating = 4.2 + Math.random() * 0.8; // تقييم عشوائي بين 4.2 و 5
-  const casesCount = Math.floor(Math.random() * 200) + 50;
 
   return (
     <Card className="w-full max-w-sm mx-auto group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 bg-white/95 backdrop-blur-xl border border-white/30 rounded-3xl overflow-hidden relative">
@@ -88,25 +84,6 @@ export const LawyerCard = ({ lawyer }: LawyerCardProps) => {
       </CardHeader>
 
       <CardContent className="relative z-10 space-y-4 px-6">
-        {/* معلومات سريعة */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-white transition-colors duration-300">
-            <div className="text-blue-600 font-bold text-lg">{experienceYears}</div>
-            <div className="text-xs text-gray-600">سنة خبرة</div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-white transition-colors duration-300">
-            <div className="text-green-600 font-bold text-lg flex items-center justify-center">
-              {rating.toFixed(1)}
-              <Star className="h-4 w-4 ml-1 text-yellow-500 fill-current" />
-            </div>
-            <div className="text-xs text-gray-600">تقييم</div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-white transition-colors duration-300">
-            <div className="text-purple-600 font-bold text-lg">{casesCount}</div>
-            <div className="text-xs text-gray-600">قضية</div>
-          </div>
-        </div>
-
         {/* معلومات الاتصال */}
         <div className="space-y-3">
           {lawyer.city && (
@@ -141,6 +118,19 @@ export const LawyerCard = ({ lawyer }: LawyerCardProps) => {
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900">بريد إلكتروني</div>
                 <div className="text-sm text-gray-600 truncate">{lawyer.email}</div>
+              </div>
+            </div>
+          )}
+
+          {/* معلومات إضافية (فقط إذا توفرت في البيانات الحقيقية) */}
+          {lawyer.organization && (
+            <div className="flex items-center bg-white/60 backdrop-blur-sm rounded-xl p-3 group-hover:bg-white/90 transition-colors duration-300">
+              <div className="bg-purple-100 rounded-full p-2 mr-3">
+                <Scale className="h-4 w-4 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-900">المنظمة</div>
+                <div className="text-sm text-gray-600">{lawyer.organization}</div>
               </div>
             </div>
           )}
