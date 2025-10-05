@@ -30,8 +30,12 @@ import AppWrapper from "./components/AppWrapper";
 
 // Components
 import { WhatsAppButton } from "./components/WhatsAppButton";
+import AIAssistant from "./components/AIAssistant";
 
 function App() {
+  // احصل على Google AI Studio API Key مز متغيرات البيئة
+  const googleAIApiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY;
+
   return (
     <Router>
       <SessionProvider>
@@ -69,6 +73,7 @@ function App() {
               
               {/* Global Components */}
               <WhatsAppButton />
+              <AIAssistant apiKey={googleAIApiKey} />
             </AppWrapper>
             <Sonner />
           </PresenceProvider>
