@@ -2,7 +2,7 @@ import { MessageCircle, Phone } from 'lucide-react';
 import { Button } from './ui/button';
 
 export const WhatsAppButton = () => {
-  const phoneNumber = "+213551234567"; // رقم واتساب للدعم
+  const phoneNumber = "+213558357689"; // رقم واتساب للدعم
   const message = "مرحبا، أحتاج مساعدة في تطبيق إنابة و معلومة";
   
   const handleWhatsAppClick = () => {
