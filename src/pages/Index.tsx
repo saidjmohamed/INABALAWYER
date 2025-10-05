@@ -6,9 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../co
 import { useEffect, useState } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { showError } from '../utils/toast';
-import { RatingModal } from '../components/feedback/RatingModal';
-import { SuggestionModal } from '../components/feedback/SuggestionModal';
-import { ThumbsUp, Lightbulb } from 'lucide-react';
 
 const Index = () => {
   const { session, profile } = useSession();
@@ -238,24 +235,6 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Enhanced Floating Action Buttons */}
-      <div className="fixed bottom-28 right-6 space-y-4 z-50">
-        <div className="animate-bounce">
-          <RatingModal trigger={
-            <Button size="icon" className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 rounded-2xl">
-              <ThumbsUp className="h-6 w-6 text-white" />
-            </Button>
-          } />
-        </div>
-        <div className="animate-bounce" style={{ animationDelay: '0.5s' }}>
-          <SuggestionModal trigger={
-            <Button size="icon" className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 rounded-2xl">
-              <Lightbulb className="h-6 w-6 text-white" />
-            </Button>
-          } />
         </div>
       </div>
     </div>
