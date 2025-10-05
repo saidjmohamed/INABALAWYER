@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { Profile } from '../types';
 import { useSession } from '../contexts/SessionContext';
-import { Loader2, ArrowRight, Mail, Phone, MapPin, Briefcase, Star, Languages, User, MessageSquare } from 'lucide-react';
+import { Loader2, ArrowRight, Mail, Phone, MapPin, Briefcase, Languages, User, MessageSquare } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -120,7 +120,6 @@ const LawyerProfilePage = () => {
             <InfoItem icon={<Phone />} label="الهاتف" value={lawyer.phone} />
             <InfoItem icon={<MapPin />} label="العنوان" value={lawyer.address} />
             <InfoItem icon={<Briefcase />} label="المنظمة" value={lawyer.organization} />
-            <InfoItem icon={<Star />} label="سنوات الخبرة" value={lawyer.experience_years?.toString()} />
           </div>
           
           <InfoList icon={<Briefcase />} label="التخصصات" items={lawyer.specialties} />
